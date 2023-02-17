@@ -45,7 +45,7 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$countyMap <- renderPlot({
+    output$county_map <- renderPlot({
       az_counties <- az_counties |>
         mutate(selected = ifelse(subregion == input$select_county, TRUE, FALSE))
       
