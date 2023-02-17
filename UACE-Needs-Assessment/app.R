@@ -36,7 +36,7 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("countyMap"),
+           plotOutput("county_map"),
            textOutput("text_out")
         )
     )
