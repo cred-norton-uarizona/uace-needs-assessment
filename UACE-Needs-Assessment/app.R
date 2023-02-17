@@ -12,8 +12,8 @@ library(tidyverse)
 library(readxl)
 
 #read in data
-path <- "/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Data without zips.xlsx"
-data <- read_excel(path)
+data <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Data without zips.xlsx")
+
 
 az_counties <- map_data("county", region = "arizona")
 
