@@ -11,9 +11,9 @@ data <- read_excel(path)
 data |> mutate(COUNTY = tolower(COUNTY))
 
 # Get map data -------
-az_counties <- map_data("county", region = "arizona")
-az_counties <- az_counties |>
-  mutate(selected = ifelse(subregion == "apache", TRUE, FALSE))
+az_counties <- map_data("county", region = "arizona") |>
+  mutate(COUNTY = str_to_title(subregion))
+
 
 #join data by column `subregion`
 
