@@ -8,26 +8,35 @@
 #
 
 library(shiny)
+library(tidyverse)
+library(readxl)
+
+#read in data
+path <- "/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Data without zips.xlsx"
+data <- read_excel(path)
+
+az_counties <- map_data("county", region = "arizona")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
+  
     # Application title
     titlePanel("Old Faithful Geyser Data"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 40,
-                        value = 30)
+          shiny::selectInput(
+            "select_county",
+            label = "Select County",
+            choices = unique(az_counties$subregion)
+          )
+
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot"),
+           plotOutput("countyMap"),
            textOutput("text_out")
         )
     )
@@ -36,13 +45,18 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    output$countyMap <- renderPlot({
+      az_counties <- az_counties |>
+        mutate(selected = ifelse(subregion == input$select_county, TRUE, FALSE))
+      
+      ggplot(data = az_counties,
+             mapping = aes(x = long, y = lat,
+                           group = group, fill = selected)) + 
+        geom_polygon(color = "black", show.legend = FALSE) +
+        scale_fill_manual(values = c("TRUE" = "darkblue", "FALSE" = "grey")) +
+        coord_map() +
+        theme_void()
 
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'blue', border = 'white')
     })
     output$text_out <- renderPrint({
       input$bins

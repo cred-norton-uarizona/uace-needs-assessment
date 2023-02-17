@@ -8,7 +8,7 @@ library(tidyverse)
 library(readxl)
 
 data <- read_excel(path)
-data
+data |> mutate(COUNTY = tolower(COUNTY))
 
 # Get map data -------
 az_counties <- map_data("county", region = "arizona")
