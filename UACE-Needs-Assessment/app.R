@@ -15,7 +15,8 @@ library(readxl)
 path <- "/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Data without zips.xlsx"
 data <- read_excel(path)
 
-az_counties <- map_data("county", region = "arizona")
+az_counties <- map_data("county", region = "arizona")|>
+  mutate(COUNTY = str_to_title(subregion))
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -29,7 +30,7 @@ ui <- fluidPage(
           shiny::selectInput(
             "select_county",
             label = "Select County",
-            choices = unique(az_counties$subregion)
+            choices = unique(az_counties$COUNTY)
           )
 
         ),
@@ -37,7 +38,7 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
            plotOutput("county_map"),
-           textOutput("text_out")
+           tableOutput("text_out")
         )
     )
 )
@@ -47,7 +48,7 @@ server <- function(input, output) {
 
     output$county_map <- renderPlot({
       az_counties <- az_counties |>
-        mutate(selected = ifelse(subregion == input$select_county, TRUE, FALSE))
+        mutate(selected = ifelse(COUNTY == input$select_county, TRUE, FALSE))
       
       ggplot(data = az_counties,
              mapping = aes(x = long, y = lat,
@@ -58,8 +59,8 @@ server <- function(input, output) {
         theme_void()
 
     })
-    output$text_out <- renderPrint({
-      input$bins
+    output$text_out <- renderTable({
+      data |> filter(COUNTY == input$select_county) |> head()
     })
 }
 
