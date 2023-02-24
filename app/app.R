@@ -10,9 +10,11 @@
 library(shiny)
 library(tidyverse)
 library(readxl)
+library(pins)
 
 #read in data
-data <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Data without zips.xlsx")
+board <- board_connect()
+data <- pin_read(board, "terrace/raw_data")
 
 
 az_counties <- map_data("county", region = "arizona")|>

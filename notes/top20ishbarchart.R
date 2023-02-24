@@ -2,7 +2,8 @@
 library(tidyverse)
 library(readxl)
 
-data <- read_excel("/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Data without zips.xlsx")
+
+# data <- read_excel("/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Data without zips.xlsx")
 
 
 # % Extremely or Very Important Selected, Top 30 for Now-------
@@ -32,7 +33,9 @@ data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
  #  select(Metric, Percentage, COUNTY)
 
 
-labels<- read_excel("/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Labels for the content areas in survey.xlsx")
+# labels<- read_excel("/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Labels for the content areas in survey.xlsx")
+
+labels <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Labels for the content areas in survey.xlsx")
 
 labels <- labels %>% 
   mutate(Topic = case_when(
