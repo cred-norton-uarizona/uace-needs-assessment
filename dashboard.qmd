@@ -1,0 +1,121 @@
+---
+title: "Dashboard"
+format: 
+  html:
+    page-layout: full
+editor: visual
+server: shiny
+---
+
+```{r}
+#| context: setup
+#| include: false
+
+library(tidyverse)
+library(pins)
+library(maps)
+library(mapproj)
+library(shiny)
+
+# load data
+board <- board_connect()
+data <- board |> pin_read("terrace/raw_data")
+
+#wrangle map data
+az_counties <- map_data("county", region = "arizona")|>
+  mutate(COUNTY = str_to_title(subregion))
+```
+
+```{r}
+#| context: server
+#| include: false
+
+#map
+output$county_map <- renderPlot({
+  az_counties <- az_counties |>
+    mutate(selected = ifelse(COUNTY == input$select_county, TRUE, FALSE))
+  
+  ggplot(data = az_counties,
+         mapping = aes(x = long, y = lat,
+                       group = group, fill = selected)) + 
+    geom_polygon(color = "black", show.legend = FALSE) +
+    scale_fill_manual(values = c("TRUE" = "darkblue", "FALSE" = "grey")) +
+    coord_map() +
+    theme_void()
+  
+})
+
+#create filtered reactive dataset to use in the rest of the dashboard
+data_filtered <- reactive({
+  data <- data |> 
+    filter(COUNTY == input$select_county)
+})
+
+#filtered table
+output$text_out <- renderTable({
+  data_filtered() |> head()
+})
+
+#bar chart example
+output$barchart <- renderPlot({
+  data_filtered() |>
+    ggplot(aes(LIVE)) + geom_bar()
+})
+  
+```
+
+```{r}
+#| panel: input
+#| layout-ncol: 3
+
+shiny::selectInput(
+  "select_county",
+  label = "Select County",
+  choices = unique(az_counties$COUNTY)
+  )
+
+shiny::selectInput(
+  "test2",
+  "another filter",
+  choices = letters[1:5],
+  multiple = TRUE
+)
+
+shiny::checkboxInput(
+  "test1",
+  "A checkbox input",
+  value = 0
+)
+
+
+
+```
+
+:::: panel-fill
+## Intro
+
+This is an [interactive Quarto document](https://quarto.org/docs/interactive/shiny/).
+It runs Shiny code and works like a Shiny app.
+Rather than putting things in a `ui` function, a `server` function, or in neither, you control which code runs where with chunk options. Chunks with `#| context: server` are equivalent to code inside of the server function of app.R. Chunks with `#| context: setup` are accessible to both the UI and the server---this is similar to code run at the top of app.R. If there is no `context` specified, it's part of the UI. 
+
+Rather than defining layout with nested `shiny` functions, you do this with chunk options and divs in Quarto.
+
+::: panel-tabset
+## Figures
+
+```{r}
+#| layout-ncol: 2
+
+plotOutput("county_map")
+
+plotOutput("barchart")
+```
+
+## Data
+
+```{r}
+tableOutput("text_out")
+```
+:::
+
+::::
