@@ -11,6 +11,10 @@ library(shiny)
 library(tidyverse)
 library(readxl)
 library(pins)
+# install.packages(c("mapproj", "maps"))
+library(mapproj)
+library(maps)
+
 
 #read in data
 board <- board_connect()

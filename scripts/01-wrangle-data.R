@@ -2,11 +2,12 @@
 library(tidyverse)
 library(readxl)
 library(pins)
+# install.packages("rsconnect")
 
 data <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Data without zips.xlsx")
 
 board <- board_connect()
-pin_write(board, data, "raw_data")
+# pin_write(board, data, "raw_data")
 
 
 
