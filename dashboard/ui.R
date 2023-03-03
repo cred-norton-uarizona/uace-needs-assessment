@@ -38,7 +38,15 @@ topics <- unique(labels$Topic)
 fluidPage(
 
     # Application title
-    navbarPage("University of Arizona Cooperative Extension Needs Assessment",
+    navbarPage(
+      h1("University of Arizona Cooperative Extension Needs Assessment"),
+      h3("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
+2022 to better understand community needs and priorities. Cooperative Extension users,
+topical experts, and members of the general public from each county were invited to
+participate via online or paper survey. Participants were shown 99 items across topics
+relevant to Cooperative Extension and asked to rank how important it is to prioritize each
+item in their community on a 5-point scale."),
+      h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
 
     # Tab panel 1 - Top 20 View
     tabPanel(
