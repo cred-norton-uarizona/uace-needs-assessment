@@ -99,11 +99,106 @@ item in their community on a 5-point scale."),
         sidebarPanel(
           # Here is where you add the widgets for the side panel with commas
           selectInput("county_tab1",
-                      "Select County:",
+                      "County",
                       choices = counties, 
                       selected = "All")
-        ),
+        ), # Variable(s) of interest: COUNTY
+        selectInput("rural_urban_tab1",
+                    "Rural versus Urban",
+                    choices = LIVE_V3,
+                    selected = "All")
+        ), # Variable(s) of interest: LIVE_V3
+      # Terrace, figure out if this variable for survey language is in this raw data file.
+        selectInput("english_spanish_tab1",
+                    "Survey in English or Spanish",
+                    choices = "English", "Spanish", "All",
+                    selected = "All")
+        ), # Variable(s) of interest: unsure- need to find
+        selectInput("race_eth_tab1",
+                    "Race/Ethnicity",
+                    choices = "American Indian or Alaska Native", "Asian", "Black or African American", "Hispanic or Latino", "Multiracial", "Native Hawaiian or Other Pacific Islander", "White",
+                    selected = "All")
+        ), # Variable(s) of interest: Binary recodes - AIAN, AS, BL, HL, MR, NHPI, WH  (note that NR means no response given; we aren't including this in the selection options)
+        selectInput("gender_tab1",
+                    "Gender",
+                    choices = "Male", "Female", "Non-binary", "All",
+                    selected = "All")
+        ), # Variable(s) of interest: GENDER
+        selectInput("age_tab1",
+                    "Age",
+                    choices = "14-24 years old", "25-39 years old", "40-54 years old", "55-64 years old", "65 years and older", "All"
+                    selected = "All")
+        ), # Variable(s) of interest: I think we need to add this one in (AGE recode) or make this.  Check with RG
+        selectInput("education_tab1",
+                    "Educational Attainment",
+                    choices = "Bachelors degree or higher", "Less than a Bachelors degree", "All"
+                    selected = "All")
+        ), # Variable(s) of interest: DEM_11
+        selectInput("low_income_tab1",
+                    "Income Status",
+                    choices = "Low-income status (185% FPL)", "Not Low-income status", "All"
+                    selected = "All")
+        ), # Variable(s) of interest: 
+# FPL:
+#   We will need to calculate the 185% FPL:
+#   DEM_13 (Household income ranges)—I’m assuming that we will use the lower end of the range for this calculation
+# DEM_5 (number of people living in household)
+
+        selectInput("ce_familiar_tab1",
+            "Familiar with Cooperative Extension",
+            choices = "Yes", "No", "All",
+            selected = "All")
+        ), # Variable(s) of interest: 
+
+# Binary variable created from: DEM_1: How much do you know about Cooperative Extension? Some or more (OR) 
+# DEM_2: I have participated in a CE event- Yes (OR) 
+# DEM_3: I am/have been a CE volunteer- Yes (OR) 
+# DEM_4: I am/have been a CE employee- Yes (OR)
+
+        selectInput("ce_user_tab1",
+                    "Cooperative Extension User",
+                    choices = "Yes", "No", "All",
+                    selected = "All")
+        ), # Variable(s) of interest: 
+# Binary variable created from: DEM_2: I have participated in a CE event- Yes (OR) 
+# DEM_3: I am/have been a CE volunteer- Yes (OR) 
+# DEM_4: I am/have been a CE employee- Yes (OR
+                                          
         
+        selectInput("topical_expert_tab1",
+                    "Topical Expert",
+                    choices = "Health and Well-Being", "Education and Youth Development", "Agriculture", "Natural Resources", "Community and Economic Development", "All respondents (Non-expert specific)",
+                    selected = "All respondents (Non-expert specific") 
+        # Is it better to just have no selection pre-selected?
+        ), # Variable(s) of interest: 
+
+# Ag: ifelse(_______ | _______ ... 
+#                   LIVE – Farm OR Ranch  OR 
+#                   KNW_AG – 2 or more  OR 
+#                   DEM_12_1 = Farming OR 
+#                   DEM_12_2 = Ranching OR 
+#                   Ed:  
+#                     ED_KNOW (a lot or some) OR 
+#                   DEM_12_4, DEM_12_5, DEM_12_6, DEM_12_7 (Early Ed OR K-12 OR Social or Community Services (Children and Youth)) 
+#                   Health 
+#                   FCHS_KNOW(a lot or some) OR 
+#                   DEM_12_6, DEM_12_7, DEM_12_9 (Health OR Social or Community Services (Adults) OR Social or Community Services (Children and Youth)) 
+#                   
+#                   Natural Resources 
+#                   NR_KNOW(a lot or some) OR 
+#                   DEM_12_3 (Forestry/Land or Resource Management) 
+#                   Community & Econ Dev 
+#                   CED_KNOW(a lot or some) OR 
+#                   DEM_12_8, DEM_12_6, DEM_12_7 (Public sector (e.g., government) OR Community Services (Adults) OR Social or Community Services (Children and Youth)) 
+#                   
+
+        selectInput("children_under_18_household_tab1",
+                    "Respondents with children under 18 in the household",
+                    choices = "Yes", "No", "Prefer not to answer", "All",
+                    selected = "All")
+        ), # Variable(s) of interest: DEM_6
+                
+  
         # Show a plot of the generated distribution
         mainPanel(
           # This is where you show the output (data, chart, leaflet map, etc.) with commas
