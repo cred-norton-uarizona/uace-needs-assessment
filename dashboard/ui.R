@@ -13,6 +13,16 @@ library(tidyverse)
 library(pins)
 
 
+#read in data
+board <- board_connect()
+data <- pin_read(board, "terrace/raw_data")
+
+
+az_counties <- map_data("county", region = "arizona")|>
+  mutate(COUNTY = str_to_title(subregion))
+
+
+
 # Incorporate the code from the app.R script
 # Add in the counties
 # Create a vector for the counties and an "All" counties
