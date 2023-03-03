@@ -63,7 +63,9 @@ server <- function(input, output) {
         scale_fill_manual(values = c("TRUE" = "darkblue", "FALSE" = "grey")) +
         coord_map() +
         theme_void()
-
+       
+      
+      
     })
     output$text_out <- renderTable({
       data |> filter(COUNTY == input$select_county) |> head()

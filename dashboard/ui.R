@@ -12,8 +12,10 @@ library(shiny)
 library(tidyverse)
 library(pins)
 
-
 #read in data
+# labels <- read.csv("data/labels.csv")
+labels <- read.csv(file.path("data", "labels.csv"))
+
 board <- board_connect()
 data <- pin_read(board, "terrace/raw_data")
 
@@ -29,7 +31,8 @@ az_counties <- map_data("county", region = "arizona")|>
 # Design a filter/dropdown
 
 counties <- c("All", unique(data$COUNTY))
-topics <- Unique(data$Metric)
+topics <- unique(labels$Topic)
+
 
 # Define UI for application that draws a histogram
 fluidPage(
@@ -52,7 +55,30 @@ fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
           # This is where you show the output (data, chart, leaflet map, etc.) with commas
-            plotOutput("distPlot")
+          # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
+          data_Evimp <- data %>% group_by(SELECTED INPUTS????) %>%
+            summarize(across(
+              ends_with("Evimp"),
+              ~sum(.x == 1, na.rm = TRUE)/n())*100)
+          
+          data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
+                                                    names_to = "Metric",
+                                                    values_to = "Percentage"
+          ) %>%
+            group_by(SELECTED INPUTS????) %>% 
+            arrange(desc(Percentage)) %>% 
+            mutate(Metric = gsub("_EVimp", "", Metric))%>%
+            slice(1:30),
+          
+          output$top_priorities <- renderPlot({
+              priorities <- top_priorities  %>% 
+                mutate(selected = ifelse(COUNTY == input$select_county, TRUE, FALSE))
+              
+              ggplot(data_Evimp, aes(x = Metric, y = Percentage)) +
+                geom_col(fill = )
+                     
+              
+            })
         )
       )
     ),
@@ -64,11 +90,10 @@ fluidPage(
       sidebarLayout(
         sidebarPanel(
           # Here is where you add the widgets for the side panel with commas
-          sliderInput("bins",
-                      "Number of bins:",
-                      min = 1,
-                      max = 50,
-                      value = 30)
+          selectInput("county_tab1",
+                      "Select County:",
+                      choices = counties, 
+                      selected = "All")
         ),
         
         # Show a plot of the generated distribution
@@ -85,11 +110,10 @@ fluidPage(
       sidebarLayout(
         sidebarPanel(
           # Here is where you add the widgets for the side panel with commas
-          sliderInput("bins",
-                      "Number of bins:",
-                      min = 1,
-                      max = 50,
-                      value = 30)
+          selectInput("county_tab1",
+                      "Select County:",
+                      choices = counties, 
+                      selected = "All")
         ),
         
         # Show a plot of the generated distribution
