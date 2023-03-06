@@ -42,7 +42,23 @@ data <- data %>% mutate(AGE = case_when(
   DEM_9 >= 65 ~ "65 years and older"
 ))
 
-
+# Calculate 185% FPL using the variabled DEM_13 (Household income) and DEM_5 (number of people living in household)
+data <- data %>% mutate(Low_Income_FPL = case_when(
+  DEM_5 == 1 & DEM_13 <= 14580 | 
+    DEM_5 == 2 & DEM_13 <= 19720 | 
+    DEM_5 == 3 & DEM_13 <= 24860 |
+    DEM_5 == 4 & DEM_13 <= 30000 |
+    DEM_5 == 5 & DEM_13 <= 35140 |
+    DEM_5 == 6 & DEM_13 <= 40280 |
+    DEM_5 == 7 & DEM_13 <= 45420 |
+    DEM_5 == 8 & DEM_13 <= 14580 |
+    DEM_5 == 9 & DEM_13 <= 55700 |
+    DEM_5 == 10 & DEM_13 <= 60840 |
+    DEM_5 == 11 & DEM_13 <= 65980 |
+    DEM_5 == 12 & DEM_13 <= 71120 |
+    DEM_5 == 13 & DEM_13 <= 76260 |
+    DEM_5 == 14 & DEM_13 <= 81400
+))
 
 
 
