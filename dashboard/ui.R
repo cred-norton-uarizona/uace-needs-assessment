@@ -33,6 +33,18 @@ az_counties <- map_data("county", region = "arizona")|>
 counties <- c("All", unique(data$COUNTY))
 topics <- unique(labels$Topic)
 
+# Create the age brackets
+data <- data %>% mutate(AGE = case_when(
+  DEM_9 >= 14 & DEM_9 <= 24 ~ "14-24 years old",
+  DEM_9 >= 25 & DEM_9 <= 39 ~ "25-39 years old",
+  DEM_9 >= 40 & DEM_9 <= 54 ~ "40-54 years old",
+  DEM_9 >= 55 & DEM_9 <= 64 ~ "55-64 years old",
+  DEM_9 >= 65 ~ "65 years and older"
+))
+
+
+
+
 
 # Define UI for application that draws a histogram
 fluidPage(
