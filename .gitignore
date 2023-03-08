@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 app/rsconnect/
+dashboard.html
+dashboard_files/
+rsconnect/
