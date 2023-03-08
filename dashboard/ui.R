@@ -71,18 +71,18 @@ data <- data %>%
 
 
 # Define UI for application that draws a histogram
-fluidPage(
 
-    # Application title
-    navbarPage(
-      "University of Arizona Cooperative Extension Needs Assessment",
-      p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
-2022 to better understand community needs and priorities. Cooperative Extension users,
-topical experts, and members of the general public from each county were invited to
-participate via online or paper survey. Participants were shown 99 items across topics
-relevant to Cooperative Extension and asked to rank how important it is to prioritize each
-item in their community on a 5-point scale."),
-      h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona"),
+
+# Application title
+navbarPage(
+  "University of Arizona Cooperative Extension Needs Assessment",
+#       p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
+# 2022 to better understand community needs and priorities. Cooperative Extension users,
+# topical experts, and members of the general public from each county were invited to
+# participate via online or paper survey. Participants were shown 99 items across topics
+# relevant to Cooperative Extension and asked to rank how important it is to prioritize each
+# item in their community on a 5-point scale."),
+#       h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona"),
 
     # Tab panel 1 - Top 20 View
     tabPanel(
@@ -90,22 +90,32 @@ item in their community on a 5-point scale."),
       sidebarLayout(
         sidebarPanel(
           # Here is where you add the widgets for the side panel with commas
+          # selectInput(
+          #   "county_tab1",
+          #   "Select County:",
+          #   choices = counties, 
+          #   selected = "All"
+          # ),
           selectizeGroupUI(
-            id = "top-priority-filter",
+            id = "my-filters",
             params = list(
               LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural:"),
               COUNTY = list(inputId = "COUNTY", title = "County:")
-              #To add a new filter, copy line above, edit to change inputId to column name, etc.  Also edit code in server.R
             ),
             inline = FALSE
-          )
+          ), status = "primary"
+        ),
+        
 
         # Show a plot of the generated distribution
-      ),
-      mainPanel(
-        # This is where you show the output (data, chart, leaflet map, etc.) with commas
-        # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
-        DT::dataTableOutput(outputId = "table")
+        mainPanel(
+          # This is where you show the output (data, chart, leaflet map, etc.) with commas
+          # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
+          DT::dataTableOutput(outputId = "table")
+          # p("hi, this is the main panel"),
+          # shiny::verbatimTextOutput("table")
+
+        )
       )
     ),
     
@@ -283,5 +293,5 @@ item in their community on a 5-point scale."),
         )
       )
     )
-    )
 )
+
