@@ -100,8 +100,27 @@ navbarPage(
           selectizeGroupUI(
             id = "my-filters",
             params = list(
-              LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural:"),
-              COUNTY = list(inputId = "COUNTY", title = "County:")
+              COUNTY = list(inputId = "COUNTY", title = "County"),
+              
+              LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
+              
+              Eng_Span = list(inputId = "NEED TO FIND", title = "Survey Language"),
+              
+              Race_Ethnicity = list(c(AIAN, AS, BL, HL, MR, NHPI, WH), title = "Race/Ethnicity"),
+              
+              Gender = list(inputId = "Gender", title = "Gender"),
+              
+              AGE = list(inputId = "AGE", title = "Age"),
+              
+              DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
+              
+              Low_Income_FPL = list(inputId = "Low_Income_FPL", title = "Low-income Status (185% Federal Poverty Level or lower)"),
+              
+              CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
+              
+              CE_USER = list(inputId = "CE_USER", title = "Extension User"),
+              
+              TOPICAL_EXPERT = list(inputId = c(HLTH_EXPERT, ED_EXPERT, AG_EXPERT, NR_EXPERT, CD_EXPERT), title = "Topical Expert")
             ),
             inline = FALSE
           ), status = "primary"
