@@ -40,18 +40,17 @@ function(input, output, session) {
   #   
   #   
   # })
+  top_20_filtered <- callModule(
+    module = selectizeGroupServer,
+    id = "my-filters",
+    data = data,
+    vars = c("LIVE_V3", "COUNTY"), #add new filters here by adding column name in quotes
+    inline = FALSE
+  )
   
+  output$table <- DT::renderDataTable(top_20_filtered())
   
-  
-  
-  
-    selected_data <- if(input$county_tab1 == "All") {
-      data
-    }
-    else{
-      data %>% filter(COUNTY == input$county_tab1)
-    }
 
-    # })
 
 }
+
