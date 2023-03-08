@@ -11,6 +11,7 @@
 library(shiny)
 library(tidyverse)
 library(pins)
+library(shinyWidgets)
 
 #read in data
 # labels <- read.csv("data/labels.csv")

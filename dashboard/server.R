@@ -12,6 +12,7 @@ library(mapproj)
 library(maps)
 library(tidyverse)
 library(pins)
+library(shinyWidgets)
 
 
 #read in data
