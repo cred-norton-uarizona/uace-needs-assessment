@@ -14,7 +14,8 @@ library(pins)
 
 #read in data
 # labels <- read.csv("data/labels.csv")
-labels <- read.csv(file.path("data", "labels.csv"))
+# labels <- read.csv(file.path("..", "data", "labels.csv"))
+labels <- read.csv(here::here("data", "labels.csv"))
 
 board <- board_connect()
 data <- pin_read(board, "terrace/raw_data")
@@ -22,7 +23,6 @@ data <- pin_read(board, "terrace/raw_data")
 
 az_counties <- map_data("county", region = "arizona")|>
   mutate(COUNTY = str_to_title(subregion))
-
 
 
 # Incorporate the code from the app.R script
@@ -82,7 +82,7 @@ topical experts, and members of the general public from each county were invited
 participate via online or paper survey. Participants were shown 99 items across topics
 relevant to Cooperative Extension and asked to rank how important it is to prioritize each
 item in their community on a 5-point scale."),
-      h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
+      h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona"),
 
     # Tab panel 1 - Top 20 View
     tabPanel(
@@ -100,29 +100,7 @@ item in their community on a 5-point scale."),
         mainPanel(
           # This is where you show the output (data, chart, leaflet map, etc.) with commas
           # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
-          data_Evimp <- data %>% group_by(SELECTED INPUTS????) %>%
-            summarize(across(
-              ends_with("Evimp"),
-              ~sum(.x == 1, na.rm = TRUE)/n())*100)
-          
-          data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
-                                                    names_to = "Metric",
-                                                    values_to = "Percentage"
-          ) %>%
-            group_by(SELECTED INPUTS????) %>% 
-            arrange(desc(Percentage)) %>% 
-            mutate(Metric = gsub("_EVimp", "", Metric))%>%
-            slice(1:30),
-          
-          output$top_priorities <- renderPlot({
-              priorities <- top_priorities  %>% 
-                mutate(selected = ifelse(COUNTY == input$select_county, TRUE, FALSE))
-              
-              ggplot(data_Evimp, aes(x = Metric, y = Percentage)) +
-                geom_col(fill = )
-                     
-              
-            })
+
         )
       )
     ),
@@ -137,44 +115,36 @@ item in their community on a 5-point scale."),
           selectInput("county_tab1",
                       "County",
                       choices = counties, 
-                      selected = "All")
-        ), # Variable(s) of interest: COUNTY
+                      selected = "All"), # Variable(s) of interest: COUNTY
         selectInput("rural_urban_tab1",
                     "Rural versus Urban",
                     choices = LIVE_V3,
-                    selected = "All")
-        ), # Variable(s) of interest: LIVE_V3
+                    selected = "All"), # Variable(s) of interest: LIVE_V3
       # Terrace, figure out if this variable for survey language is in this raw data file.
         selectInput("english_spanish_tab1",
                     "Survey in English or Spanish",
                     choices = "English", "Spanish", "All",
-                    selected = "All")
-        ), # Variable(s) of interest: unsure- need to find
+                    selected = "All"), # Variable(s) of interest: unsure- need to find
         selectInput("race_eth_tab1",
                     "Race/Ethnicity",
                     choices = "American Indian or Alaska Native", "Asian", "Black or African American", "Hispanic or Latino", "Multiracial", "Native Hawaiian or Other Pacific Islander", "White",
-                    selected = "All")
-        ), # Variable(s) of interest: Binary recodes - AIAN, AS, BL, HL, MR, NHPI, WH  (note that NR means no response given; we aren't including this in the selection options)
+                    selected = "All"), # Variable(s) of interest: Binary recodes - AIAN, AS, BL, HL, MR, NHPI, WH  (note that NR means no response given; we aren't including this in the selection options)
         selectInput("gender_tab1",
                     "Gender",
                     choices = "Male", "Female", "Non-binary", "All",
-                    selected = "All")
-        ), # Variable(s) of interest: GENDER
+                    selected = "All"), # Variable(s) of interest: GENDER
         selectInput("age_tab1",
                     "Age",
-                    choices = "14-24 years old", "25-39 years old", "40-54 years old", "55-64 years old", "65 years and older", "All"
-                    selected = "All")
-        ), # Variable(s) of interest: I think we need to add this one in (AGE recode) or make this.  Check with RG
+                    choices = c("14-24 years old", "25-39 years old", "40-54 years old", "55-64 years old", "65 years and older", "All"),
+                    selected = "All"), # Variable(s) of interest: I think we need to add this one in (AGE recode) or make this.  Check with RG
         selectInput("education_tab1",
                     "Educational Attainment",
-                    choices = "Bachelors degree or higher", "Less than a Bachelors degree", "All"
-                    selected = "All")
-        ), # Variable(s) of interest: DEM_11
+                    choices = c("Bachelors degree or higher", "Less than a Bachelors degree", "All"),
+                    selected = "All"), # Variable(s) of interest: DEM_11
         selectInput("low_income_tab1",
                     "Income Status",
-                    choices = "Low-income status (185% FPL)", "Not Low-income status", "All"
-                    selected = "All")
-        ), # Variable(s) of interest: 
+                    choices = c("Low-income status (185% FPL)", "Not Low-income status", "All"),
+                    selected = "All"), # Variable(s) of interest: 
 # FPL:
 #   We will need to calculate the 185% FPL:
 #   DEM_13 (Household income ranges)—I’m assuming that we will use the lower end of the range for this calculation
@@ -183,8 +153,7 @@ item in their community on a 5-point scale."),
         selectInput("ce_familiar_tab1",
             "Familiar with Cooperative Extension",
             choices = "Yes", "No", "All",
-            selected = "All")
-        ), # Variable(s) of interest: 
+            selected = "All"), # Variable(s) of interest: 
 
 # Binary variable created from: DEM_1: How much do you know about Cooperative Extension? Some or more (OR) 
 # DEM_2: I have participated in a CE event- Yes (OR) 
@@ -194,8 +163,7 @@ item in their community on a 5-point scale."),
         selectInput("ce_user_tab1",
                     "Cooperative Extension User",
                     choices = "Yes", "No", "All",
-                    selected = "All")
-        ), # Variable(s) of interest: 
+                    selected = "All"), # Variable(s) of interest: 
 # Binary variable created from: DEM_2: I have participated in a CE event- Yes (OR) 
 # DEM_3: I am/have been a CE volunteer- Yes (OR) 
 # DEM_4: I am/have been a CE employee- Yes (OR
@@ -204,9 +172,9 @@ item in their community on a 5-point scale."),
         selectInput("topical_expert_tab1",
                     "Topical Expert",
                     choices = "Health and Well-Being", "Education and Youth Development", "Agriculture", "Natural Resources", "Community and Economic Development", "All respondents (Non-expert specific)",
-                    selected = "All respondents (Non-expert specific") 
+                    selected = "All respondents (Non-expert specific"),
         # Is it better to just have no selection pre-selected?
-        ), # Variable(s) of interest: 
+ # Variable(s) of interest: 
 
 # Ag: ifelse(_______ | _______ ... 
 #                   LIVE – Farm OR Ranch  OR 
@@ -231,9 +199,8 @@ item in their community on a 5-point scale."),
         selectInput("children_under_18_household_tab1",
                     "Respondents with children under 18 in the household",
                     choices = "Yes", "No", "Prefer not to answer", "All",
-                    selected = "All")
-        ), # Variable(s) of interest: DEM_6
-                
+                    selected = "All") # Variable(s) of interest: DEM_6
+        ), #end of sidebarPanel
   
         # Show a plot of the generated distribution
         mainPanel(
