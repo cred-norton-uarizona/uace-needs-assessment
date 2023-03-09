@@ -1,22 +1,12 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
-library(mapproj)
-library(maps)
+library(shinyWidgets)
+library(shiny)
 library(tidyverse)
 library(pins)
-library(shinyWidgets)
-
 
 #read in data
-
+# labels <- read.csv("data/labels.csv")
+# labels <- read.csv(file.path("..", "data", "labels.csv"))
 labels <- read.csv(here::here("data", "labels.csv"))
 
 board <- board_connect()
@@ -67,46 +57,41 @@ data <- data %>%
     DEM_5 == 14 & DEM_13 <= 150590 ~ 1,
     TRUE ~ 0 
   ))
-
-# Define server logic required to draw a histogram
-function(input, output, session) {
-
   
-  # data_Evimp <- data %>% group_by(SELECTED INPUTS????) %>%
-  #   summarize(across(
-  #     ends_with("Evimp"),
-  #     ~sum(.x == 1, na.rm = TRUE)/n())*100),
-  # 
-  # data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
-  #                                           names_to = "Metric",
-  #                                           values_to = "Percentage"
-  # ) %>%
-  #   group_by(SELECTED INPUTS????) %>% 
-  #   arrange(desc(Percentage)) %>% 
-  #   mutate(Metric = gsub("_EVimp", "", Metric))%>%
-  #   slice(1:30),
-  # 
-  # output$top_priorities <- renderPlot({
-  #   priorities <- top_priorities  %>% 
-  #     mutate(selected = ifelse(COUNTY == input$select_county, TRUE, FALSE))
-  #   
-  #   ggplot(data_Evimp, aes(x = Metric, y = Percentage)) +
-  #     geom_col(fill = )
-  #   
-  #   
-  # })
-  top_20_filtered <- callModule(
-    module = selectizeGroupServer,
-    id = "my-filters",
-    data = data,
-    vars = c("LIVE_V3", "COUNTY"), #add new filters here by adding column name in quotes
-    inline = FALSE
+  
+data <- head(data, 20)
+    
+# data("mpg", package = "ggplot2")
+  
+ui <- navbarPage("app title",
+  tabPanel("tab1",
+    sidebarLayout(
+      sidebarPanel(
+        selectizeGroupUI(
+          id = "my-filters",
+          params = list(
+            LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural:"),
+            COUNTY = list(inputId = "COUNTY", title = "County:")
+          ),
+          inline = FALSE
+        ), status = "primary"
+      ),
+      mainPanel(DT::dataTableOutput(outputId = "table"))
+    )
   )
+)
+
   
-  output$table <- DT::renderDataTable(top_20_filtered())
-  # output$table = renderPrint({"hello"})
+  server <- function(input, output, session) {
+    res_mod <- callModule(
+      module = selectizeGroupServer,
+      id = "my-filters",
+      data = data,
+      vars = c("LIVE_V3", "COUNTY"),
+      inline = FALSE
+    )
+    output$table <- DT::renderDataTable(res_mod())
+  }
   
-
-
-}
-
+  shinyApp(ui, server)
+  
