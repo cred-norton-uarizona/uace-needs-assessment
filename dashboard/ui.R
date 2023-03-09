@@ -82,7 +82,7 @@ topical experts, and members of the general public from each county were invited
 participate via online or paper survey. Participants were shown 99 items across topics
 relevant to Cooperative Extension and asked to rank how important it is to prioritize each
 item in their community on a 5-point scale."),
-      h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
+      h6("prepared by the Community Research, Evaluation and Develpment (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona"),
 
     # Tab panel 1 - Top 20 View
     tabPanel(
@@ -119,7 +119,7 @@ item in their community on a 5-point scale."),
                 mutate(selected = ifelse(COUNTY == input$select_county, TRUE, FALSE))
               
               ggplot(data_Evimp, aes(x = Metric, y = Percentage)) +
-                geom_col(fill = )
+                geom_col(fill = "Topic")
                      
               
             })
