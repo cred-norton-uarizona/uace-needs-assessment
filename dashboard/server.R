@@ -68,16 +68,6 @@ data <- data %>%
     TRUE ~ 0 
   ))
 
-data <- data %>% 
-  mutate(Race_Ethnicity = case_when(
-    AIAN == 1 ~ "American Indian or Alaska Native",
-    AS == 1 ~ "Asian",
-    BL == 1 ~ "Black or African American", 
-    HL == 1 ~ "Hispanic or Latinx",
-    MR == 1 ~ "Multiracial",
-    NHPI == 1 ~ "Native Hawaiian or Pacific Islander",
-    WH == 1 ~ "White",
-    TRUE ~ "Prefer not to answer"))
 
 
 # Define server logic required to draw a histogram
@@ -111,13 +101,25 @@ function(input, output, session) {
     module = selectizeGroupServer,
     id = "my-filters",
     data = data,
-    vars = c("COUNTY", "LIVE_V3", "Race_Ethnicity", "GENDER",
+    vars = c("COUNTY", "LIVE_V3", "GENDER", # "Race_Ethnicity", 
              "AGE", "DEM_11", "Low_Income_FPL", "CE_EXPOSED", "CE_USER"), #add new filters here by adding column name in quotes
     inline = FALSE
   )
   
-  output$table <- DT::renderDataTable(top_20_filtered())
-  # output$table = renderPrint({"hello"})
+  refine_top_20 <- reactive({
+    top_20_filtered() %>% 
+      filter(if_any(all_of(input$race_ethnicity), function(x) {x == 1})) %>% # anonymous functions
+      filter(if_any(all_of(input$topical_expert), function(x) {x == 1})) 
+  })
+  
+  output$table <- DT::renderDataTable(refine_top_20())
+  output$text <- renderText({dim(refine_top_20())})
+  
+  output$top20bar <- renderPlot({
+    
+   
+    
+  })
   
 
 

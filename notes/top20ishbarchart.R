@@ -43,7 +43,7 @@ labels <- labels %>%
     str_detect(Metric, "YD_") ~ "Education",
     str_detect(Metric, "AG_") ~ "Agriculture",
     str_detect(Metric, "NR_") ~ "Natural Resources", 
-    str_detect(Metric, "CED_") ~ "Community and Econonic Development",
+    str_detect(Metric, "CED_") ~ "Community and Economic Development",
     TRUE ~ 'NA'
   ))
 

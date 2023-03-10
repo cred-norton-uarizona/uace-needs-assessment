@@ -51,19 +51,22 @@ data <- data %>%
   ))
 
 
-data <- data %>% 
-  mutate(Race_Ethnicity = case_when(
-    AIAN == 1 ~ "American Indian or Alaska Native",
-    AS == 1 ~ "Asian",
-    BL == 1 ~ "Black or African American", 
-    HL == 1 ~ "Hispanic or Latinx",
-    MR == 1 ~ "Multiracial",
-    NHPI == 1 ~ "Native Hawaiian or Pacific Islander",
-    WH == 1 ~ "White",
-    TRUE ~ "Prefer not to answer"))
 
+race_vec <- c("American Indian or Alaska Native" = "AIAN",
+              "Asian" = "AS",
+              "Black or African American" = "BL", 
+              "Hispanic or Latinx" =  "HL",
+              "Multiracial" = "MR", 
+              "Native Hawaiian or Pacific Islander" = "NHPI", 
+              "White" = "WH" , 
+              "Prefer not to answer" = "NR") 
     
-    
+expert_vec <- c("Health & Well-Being" = "HLTH_EXPERT",
+              "Education & Youth Development" = "ED_EXPERT", 
+              "Agriculture" = "AG_EXPERT", 
+              "Natural Resources" =  "NR_EXPERT",
+              "Community & Economic Development" = "CD_EXPERT") 
+
 # az_counties <- map_data("county", region = "arizona")|>
 #   mutate(COUNTY = str_to_title(subregion))
 
@@ -102,7 +105,7 @@ navbarPage(
             
             # Eng_Span = list(inputId = "NEED TO FIND", title = "Survey Language"),
             
-            Race_Ethnicity = list(inputId = "Race_Ethnicity", title = "Race/Ethnicity"),
+            # Race_Ethnicity = list(inputId = "Race_Ethnicity", title = "Race/Ethnicity"),
             
             GENDER = list(inputId = "GENDER", title = "Gender"),
             
@@ -116,10 +119,18 @@ navbarPage(
             
             CE_USER = list(inputId = "CE_USER", title = "Extension User")
             
-            # TOPICAL_EXPERT = list(inputId = c("HLTH_EXPERT", "ED_EXPERT", "AG_EXPERT", "NR_EXPERT", "CD_EXPERT"), title = "Topical Expert")
           ),
           inline = FALSE
-        ), status = "primary"
+        ), status = "primary",
+        selectInput(inputId = "race_ethnicity",
+                    label = "Race/Ethnicity",
+                    choices = race_vec,
+                    multiple = TRUE),
+        
+        selectInput(inputId = "topical_expert",
+                    label = "Topical Expert",
+                    choices = expert_vec,
+                    multiple = TRUE)
       ),
       
       
@@ -127,7 +138,8 @@ navbarPage(
       mainPanel(
         # This is where you show the output (data, chart, leaflet map, etc.) with commas
         # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
-        DT::dataTableOutput(outputId = "table")
+        DT::dataTableOutput(outputId = "table"),
+        textOutput(outputId = "text")
         # p("hi, this is the main panel"),
         # shiny::verbatimTextOutput("table")
         
