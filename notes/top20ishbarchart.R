@@ -1,21 +1,16 @@
 # Load the data and libraries  -----------------------------------------------------------
 library(tidyverse)
 library(readxl)
+library(pins)
 
+board <- board_connect()
+data <- pin_read(board, "terrace/uace-na")
+labels <- read.csv(here::here("data", "labels.csv"))
 
-# data <- read_excel("/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Data without zips.xlsx")
-
+# Test filtering the data
 
 # % Extremely or Very Important Selected, Top 30 for Now-------
 
-# Jessica and Eric, we need to think about how to deal is ties for 20th place.
-# We want to sort in descending (largest to smallest) by the tenths place
-# and then show items that tied for 20th place when rounded to the ones place.
-
-# I keep getting this error.  Can you help fix my code?
-# 
-#   Error in layer(data = data, mapping = mapping, stat = "identity", geom = GeomCol,  : 
-#                    object 'Description' not found
 
 data_Evimp <- data %>% group_by(COUNTY) %>%
 summarize(across(
@@ -32,11 +27,6 @@ data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
   slice(1:30)  # %>% 
  #  select(Metric, Percentage, COUNTY)
 
-
-# labels<- read_excel("/Users/ericscott/Library/CloudStorage/Box-Box/CRED - Incubator Collaboration/Labels for the content areas in survey.xlsx")
-
-labels <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Labels for the content areas in survey.xlsx")
-
 labels <- labels %>% 
   mutate(Topic = case_when(
     str_detect(Metric, "FCHS_") ~ "Health and Well-Being",
@@ -51,9 +41,9 @@ labels <- labels %>%
 data_joined <- left_join(data_Evimp, labels) %>% 
   select(COUNTY, Topic, Metric, Description, Percentage)
 
-colnames(data_joined)
+# colnames(data_joined)
 
-print(data_joined)
+# print(data_joined)
 
 # I think that the mistake that I've made here is that I need to do this work connected to the full data frame and not a cut
 # This isn't going to help us, because we won't have access to other data for filters
@@ -65,15 +55,21 @@ plot_df <- data_joined |>
   filter(Percentage >= nth(Percentage, 20)) |> 
   mutate(row = 1:n())
 
+
+colors <- c("Health and Well-Being" = "#604878", "Natural Resources" = "#1B587C", "Agriculture" = "#4E8542", "Community and Economic Development" = "#C09001", "Education" = "#C65A11")
+
 ggplot(plot_df, aes(x = row, y = Percentage)) + 
-  geom_col(aes(fill = Description), width = 0.7, ) +
-  geom_text(aes(label = scales::percent(Percentage, accuracy = 1)), vjust = 0.5, hjust = 1.2, color = "white", size = 4) +
+  geom_col(aes(fill = Topic), width = 0.7, ) +
+  geom_text(aes(label = paste(Description, scales::percent(Percentage, accuracy = 1), sep = ", ")), vjust = 0.5, hjust = "right", color = "white", size = 4) +
   scale_y_continuous(expand = c(0, 0)) +
+  scale_x_reverse()+
+  scale_fill_manual(values = colors)+
   coord_flip() +
-  labs(title = "Top Priorities",
+  labs(title = "Top Priorities", # We can explore how to add more than one county name
        subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
   theme(
-    legend.position = "none",
+    #legend.position = "none",
+    legend.position = "left",
     plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
     plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "gray"),
     panel.background = element_rect(fill = NA),
@@ -85,4 +81,6 @@ ggplot(plot_df, aes(x = row, y = Percentage)) +
     axis.text.y = element_blank()
   )
 
-# I am getting an error that 'Description' doesn't exist
+# Descriptions in the bars
+# Hex colors for each topical area (custom colors)
+# Legend
