@@ -4,10 +4,10 @@ library(readxl)
 library(pins)
 # install.packages("rsconnect")
 
-data <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Data without zips.xlsx")
+data <- read.csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_3.10.23 no zip.csv")
 
 board <- board_connect()
-# pin_write(board, data, "raw_data")
+pin_write(board, data, "uace-na")
 
 
 
