@@ -8,50 +8,6 @@
 #
 
 
-library(shiny)
-library(tidyverse)
-library(pins)
-library(shinyWidgets)
-
-#read in data
-# labels <- read.csv("data/labels.csv")
-# labels <- read.csv(file.path("..", "data", "labels.csv"))
-labels <- read.csv(here::here("data", "labels.csv"))
-
-board <- board_connect()
-data <- pin_read(board, "terrace/raw_data")
-
-# Create the age brackets
-data <- data %>% mutate(AGE = case_when(
-  DEM_9 >= 14 & DEM_9 <= 24 ~ "14-24 years old",
-  DEM_9 >= 25 & DEM_9 <= 39 ~ "25-39 years old",
-  DEM_9 >= 40 & DEM_9 <= 54 ~ "40-54 years old",
-  DEM_9 >= 55 & DEM_9 <= 64 ~ "55-64 years old",
-  DEM_9 >= 65 ~ "65 years and older"
-))
-
-# Calculate 185% FPL using the variable DEM_13 (Household income) and DEM_5 (number of people living in household)
-data <- data %>% 
-  mutate(Low_Income_FPL = case_when(
-    DEM_5 == 1 & DEM_13 <= 26973 ~ 1,
-    DEM_5 == 2 & DEM_13 <= 36482 ~ 1,
-    DEM_5 == 3 & DEM_13 <= 45991 ~ 1,
-    DEM_5 == 4 & DEM_13 <= 55500 ~ 1,
-    DEM_5 == 5 & DEM_13 <= 65009 ~ 1,
-    DEM_5 == 6 & DEM_13 <= 74518 ~ 1,
-    DEM_5 == 7 & DEM_13 <= 84027 ~ 1,
-    DEM_5 == 8 & DEM_13 <= 93536 ~ 1,
-    DEM_5 == 9 & DEM_13 <= 103045 ~ 1,
-    DEM_5 == 10 & DEM_13 <= 112554 ~ 1,
-    DEM_5 == 11 & DEM_13 <= 122063 ~ 1,
-    DEM_5 == 12 & DEM_13 <= 131572 ~ 1,
-    DEM_5 == 13 & DEM_13 <= 141081 ~ 1,
-    DEM_5 == 14 & DEM_13 <= 150590 ~ 1,
-    TRUE ~ 0 
-  ))
-
-
-
 race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "Asian" = "AS",
               "Black or African American" = "BL", 
@@ -66,6 +22,8 @@ expert_vec <- c("Health & Well-Being" = "HLTH_EXPERT",
               "Agriculture" = "AG_EXPERT", 
               "Natural Resources" =  "NR_EXPERT",
               "Community & Economic Development" = "CD_EXPERT") 
+
+
 
 # az_counties <- map_data("county", region = "arizona")|>
 #   mutate(COUNTY = str_to_title(subregion))
@@ -103,9 +61,7 @@ navbarPage(
             
             LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
             
-            # Eng_Span = list(inputId = "NEED TO FIND", title = "Survey Language"),
-            
-            # Race_Ethnicity = list(inputId = "Race_Ethnicity", title = "Race/Ethnicity"),
+            UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
             
             GENDER = list(inputId = "GENDER", title = "Gender"),
             
@@ -113,7 +69,7 @@ navbarPage(
             
             DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
             
-            Low_Income_FPL = list(inputId = "Low_Income_FPL", title = "Low-income Status (185% Federal Poverty Level or lower)"),
+            Low_Income_FPL_100 = list(inputId = "Low_Income_FPL_100", title = "Low-income Status (100% Federal Poverty Level or lower)"),
             
             CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
             
