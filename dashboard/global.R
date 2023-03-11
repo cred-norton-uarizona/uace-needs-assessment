@@ -17,6 +17,9 @@ labels <- read.csv(here::here("data", "labels.csv"))
 
 
 # This is taking the following columns and recoding them as "Yes" and No" rather than 1, 0
+# Also recodes "EN" and "ES" as "English" and "Spanish"
 data <- data %>% mutate(across(
   c(CE_USER, CE_EXPOSED, Low_Income_FPL_100, Low_Income_FPL_185),
-  function(x) ifelse(x == 1, "Yes", "No")))
+  function(x) ifelse(x == 1, "Yes", "No")),
+  UserLanguage = case_when(UserLanguage == "EN" ~ "English", 
+                           UserLanguage == "ES" ~ "Spanish"))
