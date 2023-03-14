@@ -40,15 +40,17 @@ expert_vec <- c("Health & Well-Being" = "HLTH_EXPERT",
 
 # Application title
 navbarPage(
-  "University of Arizona Cooperative Extension Needs Assessment",
-        p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
+  title = "University of Arizona Cooperative Extension Needs Assessment",
+  header =  mainPanel(
+    p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
   2022 to better understand community needs and priorities. Cooperative Extension users,
   topical experts, and members of the general public from each county were invited to
   participate via online or paper survey. Participants were shown 99 items across topics
   relevant to Cooperative Extension and asked to rank how important it is to prioritize each
   item in their community on a 5-point scale."),
-        h6("prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona"),
-
+  h6("prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
+  ),
+  
   # Tab panel 1 - Top 20 View
   tabPanel(
     "Top Priorities",
