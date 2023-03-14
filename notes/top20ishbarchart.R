@@ -27,15 +27,15 @@ data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
   slice(1:30)  # %>% 
  #  select(Metric, Percentage, COUNTY)
 
-labels <- labels %>% 
-  mutate(Topic = case_when(
-    str_detect(Metric, "FCHS_") ~ "Health and Well-Being",
-    str_detect(Metric, "YD_") ~ "Education",
-    str_detect(Metric, "AG_") ~ "Agriculture",
-    str_detect(Metric, "NR_") ~ "Natural Resources", 
-    str_detect(Metric, "CED_") ~ "Community and Economic Development",
-    TRUE ~ 'NA'
-  ))
+# labels <- labels %>% 
+#   mutate(Topic = case_when(
+#     str_detect(Metric, "FCHS_") ~ "Health and Well-Being",
+#     str_detect(Metric, "YD_") ~ "Education",
+#     str_detect(Metric, "AG_") ~ "Agriculture",
+#     str_detect(Metric, "NR_") ~ "Natural Resources", 
+#     str_detect(Metric, "CED_") ~ "Community and Economic Development",
+#     TRUE ~ 'NA'
+#   ))
 
 
 data_joined <- left_join(data_Evimp, labels) %>% 

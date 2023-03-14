@@ -11,9 +11,8 @@ board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
 
 #read in data
-# labels <- read.csv("data/labels.csv")
-# labels <- read.csv(file.path("..", "data", "labels.csv"))
-labels <- read.csv(here::here("data", "labels.csv"))
+
+labels <- read.csv("labels.csv")
 
 
 # This is taking the following columns and recoding them as "Yes" and No" rather than 1, 0
