@@ -95,15 +95,9 @@ navbarPage(
         # This is where you show the output (data, chart, leaflet map, etc.) with commas
         # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
         plotOutput("top20bar", height = 800)
-          )
-        # p("hi, this is the main panel"),
-        # shiny::verbatimTextOutput("table")
-        
-      ),
-    width = "100%",
     )
   )
-  
-  
+)
+)
   
 

@@ -68,13 +68,38 @@ function(input, output, session) {
       filter(if_any(all_of(input$topical_expert), function(x) {x == 1})) 
   })
   
-  output$table <- DT::renderDataTable(refine_top_20())
-  output$text <- renderText({dim(refine_top_20())})
+  # Make a function for refine_top_20 by adding ()
+  data_Evimp <- reactive({
+    refine_top_20() %>% group_by(COUNTY) %>%
+      summarize(across(
+        ends_with("Evimp"),
+        ~sum(.x == 1, na.rm = TRUE)/n())*100) %>% 
+      
+      pivot_longer(-COUNTY,
+                   names_to = "Metric",
+                   values_to = "Percentage"
+      ) %>%
+      group_by(COUNTY) %>% 
+      arrange(desc(Percentage)) %>% 
+      mutate(Metric = gsub("_EVimp", "", Metric))%>%
+      slice(1:30) %>% 
+      left_join(labels) %>% 
+        select(COUNTY, Topic, Metric, Description, Percentage) %>% 
+    
+      arrange(desc(Percentage)) %>% 
+      ungroup() %>% 
+      mutate(Percentage = round(Percentage)/100) %>% 
+      filter(Percentage >= nth(Percentage, 20)) %>% 
+      mutate(row = 1:n())
+  })
   
+  output$table <- DT::renderDataTable(data_Evimp())
+
   output$top20bar <- renderPlot({
     colors <- c("Health and Well-Being" = "#604878", "Natural Resources" = "#1B587C", "Agriculture" = "#4E8542", "Community and Economic Development" = "#C09001", "Education" = "#C65A11")
-    
-    ggplot(plot_df, aes(x = row, y = Percentage)) + 
+
+    # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
+    ggplot(data_Evimp(), aes(x = row, y = Percentage)) +
       geom_col(aes(fill = Topic), width = 0.9, ) +
       geom_text(aes(label = paste(Description, scales::percent(Percentage, accuracy = 1), sep = ", ")), vjust = 0.5, hjust = "right", color = "white", size = 4) +
       scale_y_continuous(expand = c(0, 0)) +
@@ -97,7 +122,7 @@ function(input, output, session) {
         axis.text.y = element_blank()
       )
     })
-  
+
 
 
 }
