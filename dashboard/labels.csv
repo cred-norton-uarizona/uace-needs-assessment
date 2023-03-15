@@ -1,0 +1,100 @@
+Metric,Description,Topic
+FCHS_1,"Access to affordable, healthy food",Health and Well-Being
+FCHS_2,Preparing healthy food,Health and Well-Being
+FCHS_3,Food safety (for homes and businesses),Health and Well-Being
+FCHS_4,Personal and family financial planning,Health and Well-Being
+FCHS_5,Promoting parenting skills,Health and Well-Being
+FCHS_6,Supports for grandparents and other friends and family raising children,Health and Well-Being
+FCHS_7,Supports for youth in the foster care system,Health and Well-Being
+FCHS_8,Child abuse and neglect prevention,Health and Well-Being
+FCHS_9,Domestic violence prevention,Health and Well-Being
+FCHS_10,Access to affordable health insurance,Health and Well-Being
+FCHS_11,"Having enough medical, dental, and mental health providers",Health and Well-Being
+FCHS_12,Understanding and navigating the health care system,Health and Well-Being
+FCHS_13,Services for veterans,Health and Well-Being
+FCHS_14,"Access to good, affordable child care and preschools",Health and Well-Being
+FCHS_15,Screenings and early intervention for young children who may have developmental delays,Health and Well-Being
+FCHS_16,Infant and child health,Health and Well-Being
+FCHS_17,Reproductive health and family planning,Health and Well-Being
+FCHS_18,"The physical and mental health of mothers before, during, and after pregnancy",Health and Well-Being
+FCHS_19,Mental health and stress management,Health and Well-Being
+FCHS_20,Healthy physical activity,Health and Well-Being
+FCHS_21,"Oral health, including affordable dental care",Health and Well-Being
+FCHS_22,Healthy aging and quality long-term care options,Health and Well-Being
+FCHS_23,"Chronic disease prevention and management (e.g., cancer, heart disease, stroke, diabetes)",Health and Well-Being
+FCHS_24,Infectious disease prevention and response,Health and Well-Being
+FCHS_25,Substance abuse prevention and treatment services,Health and Well-Being
+FCHS_26,Suicide prevention,Health and Well-Being
+YD_1,Resources for children and youth with disabilities,Education
+YD_2,"Supports for at-risk youth (e.g., low-income, homeless, English language learners)",Education
+YD_3,"Social-emotional learning and youth mental health (e.g., managing feelings, relationship skills)",Education
+YD_4,Recreational activities and resources for youth,Education
+YD_5,Quality preschools,Education
+YD_6,Early childhood reading and language skills,Education
+YD_7,Quality K-12 education,Education
+YD_8,Recruitment and retention of qualified teachers,Education
+YD_9,"In-school student resources (e.g., counselors, nurses, substance use prevention)",Education
+YD_10,Helping all young people graduate high school or get a GED,Education
+YD_11,Entrepreneurial skills for youth,Education
+YD_12,"Youth internships, apprenticeships, and mentoring for career development",Education
+YD_13,"Youth leadership and civic engagement (e.g., volunteering, community involvement)",Education
+YD_14,Making sure everyone who wants to go to college or university can,Education
+AG_1,"Local food system development (e.g., home and community gardens, farmers markets)",Agriculture
+AG_2,Learning where food comes from,Agriculture
+AG_3,Agricultural tourism and ecotourism,Agriculture
+AG_4,Sustainable and regenerative agriculture,Agriculture
+AG_5,Traditional Native American agricultural practices,Agriculture
+AG_6,Organic agriculture,Agriculture
+AG_7,Soil health,Agriculture
+AG_8,Rangeland health,Agriculture
+AG_9,Water-efficient farming and ranching,Agriculture
+AG_10,"Having enough, quality water for irrigation and livestock",Agriculture
+AG_11,Crop nutrient management (fertilizer and soil amendment),Agriculture
+AG_12,Having access to climate and weather outlooks,Agriculture
+AG_13,Preserving family or individually-owned farms and ranches,Agriculture
+AG_14,Support for new farmers and ranchers,Agriculture
+AG_15,Farm and ranch profitability,Agriculture
+AG_16,Having enough well-trained agricultural workers,Agriculture
+AG_17,"Agricultural producer and worker health, safety, and training",Agriculture
+AG_18,"Food and agricultural business support (e.g., marketing, sales and tax management, succession planning)",Agriculture
+AG_19,Food safety in agricultural production,Agriculture
+AG_20,"New agricultural technologies (e.g., smart agriculture)",Agriculture
+AG_21,Having access to scientific information about plant and animal systems,Agriculture
+AG_22,"Identifying and managing pests (e.g., insects, weeds, diseases)",Agriculture
+NR_1,Recycling and waste reduction,Natural Resources
+NR_2,Water conservation,Natural Resources
+NR_3,"Sustainable landscaping (e.g., low water use, pollinator, wildlife-friendly)",Natural Resources
+NR_4,Protecting native plants and animals,Natural Resources
+NR_5,Protecting cultural resources (including Native American sacred sites),Natural Resources
+NR_6,Preserving and restoring wetland and riparian areas,Natural Resources
+NR_7,"Healthy forests, forest restoration, and forest product development",Natural Resources
+NR_8,"Preserving and restoring open spaces, natural ecosystems, and wildlife habitats",Natural Resources
+NR_9,Preserving dark night skies and natural quiet,Natural Resources
+NR_10,Natural spaces for outdoor recreation,Natural Resources
+NR_11,Addressing climate change,Natural Resources
+NR_12,"Energy conservation and energy efficiency (e.g., weatherization, low-energy appliances)",Natural Resources
+NR_13,"Renewable energy (e.g., solar, wind)",Natural Resources
+NR_14,Water policy and water rights,Natural Resources
+NR_15,Planning for and reducing drought effects,Natural Resources
+NR_16,Preparing for and reducing the severity of natural disasters and other emergencies,Natural Resources
+NR_17,Planning for and reducing the severity of wildfires,Natural Resources
+NR_18,Air quality,Natural Resources
+NR_19,Water quality,Natural Resources
+NR_20,Higher heat (heat island effects) in urban areas,Natural Resources
+NR_21,"Recognizing connections between animal, environmental, and human health",Natural Resources
+CED_1,Job training and workforce development,Community and Economic Development
+CED_2,Well-paying job opportunities at all skill levels,Community and Economic Development
+CED_3,Job opportunities that keep people in their home communities,Community and Economic Development
+CED_4,Small and local business support,Community and Economic Development
+CED_5,Support for entrepreneurs,Community and Economic Development
+CED_6,Affordable housing,Community and Economic Development
+CED_7,Safe and healthy homes,Community and Economic Development
+CED_8,Reducing homelessness,Community and Economic Development
+CED_9,"Safe, reliable, and affordable transportation (e.g., public transit, walking, biking)",Community and Economic Development
+CED_10,"Access to reliable, high-speed internet",Community and Economic Development
+CED_11,Safe community spaces for recreation and social connection,Community and Economic Development
+CED_12,Accessibility in community spaces (particularly for individuals with disabilities and seniors),Community and Economic Development
+CED_13,Building social connections and reducing social isolation,Community and Economic Development
+CED_14,"Civic engagement and community leadership (e.g., volunteering, community involvement)",Community and Economic Development
+CED_15,Cultural and language revitalization in Native American communities,Community and Economic Development
+CED_16,Supporting nonprofit organizations and community leaders,Community and Economic Development
