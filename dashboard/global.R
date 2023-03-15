@@ -10,13 +10,8 @@ library(shinyWidgets)
 board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
 
-#read in data
+# read in data
 
 labels <- read.csv("labels.csv")
 
 
-# This is taking the following columns and recoding them as "Yes" and No" rather than 1, 0
-# Also recodes "EN" and "ES" as "English" and "Spanish"
-data <- data %>% mutate(across(
-  c(CE_USER, CE_EXPOSED, Low_Income_FPL_100, Low_Income_FPL_185),
-  function(x) ifelse(x == 1, "Yes", "No")))
