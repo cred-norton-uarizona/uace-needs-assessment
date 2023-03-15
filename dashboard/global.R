@@ -19,6 +19,4 @@ labels <- read.csv("labels.csv")
 # Also recodes "EN" and "ES" as "English" and "Spanish"
 data <- data %>% mutate(across(
   c(CE_USER, CE_EXPOSED, Low_Income_FPL_100, Low_Income_FPL_185),
-  function(x) ifelse(x == 1, "Yes", "No")),
-  UserLanguage = case_when(UserLanguage == "EN" ~ "English", 
-                           UserLanguage == "ES" ~ "Spanish"))
+  function(x) ifelse(x == 1, "Yes", "No")))
