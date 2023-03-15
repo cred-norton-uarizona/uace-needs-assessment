@@ -25,5 +25,5 @@ labels <- labels %>%
 
 
 write_csv(labels, "data/labels.csv")
-
+write_csv(labels, "dashboard/labels.csv")
 
