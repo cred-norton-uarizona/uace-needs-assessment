@@ -4,9 +4,7 @@ library(plotly)
 
 board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
-data <- data %>% mutate(across(
-  c(CE_USER, CE_EXPOSED, Low_Income_FPL_100, Low_Income_FPL_185),
-  function(x) ifelse(x == 1, "Yes", "No")))
+
 
 # Gauge chart for sample size
 
