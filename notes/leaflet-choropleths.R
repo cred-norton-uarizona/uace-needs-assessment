@@ -1,6 +1,7 @@
 library(pins)
 library(tidyverse)
 library(sf)
+library(leaflet)
 
 board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
