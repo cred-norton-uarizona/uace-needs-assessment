@@ -110,7 +110,8 @@ function(input, output, session) {
            subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
       theme(
         #legend.position = "none",
-        legend.position = "left",
+        legend.position = "top",
+        legend.title = element_blank(),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
         plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "gray"),
         panel.background = element_rect(fill = NA),
@@ -120,10 +121,68 @@ function(input, output, session) {
         axis.text.x = element_blank(),
         # axis.text.y = element_text(size = 11, margin = margin(0, 5, 0, 0)),
         axis.text.y = element_blank()
-      )
+      ) +
+      guides(fill = guide_legend(nrow = 2))
     })
+  
+  output$Ngauge <- renderPlotly({
+    temp <- refine_top_20()
+    
+    fig <- plot_ly(
+      domain = list(x = c(0, 1), y = c(0, 1)),
+      value = nrow(temp), # substitute with actual sample size
+      title = list(text = "Sample size"),
+      type = "indicator",
+      mode = "gauge+number",
+      # delta = list(reference = 380),
+      gauge = list(
+        axis =list(range = list(NULL, nrow(data)),# include maximum
+                   nticks = 5), 
+        threshold = list(
+          line = list(color = "red", width = 4),
+          thickness = 0.75,
+          value = nrow(data))))  # include maximum
+    fig <- fig %>%
+      layout(margin = list(l = 20,r = 30))
+    print(fig)
+  })
+  
+  output$gender_donut <- renderPlotly({
+    refine_top_20() %>%
+      group_by(GENDER) %>%
+      summarize(count = n()) %>%
+      plot_ly(labels = ~GENDER, values = ~count) %>%
+      add_pie(hole = 0.5) %>%
+      layout(title = "Gender",  
+             showlegend = TRUE,
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    
+  })
 
-
+  output$race_bar <- renderPlotly({
+    refine_top_20() %>%
+      select(AIAN, AS, BL, HL, MR, NHPI, WH, NR) %>%
+      pivot_longer(cols = everything(), 
+                   names_to = "race_ethnicity") %>%
+      mutate(race_long = case_when(race_ethnicity == "AIAN" ~ "American Indian or Alaska Native",
+                                   race_ethnicity == "AS" ~ "Asian",
+                                   race_ethnicity == "BL" ~ "Black or African American", 
+                                   race_ethnicity == "HL" ~ "Hispanic or Latinx",
+                                   race_ethnicity == "MR" ~ "Multiracial", 
+                                   race_ethnicity == "NHPI" ~ "Native Hawaiian or Pacific Islander", 
+                                   race_ethnicity == "WH" ~ "White", 
+                                   race_ethnicity == "NR" ~ "Prefer not to answer")) %>%
+      filter(value == 1) %>%
+      group_by(race_long) %>%
+      summarize(count = n(),
+                frac = n()/nrow(.)) %>%
+      plot_ly(x = ~frac, y = ~race_long,
+              type = 'bar',
+              orientation = 'h') %>%
+      layout(xaxis = list(title = FALSE),
+             yaxis = list(title = FALSE))
+  })
 
 }
 
