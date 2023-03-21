@@ -70,7 +70,8 @@ function(input, output, session) {
   
   # Make a function for refine_top_20 by adding ()
   data_Evimp <- reactive({
-    refine_top_20() %>% group_by(COUNTY) %>%
+    refine_top_20() %>% 
+      group_by(COUNTY) %>%
       summarize(across(
         ends_with("Evimp"),
         ~sum(.x == 1, na.rm = TRUE)/n())*100) %>% 
@@ -81,11 +82,15 @@ function(input, output, session) {
       ) %>%
       group_by(COUNTY) %>% 
       arrange(desc(Percentage)) %>% 
-      mutate(Metric = gsub("_EVimp", "", Metric))%>%
+      # Remove _EVimp from column names so join with labels works
+      mutate(Metric = gsub("_EVimp", "", Metric)) %>%
+      # Summarize across counties in the case that multiple counties are selected
+      group_by(Metric) %>%
+      summarize(Percentage = mean(Percentage)) %>%
+      # Take top 30
       slice(1:30) %>% 
       left_join(labels) %>% 
-        select(COUNTY, Topic, Metric, Description, Percentage) %>% 
-    
+        select(Topic, Metric, Description, Percentage) %>% 
       arrange(desc(Percentage)) %>% 
       ungroup() %>% 
       mutate(Percentage = round(Percentage)/100) %>% 
