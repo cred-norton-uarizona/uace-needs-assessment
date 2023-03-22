@@ -12,16 +12,18 @@ labels <- read.csv(here::here("data", "labels.csv"))
 # % Extremely or Very Important Selected, Top 30 for Now-------
 
 
-data_Evimp <- data %>% group_by(COUNTY) %>%
+data_Evimp <- data %>% 
+  # group_by(COUNTY) %>%
 summarize(across(
   ends_with("Evimp"),
   ~sum(.x == 1, na.rm = TRUE)/n())*100)
 
-data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
-                                    names_to = "Metric",
-                                    values_to = "Percentage"
+data_Evimp <- data_Evimp %>% pivot_longer(ends_with("Evimp"),
+  # -COUNTY,
+  names_to = "Metric",
+  values_to = "Percentage"
 ) %>%
-  group_by(COUNTY) %>% 
+  # group_by(COUNTY) %>% 
   arrange(desc(Percentage)) %>% 
   mutate(Metric = gsub("_EVimp", "", Metric))%>%
   slice(1:30)  # %>% 
@@ -39,7 +41,9 @@ data_Evimp <- data_Evimp %>% pivot_longer(-COUNTY,
 
 
 data_joined <- left_join(data_Evimp, labels) %>% 
-  select(COUNTY, Topic, Metric, Description, Percentage)
+  select(
+    # COUNTY,
+    Topic, Metric, Description, Percentage)
 
 # colnames(data_joined)
 
