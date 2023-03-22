@@ -32,15 +32,16 @@ function(input, output, session) {
     module = selectizeGroupServer,
     id = "my-filters",
     data = data,
-    vars = c("COUNTY", "LIVE_V3", "UserLanguage", "GENDER", 
-             "AGE", "DEM_11", "Low_Income_FPL_100", "CE_EXPOSED", "CE_USER"), #add new filters here by adding column name in quotes
+    vars = c("COUNTY", "LIVE_V3", "UserLanguage", "Gender", 
+             "AGE", "DEM_11", "Low_Income_FPL_185", "CE_EXPOSED", "CE_USER"), #add new filters here by adding column name in quotes
     inline = FALSE
   )
   
   refine_top_20 <- reactive({
     top_20_filtered() %>% 
       filter(if_any(all_of(input$race_ethnicity), function(x) {x == 1})) %>% # anonymous functions
-      filter(if_any(all_of(input$topical_expert), function(x) {x == 1})) 
+      filter(if_any(all_of(input$topical_experience), function(x) {x == 1})) %>%
+      filter(if_any(all_of(input$topical_knowledge), function(x) {x == 1}))
   })
   
   # Make a function for refine_top_20 by adding ()

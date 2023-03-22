@@ -17,13 +17,17 @@ race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "White" = "WH" , 
               "Prefer not to answer" = "NR") 
     
-expert_vec <- c("Health & Well-Being" = "HLTH_EXPERT",
-              "Education & Youth Development" = "ED_EXPERT", 
-              "Agriculture" = "AG_EXPERT", 
-              "Natural Resources" =  "NR_EXPERT",
-              "Community & Economic Development" = "CD_EXPERT") 
+topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
+                     "Education & Youth Development" = "ED_EXPERIENCE", 
+                     "Health & Well-Being" = "HLTH_EXPERIENCE", 
+                     "Natural Resources" =  "NR_EXPERIENCE", 
+                     "Community & Economic Development" = "CD_EXPERIENCE")
 
-
+topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
+                     "Education & Youth Development" = "ED_KNOWLEDGE",
+                     "Health & Well-Being" = "HLTH_KNOWLEDGE",
+                     "Natural Resources" = "NR_KNOWLEDGE",
+                     "Community & Economic Development" = "CD_KNOWLEDGE")
 
 # az_counties <- map_data("county", region = "arizona")|>
 #   mutate(COUNTY = str_to_title(subregion))
@@ -51,13 +55,13 @@ dashboardPage(
         
         UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
         
-        GENDER = list(inputId = "GENDER", title = "Gender"),
+        Gender = list(inputId = "Gender", title = "Gender"),
         
         AGE = list(inputId = "AGE", title = "Age"),
         
         DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
         
-        Low_Income_FPL_100 = list(inputId = "Low_Income_FPL_100", title = "Low-income Status (100% Federal Poverty Level or lower)"),
+        Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income Status (185% Federal Poverty Level or lower)"),
         
         CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
         
@@ -74,9 +78,15 @@ dashboardPage(
       multiple = TRUE
     ),
     selectInput(
-      inputId = "topical_expert",
-      label = "Topical Expert",
-      choices = expert_vec,
+      inputId = "topical_experience",
+      label = "Topical Experience",
+      choices = topical_exp_vec,
+      multiple = TRUE
+    ),
+    selectInput(
+      inputId = "topical_knowledge",
+      label = "Topical Knowledge",
+      choices = topical_knw_vec,
       multiple = TRUE
     )
   ),
