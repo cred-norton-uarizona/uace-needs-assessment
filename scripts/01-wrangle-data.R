@@ -4,7 +4,7 @@ library(readxl)
 library(pins)
 # install.packages("rsconnect")
 
-data <- read_csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_3.22.23 no zip.csv")
+data <- read_csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_3.23.23 no zip.csv")
 
 
 
