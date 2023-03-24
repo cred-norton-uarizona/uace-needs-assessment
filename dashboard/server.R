@@ -49,10 +49,13 @@ function(input, output, session) {
     refine_top_20() %>% 
       summarize(across(
         ends_with("Evimp"),
-        ~sum(.x == 1, na.rm = TRUE)/n())*100) %>% 
-      pivot_longer(ends_with("Evimp"),
-                   names_to = "Metric",
-                   values_to = "Percentage"
+        ~ sum(.x == 1, na.rm = TRUE) / sum(!is.na(.x)) 
+      )) %>% 
+      
+      pivot_longer(
+        everything(),
+        names_to = "Metric",
+        values_to = "Percentage"
       ) %>%
       arrange(desc(Percentage)) %>% 
       # Remove _EVimp from column names so join with labels works
@@ -62,7 +65,6 @@ function(input, output, session) {
       left_join(labels) %>% 
       select(Topic, Metric, Description, Percentage) %>% 
       arrange(desc(Percentage)) %>% 
-      mutate(Percentage = round(Percentage)/100) %>% 
       filter(Percentage >= nth(Percentage, 20)) %>% 
       mutate(row = 1:n())
   })
