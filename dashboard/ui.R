@@ -8,6 +8,20 @@
 #
 
 
+county_vec <- unique(data$COUNTY) %>% na.omit()
+
+live_vec <- unique(data$LIVE_V3) %>% na.omit()
+
+lang_vec <- unique(data$UserLanguage) %>% na.omit()
+
+ed_vec <- unique(data$DEM_11) %>% na.omit()
+
+income_vec <- unique(data$Low_Income_FPL_185) %>% na.omit()
+
+age_vec <- unique(data$AGE) %>% na.omit()
+
+gender_vec <- unique(data$Gender) %>% na.omit()
+
 race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "Asian" = "AS",
               "Black or African American" = "BL", 
@@ -64,12 +78,10 @@ dashboardPage(
                       COUNTY = list(inputId = "COUNTY", title = "County"),
                       LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
                       UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
-                      Gender = list(inputId = "Gender", title = "Gender"),
-                      AGE = list(inputId = "AGE", title = "Age"),
                       DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
                       Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income Status"),
-                      CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
-                      CE_USER = list(inputId = "CE_USER", title = "Extension User")),
+                      Gender = list(inputId = "Gender", title = "Gender"),
+                      AGE = list(inputId = "AGE", title = "Age")),
                     inline = TRUE
                   )
                 )
@@ -96,7 +108,8 @@ dashboardPage(
                       choices = topical_knw_vec,
                       multiple = TRUE
                     )),
-                infoBoxOutput("Nbox", width = 3)
+                infoBoxOutput("Nbox", width = 3),
+                
               ),
               fluidRow(column(width = 8,
                               box(
@@ -106,7 +119,8 @@ dashboardPage(
                                   width = NULL)),
                        column(
                          width = 4,
-                         box(plotlyOutput("gender_donut", height = 200),
+                         box(
+                             plotlyOutput("gender_donut", height = 200),
                              width = NULL)
                          
                        )))

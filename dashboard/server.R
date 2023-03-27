@@ -32,8 +32,8 @@ function(input, output, session) {
     module = selectizeGroupServer,
     id = "my-filters",
     data = data,
-    vars = c("COUNTY", "LIVE_V3", "UserLanguage", "Gender", 
-             "AGE", "DEM_11", "Low_Income_FPL_185", "CE_EXPOSED", "CE_USER"), #add new filters here by adding column name in quotes
+    vars = c("COUNTY", "LIVE_V3", "UserLanguage", "DEM_11", "Low_Income_FPL_185",
+             "Gender", "AGE"), #add new filters here by adding column name in quotes
     inline = TRUE
   )
   
@@ -69,7 +69,7 @@ function(input, output, session) {
       mutate(row = 1:n())
   })
   
-  output$table <- DT::renderDataTable(data_Evimp())
+  # output$table <- DT::renderDataTable(data_Evimp())
 
   output$top20bar <- renderPlot({
     colors <- c("Health and Well-Being" = "#604878", "Natural Resources" = "#1B587C", "Agriculture" = "#4E8542", "Community and Economic Development" = "#C09001", "Education" = "#C65A11")
