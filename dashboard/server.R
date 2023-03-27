@@ -34,7 +34,7 @@ function(input, output, session) {
     data = data,
     vars = c("COUNTY", "LIVE_V3", "UserLanguage", "Gender", 
              "AGE", "DEM_11", "Low_Income_FPL_185", "CE_EXPOSED", "CE_USER"), #add new filters here by adding column name in quotes
-    inline = FALSE
+    inline = TRUE
   )
   
   refine_top_20 <- reactive({
@@ -101,6 +101,14 @@ function(input, output, session) {
       guides(fill = guide_legend(nrow = 2))
     })
   
+  # Sample size infobox
+  output$Nbox <- renderInfoBox({
+    infoBox("Respondents",
+            value = paste0(nrow(refine_top_20()), "/", nrow(data)),
+            icon = icon("user", lib = "glyphicon"))
+  })
+  
+  # Sample size gauge
   output$Ngauge <- renderPlotly({
     temp <- refine_top_20()
     

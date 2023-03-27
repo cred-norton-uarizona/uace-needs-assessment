@@ -46,65 +46,72 @@ topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
 dashboardPage(
   dashboardHeader(title = "University of Arizona Cooperative Extension Needs Assessment"),
   dashboardSidebar(
-    selectizeGroupUI(
-      id = "my-filters",
-      params = list(
-        COUNTY = list(inputId = "COUNTY", title = "County"),
-        
-        LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
-        
-        UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
-        
-        Gender = list(inputId = "Gender", title = "Gender"),
-        
-        AGE = list(inputId = "AGE", title = "Age"),
-        
-        DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
-        
-        Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income Status (185% Federal Poverty Level or lower)"),
-        
-        CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
-        
-        CE_USER = list(inputId = "CE_USER", title = "Extension User")
-        
-      ),
-      inline = FALSE
-    ),
-    # status = "primary",
-    selectInput(
-      inputId = "race_ethnicity",
-      label = "Race/Ethnicity",
-      choices = race_vec,
-      multiple = TRUE
-    ),
-    selectInput(
-      inputId = "topical_experience",
-      label = "Topical Experience",
-      choices = topical_exp_vec,
-      multiple = TRUE
-    ),
-    selectInput(
-      inputId = "topical_knowledge",
-      label = "Topical Knowledge",
-      choices = topical_knw_vec,
-      multiple = TRUE
-    )
+    sidebarMenu(
+      menuItem("Introduction", tabName = "intro"),
+      menuItem("Demographics", tabName = "demographics"),
+      menuItem("Top 20", tabName = "top20"))
   ),
   dashboardBody(# Boxes need to be put in a row (or column)
-    fluidRow(column(width = 8,
-                    box(
-                      plotOutput("top20bar", height = 600),
-                      width = NULL),
-                    box(plotlyOutput("race_bar", height = 300),
-                        width = NULL)),
-             column(
-               width = 4,
-               box(plotlyOutput("Ngauge", height = 200),
-                   width = NULL),
-               box(plotlyOutput("gender_donut", height = 200),
-                   width = NULL)
-               
-             )))
+    tabItems(
+      tabItem(tabName = "top20",
+              fluidRow(
+                box(
+                  title = "Select inputs", width = 12, status = "primary",
+                  selectizeGroupUI(
+                    id = "my-filters",
+                    params = list(
+                      COUNTY = list(inputId = "COUNTY", title = "County"),
+                      LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
+                      UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
+                      Gender = list(inputId = "Gender", title = "Gender"),
+                      AGE = list(inputId = "AGE", title = "Age"),
+                      DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
+                      Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income Status"),
+                      CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
+                      CE_USER = list(inputId = "CE_USER", title = "Extension User")),
+                    inline = TRUE
+                  )
+                )
+              ),
+              fluidRow(
+                box(width = 3,
+                    selectInput(
+                      inputId = "race_ethnicity",
+                      label = "Race/Ethnicity",
+                      choices = race_vec,
+                      multiple = TRUE
+                    )),
+                box(width = 3,
+                    selectInput(
+                      inputId = "topical_experience",
+                      label = "Topical Experience",
+                      choices = topical_exp_vec,
+                      multiple = TRUE
+                    )),
+                box(width = 3,
+                    selectInput(
+                      inputId = "topical_knowledge",
+                      label = "Topical Knowledge",
+                      choices = topical_knw_vec,
+                      multiple = TRUE
+                    )),
+                infoBoxOutput("Nbox", width = 3)
+              ),
+              fluidRow(column(width = 8,
+                              box(
+                                plotOutput("top20bar", height = 600),
+                                width = NULL),
+                              box(plotlyOutput("race_bar", height = 300),
+                                  width = NULL)),
+                       column(
+                         width = 4,
+                         box(plotlyOutput("gender_donut", height = 200),
+                             width = NULL)
+                         
+                       )))
+    )
+    
+    )
   )
 
 
