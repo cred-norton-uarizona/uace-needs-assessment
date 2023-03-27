@@ -47,9 +47,10 @@ dashboardPage(
   dashboardHeader(title = "University of Arizona Cooperative Extension Needs Assessment"),
   dashboardSidebar(
     sidebarMenu(
+      menuItem("Top 20", tabName = "top20")),
       menuItem("Introduction", tabName = "intro"),
-      menuItem("Demographics", tabName = "demographics"),
-      menuItem("Top 20", tabName = "top20"))
+      menuItem("Demographics", tabName = "demographics")
+      
   ),
   dashboardBody(# Boxes need to be put in a row (or column)
     tabItems(
