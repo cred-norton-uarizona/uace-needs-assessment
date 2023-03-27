@@ -16,26 +16,18 @@ race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "Native Hawaiian or Pacific Islander" = "NHPI", 
               "White" = "WH" , 
               "Prefer not to answer" = "NR") 
-    
-expert_vec <- c("Health & Well-Being" = "HLTH_EXPERT",
-              "Education & Youth Development" = "ED_EXPERT", 
-              "Agriculture" = "AG_EXPERT", 
-              "Natural Resources" =  "NR_EXPERT",
-              "Community & Economic Development" = "CD_EXPERT") 
 
+topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
+                     "Education & Youth Development" = "ED_EXPERIENCE", 
+                     "Health & Well-Being" = "HLTH_EXPERIENCE", 
+                     "Natural Resources" =  "NR_EXPERIENCE", 
+                     "Community & Economic Development" = "CD_EXPERIENCE")
 
-
-# az_counties <- map_data("county", region = "arizona")|>
-#   mutate(COUNTY = str_to_title(subregion))
-
-
-# Incorporate the code from the app.R script
-
-# data %>% count(AGE)
-# Ask RG if this works for her and if these numbers look like what she found
-
-
-# data %>% count(Low_Income_FPL)
+topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
+                     "Education & Youth Development" = "ED_KNOWLEDGE",
+                     "Health & Well-Being" = "HLTH_KNOWLEDGE",
+                     "Natural Resources" = "NR_KNOWLEDGE",
+                     "Community & Economic Development" = "CD_KNOWLEDGE")
 
 
 # Application title
@@ -53,51 +45,61 @@ navbarPage(
   tabPanel(
     "Top Priorities",
     sidebarLayout(
-      sidebarPanel(
+      sidebarPanel( width = 3,
         selectizeGroupUI(
           id = "my-filters",
           params = list(
             COUNTY = list(inputId = "COUNTY", title = "County"),
-            
             LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
-            
             UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
-            
-            GENDER = list(inputId = "GENDER", title = "Gender"),
-            
-            AGE = list(inputId = "AGE", title = "Age"),
-            
             DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
-            
-            Low_Income_FPL_100 = list(inputId = "Low_Income_FPL_100", title = "Low-income Status (100% Federal Poverty Level or lower)"),
-            
-            CE_EXPOSED = list(inputId = "CE_EXPOSED", title = "Familiar with Extension"),
-            
-            CE_USER = list(inputId = "CE_USER", title = "Extension User")
-            
-          ),
+            Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income Status"),
+            Gender = list(inputId = "Gender", title = "Gender"),
+            AGE = list(inputId = "AGE", title = "Age")),
           inline = FALSE
-        ), status = "primary",
+        ), 
         selectInput(inputId = "race_ethnicity",
                     label = "Race/Ethnicity",
                     choices = race_vec,
                     multiple = TRUE),
         
-        selectInput(inputId = "topical_expert",
-                    label = "Topical Expert",
-                    choices = expert_vec,
-                    multiple = TRUE)
+        selectInput(
+          inputId = "topical_experience",
+          label = "Topical Experience",
+          choices = topical_exp_vec,
+          multiple = TRUE
+        ),
+        
+        selectInput(
+          inputId = "topical_knowledge",
+          label = "Topical Knowledge",
+          choices = topical_knw_vec,
+          multiple = TRUE
+        )
       ),
-      
       
       # Show a plot of the generated distribution
       mainPanel(
-        # This is where you show the output (data, chart, leaflet map, etc.) with commas
-        # Where do we put this code for the Top Priorities and how do we specific grouping by the slicers/filters selected dynamically?
-        plotOutput("top20bar", height = 800)
+        fluidRow(column(width = 8,
+                        box(
+                          plotOutput("top20bar", height = 800),
+                          width = NULL),
+                        ),
+                 column(width = 4,
+                        box(
+                          plotOutput("n_indicator", height = 200), 
+                          width = NULL
+                        ),
+                        box(
+                          plotlyOutput("gender_donut", height = 300),
+                          width = NULL),
+                        box(plotlyOutput("race_donut", height = 225),
+                            width = NULL))
+                   
+                 )))
     )
   )
-)
-)
+
+
   
 

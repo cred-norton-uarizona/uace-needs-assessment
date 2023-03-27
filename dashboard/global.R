@@ -3,8 +3,10 @@ library(mapproj)
 library(maps)
 library(tidyverse)
 library(pins)
+library(shinydashboard)
 library(shinyWidgets)
-
+library(plotly)
+library(ggforce)
 
 
 board <- board_connect()
