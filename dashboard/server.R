@@ -35,7 +35,7 @@ function(input, output, session) {
       mutate(Metric = gsub("_EVimp", "", Metric)) %>%
       # Take top 30
       slice(1:30) %>% 
-      left_join(labels) %>% 
+      left_join(labels, by = join_by(Metric)) %>% 
       select(Topic, Metric, Description, Percentage) %>% 
       arrange(desc(Percentage)) %>% 
       filter(Percentage >= nth(Percentage, 20)) %>% 
@@ -76,12 +76,19 @@ function(input, output, session) {
   # Sample size indicator
   
   output$n_indicator <- renderPlot({
-    df <- tibble(
-      count = c(nrow(refine_top_20()), nrow(data)),
-      category = c("filtered", "total")
-    ) %>% 
+    data_filtered <- refine_top_20()
+    
+    df <-
+      tibble(
+        # get the fraction of rows (observations) for after and before filtering
+        fraction = c(
+          nrow(data_filtered)/nrow(data),
+          (nrow(data)-nrow(data_filtered))/nrow(data)
+        ),
+        category = c("filtered", "total")
+      ) |> 
+      # convert to coordinates of a bar
       mutate(
-        fraction = count/sum(count),
         start = cumsum(fraction),
         end = c(0, head(start, n=-1))
       )
