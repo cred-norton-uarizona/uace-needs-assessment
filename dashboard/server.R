@@ -35,7 +35,7 @@ function(input, output, session) {
       mutate(Metric = gsub("_EVimp", "", Metric)) %>%
       # Take top 30
       slice(1:30) %>% 
-      left_join(labels, by = join_by(Metric)) %>% 
+      left_join(labels) %>% 
       select(Topic, Metric, Description, Percentage) %>% 
       arrange(desc(Percentage)) %>% 
       filter(Percentage >= nth(Percentage, 20)) %>% 
