@@ -82,23 +82,35 @@ navbarPage(
       
       # Show a plot of the generated distribution
       mainPanel(
-        fluidRow(column(width = 8,
-                        box(
-                          plotOutput("top20bar", height = 800),
-                          width = NULL),
-                        ),
-                 column(width = 4,
-                        box(
-                          plotOutput("n_indicator", height = 200), 
-                          width = NULL
-                        ),
-                        box(
-                          plotlyOutput("gender_donut", height = 300),
-                          width = NULL),
-                        box(plotlyOutput("race_donut", height = 225),
-                            width = NULL))
-                   
-                 )))
+        tabsetPanel(type = "tabs",
+                    tabPanel("Overall",
+                             fluidRow(column(width = 8,
+                                             box(
+                                               plotOutput("top20bar", height = 800),
+                                               width = NULL),
+                             ),
+                             column(width = 4,
+                                    box(
+                                      plotOutput("n_indicator", height = 200), 
+                                      width = NULL
+                                    ),
+                                    box(
+                                      plotlyOutput("gender_donut", height = 300),
+                                      width = NULL),
+                                    box(plotlyOutput("race_donut", height = 225),
+                                        width = NULL))
+                             
+                             )),
+                    tabPanel("By Topic",
+                             fluidRow(box(selectInput(
+                               inputId = "topic",
+                               label = "Select Topic",
+                               choices = unique(labels$Topic),
+                               multiple = FALSE
+                             ), width = 6),
+                             box("Box")))
+                    )
+        ))
     )
   )
 

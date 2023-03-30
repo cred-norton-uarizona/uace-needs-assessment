@@ -53,8 +53,9 @@ function(input, output, session) {
       scale_x_reverse()+
       scale_fill_manual(values = colors)+
       coord_flip() +
-      labs(title = "Top Priorities", # We can explore how to add more than one county name
-           subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
+      labs(
+        # title = "Top Priorities", # We can explore how to add more than one county name
+        subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
       theme(
         #legend.position = "none",
         legend.position = "top",
