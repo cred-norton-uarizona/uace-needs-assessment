@@ -10,14 +10,15 @@ labels <- read.csv(here::here("data", "labels.csv"))
 cnames <- labels$Metric[labels$Topic == "Agriculture"] # substitute with input$topic
 
 # For range of sample size (we're not including NAs)
-data %>% # substitute with refine_top_20()
+n_range <- data %>% # substitute with refine_top_20()
   select(all_of(cnames)) %>%
   pivot_longer(cols = everything(),
                names_to = "Metric",
                values_to = "Response") %>%
   drop_na() %>%
   count(Metric) %>%
-  summarize(range = range(n))
+  summarize(range = range(n)) %>%
+  pull(range)
 
 # Make E + V only for ranking purposes
 rank_EV <- data %>% # substitute with refine_top_20()
