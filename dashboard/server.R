@@ -106,7 +106,7 @@ function(input, output, session) {
         fill = category
       )) +
       annotate(geom = "text", label = nrow(refine_top_20()), x = 0, y = 0.1, size = 16) +
-      scale_fill_manual(values = c("purple", "white")) +
+      scale_fill_manual(values = c("#418ab3", "white")) +
       coord_equal() +
       theme_void() +
       theme(legend.position = "none")
@@ -114,20 +114,25 @@ function(input, output, session) {
   
   
   # Gender donut
+
+  colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
+  
   output$gender_donut <- renderPlotly({
     refine_top_20() %>%
-      mutate(Gender = ifelse(is.na(Gender), "No response", Gender)) %>%
+      mutate(Gender = ifelse(is.na(Gender), "No Response", Gender)) %>%
       group_by(Gender) %>%
       summarize(count = n()) %>%
-      plot_ly(labels = ~Gender, values = ~count) %>%
+      plot_ly(labels = ~Gender, values = ~count, textinfo = "label+percent", 
+              marker = list(colors = colors_gender)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Gender",  
              showlegend = TRUE,
              legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-    
   })
+  
+  colors_education <- c("No" = "#1b587c", "Yes" = "#9f2936", "No response" = "#f2f2f2")
   
   # Bach donut
   output$bach_donut <- renderPlotly({
@@ -135,15 +140,15 @@ function(input, output, session) {
       mutate(Bach_or_higher = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
       group_by(Bach_or_higher) %>%
       summarize(count = n()) %>%
-      plot_ly(labels = ~Bach_or_higher, values = ~count) %>%
-      add_pie(hole = 0.5) %>%
+      plot_ly(labels = ~Bach_or_higher, values = ~count, type = 'pie',
+              marker = list(colors = colors_education)) %>%
       layout(title = "Bachelor's or higher",  
              showlegend = TRUE,
              legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-    
   })
+  
   
   #  Donut for white/non-white
   output$race_donut <- renderPlotly({
