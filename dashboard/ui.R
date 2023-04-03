@@ -95,10 +95,14 @@ navbarPage(
                                       width = NULL
                                     ),
                                     box(
-                                      plotlyOutput("gender_donut", height = 300),
+                                      plotlyOutput("gender_donut", height = 225),
                                       width = NULL),
-                                    box(plotlyOutput("race_donut", height = 225),
-                                        width = NULL))
+                                    box(
+                                      plotlyOutput("race_donut", height = 225),
+                                        width = NULL),
+                                    box(
+                                      plotlyOutput("bach_donut", height = 225),
+                                      width = NULL))
                              
                              )),
                     tabPanel("By Topic",

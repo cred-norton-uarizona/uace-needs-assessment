@@ -105,7 +105,7 @@ function(input, output, session) {
         end = end * pi - pi/2,
         fill = category
       )) +
-      annotate(geom = "text", label = nrow(refine_top_20()), x = 0, y = 0.1, size = 16) +
+      annotate(geom = "text", label = nrow(refine_top_20()), x = 0, y = 0.1, size = 12) +
       scale_fill_manual(values = c("#418ab3", "white")) +
       coord_equal() +
       theme_void() +
@@ -115,35 +115,45 @@ function(input, output, session) {
   
   # Gender donut
 
-  colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
-  
   output$gender_donut <- renderPlotly({
+    
+    colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", 
+                       "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
+    
     refine_top_20() %>%
-      mutate(Gender = ifelse(is.na(Gender), "No Response", Gender)) %>%
+      mutate(Gender = ifelse(is.na(Gender), "No Response", Gender),
+             Gender = factor(Gender, levels = c("Woman", "Man",
+                                                "Non-binary", "No Response"))) %>%
       group_by(Gender) %>%
       summarize(count = n()) %>%
-      plot_ly(labels = ~Gender, values = ~count, textinfo = "label+percent", 
+      plot_ly(labels = ~Gender, values = ~count, 
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
               marker = list(colors = colors_gender)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Gender",  
-             showlegend = TRUE,
+             showlegend = FALSE,
              legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
   
-  colors_education <- c("No" = "#1b587c", "Yes" = "#9f2936", "No response" = "#f2f2f2")
+   # Bach donut
+  colors_education <- c("#1b587c", "#9f2936", "#f2f2f2")
   
-  # Bach donut
   output$bach_donut <- renderPlotly({
     refine_top_20() %>%
-      mutate(Bach_or_higher = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
+      mutate(Bach_or_higher = ifelse(is.na(Bach_or_higher), "No Response", Bach_or_higher),
+             Bach_or_higher = factor(Bach_or_higher, levels = c("No", "Yes", "No Response"))) %>%
       group_by(Bach_or_higher) %>%
       summarize(count = n()) %>%
-      plot_ly(labels = ~Bach_or_higher, values = ~count, type = 'pie',
+      plot_ly(labels = ~Bach_or_higher, values = ~count,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
               marker = list(colors = colors_education)) %>%
+      add_pie(hole = 0.5) %>%
       layout(title = "Bachelor's or higher",  
-             showlegend = TRUE,
+             showlegend = FALSE,
              legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
@@ -151,12 +161,19 @@ function(input, output, session) {
   
   
   #  Donut for white/non-white
+  
+  colors_white <- c("#1b587c", "#9f2936")
   output$race_donut <- renderPlotly({
     refine_top_20() %>%
       # mutate(non_white = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
       group_by(non_white) %>%
       summarize(count = n()) %>%
-      plot_ly(labels = ~non_white, values = ~count) %>%
+      mutate(non_white = case_when(non_white == 0 ~ "White",
+                                   non_white == 1 ~ "Non-White")) %>%
+      plot_ly(labels = ~non_white, values = ~count,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              marker = list(colors = colors_white)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Identity",  
              showlegend = FALSE,
