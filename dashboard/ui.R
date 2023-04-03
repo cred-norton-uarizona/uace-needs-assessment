@@ -111,12 +111,15 @@ navbarPage(
                                label = "Select Topic",
                                choices = unique(labels$Topic),
                                multiple = FALSE
-                             ), width = 6),
-                             box("Box")))
+                             ), width = 6)),
+                             fluidRow(
+                               plotOutput("bytopicbar", height = 800,
+                                          width = 700)
+                             )))
                     )
         ))
     )
-  )
+  
 
 
   
