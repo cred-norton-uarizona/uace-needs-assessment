@@ -17,4 +17,14 @@ data <- pin_read(board, "terrace/uace-na")
 
 labels <- read.csv("labels.csv")
 
+# funtion to break strings for ggplot
+break_string <- function(x, n) {
+  # x is a character string
+  # n is number of characters before the break
+  out_string <- stringi::stri_wrap(x, n)
+  out_n <- length(out_string)
+  
+  ifelse(out_n == 1, out_string, 
+         paste0(out_string[1], "\n", out_string[2]))
+}
 

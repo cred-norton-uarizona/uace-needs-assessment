@@ -95,10 +95,14 @@ navbarPage(
                                       width = NULL
                                     ),
                                     box(
-                                      plotlyOutput("gender_donut", height = 300),
+                                      plotlyOutput("gender_donut", height = 225),
                                       width = NULL),
-                                    box(plotlyOutput("race_donut", height = 225),
-                                        width = NULL))
+                                    box(
+                                      plotlyOutput("race_donut", height = 225),
+                                        width = NULL),
+                                    box(
+                                      plotlyOutput("bach_donut", height = 225),
+                                      width = NULL))
                              
                              )),
                     tabPanel("By Topic",
@@ -107,12 +111,15 @@ navbarPage(
                                label = "Select Topic",
                                choices = unique(labels$Topic),
                                multiple = FALSE
-                             ), width = 6),
-                             box("Box")))
+                             ), width = 6)),
+                             fluidRow(
+                               plotOutput("bytopicbar", height = 800,
+                                          width = 700)
+                             )))
                     )
         ))
     )
-  )
+  
 
 
   
