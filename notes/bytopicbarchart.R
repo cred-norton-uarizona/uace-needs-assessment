@@ -106,6 +106,7 @@ ggplot() +
             vjust = 0.5, hjust = 0.5,
             color = "white", size = 3.5) +
   scale_x_discrete(labels = xlabs) +
+  scale_fill_manual(values = colors_ag) +
   coord_flip() +
   guides(fill = guide_legend(reverse = TRUE)) +
   labs(subtitle = paste0("Between ", n_range[1], " and ", n_range[2], 
