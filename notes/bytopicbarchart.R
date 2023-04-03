@@ -3,6 +3,18 @@
 library(tidyverse)
 library(pins)
 
+break_string <- function(x, n) {
+  # x is a character string
+  # n is number of characters before the break
+  out_string <- stringi::stri_wrap(x, n)
+  out_n <- length(out_string)
+  
+  ifelse(out_n == 1, out_string, 
+         paste0(out_string[1], "\n", out_string[2]))
+}
+
+
+
 board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
 labels <- read.csv(here::here("data", "labels.csv"))
@@ -66,9 +78,56 @@ data_bytopic <- data %>% # substitute with refine_top_20()
                                                "Extremely")))
 
 str(data_bytopic)
+
+# data labels - only for top 3 rankings
+percent_labels <- data_bytopic %>%
+  filter(Response %in% c("Extremely", "Very", "Somewhat")) %>% 
+  arrange(Description, desc(Response)) %>%
+  group_by(Description) %>%
+  mutate(location_half = percent/2,
+         location_prev = lag(percent),
+         location_prev2 = lag(location_prev),
+         y = rowSums(across(starts_with("location")), 
+                     na.rm = TRUE))
+
+# Make vector of x labels
+xlabs <- sapply(levels(data_bytopic$Description), break_string, 50)
+
 # ggplot prototype
 
-ggplot(data_bytopic, aes(x = fct_rev(Description), y = percent)) +
-  geom_col(aes(fill = Response)) +
+ggplot() +
+  geom_col(data = data_bytopic, aes(x = fct_rev(Description), 
+                                    y = percent,
+                                    fill = Response)) +
+  geom_text(data = percent_labels,
+            aes(x = fct_rev(Description), 
+                y = y, 
+                label = paste0(percent, "%")),
+            vjust = 0.5, hjust = 0.5,
+            color = "white", size = 3.5) +
+  scale_x_discrete(labels = xlabs) +
   coord_flip() +
-  theme(legend.position = "bottom")
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme(
+    #legend.position = "none",
+    legend.position = "top",
+    legend.title = element_blank(),
+    plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
+    plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "gray"),
+    panel.background = element_rect(fill = NA),
+    panel.grid.major = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text.x = element_blank()
+    # axis.text.y = element_text(size = 11, margin = margin(0, 5, 0, 0)),
+    # axis.text.y = element_blank()
+  )
+
+
+# Color 
+# Set the colors for each topical area
+colors_health <- c("Extremely" = "#30243c", "Very" = "#5a4a6a", "Somewhat" = "#a088b7", "A little" = "#bfafcf", "Not at all" = "#dfd7e7")
+colors_education <- c("Extremely" = "#783f05", "Very" = "#b45f07", "Somewhat" = "#f9b268", "A little" = "#fbcc9a", "Not at all" = "#fde5cd")
+colors_ag <- c("Extremely" = "#274221", "Very" = "#4e7345", "Somewhat" = "#8ec182", "A little" = "#b3d6ac", "Not at all" = "#d9ead5")
+colors_nr <- c("Extremely" = "#0e2c3e", "Very" = "#2b556d", "Somewhat" = "#4ea5d8", "A little" = "#89c3e5", "Not at all" = "#c4e1f2")
+colors_ced <- c("Extremely" = "#c39001", "Very" = "#f5b501", "Somewhat" = "#fecf4c", "A little" = "#fee398", "Not at all" = "#fff6dd")
