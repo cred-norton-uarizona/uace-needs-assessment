@@ -108,6 +108,8 @@ ggplot() +
   scale_x_discrete(labels = xlabs) +
   coord_flip() +
   guides(fill = guide_legend(reverse = TRUE)) +
+  labs(subtitle = paste0("Between ", n_range[1], " and ", n_range[2], 
+                         " participants responded to each item")) +
   theme(
     #legend.position = "none",
     legend.position = "top",
