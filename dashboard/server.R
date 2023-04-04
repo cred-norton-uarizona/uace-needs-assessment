@@ -126,25 +126,33 @@ function(input, output, session) {
   # Gender donut
 
   output$gender_donut <- renderPlotly({
-
+    
+    # Establish universal colors
     colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", 
                        "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
+    
+    # Wrangle data for donut
+    gender_count <- refine_filtered() %>%
+      mutate(Gender = ifelse(is.na(Gender), "No Response", Gender),
+             Gender = factor(Gender, levels = c("Woman", "Man",
+                                                "Non-binary", "No Response"))) %>%
+      group_by(Gender) %>%
+      summarize(count = n())
+    
+    # Establish specific colors needed
+    colors_temp <- colors_gender[intersect(gender_count$Gender, names(colors_gender))]
+
     # Do not print if N < = 6
     N <- nrow(refine_filtered())
     
     if(N <= 6) {
       plotly_empty()
     } else {
-    refine_filtered() %>%
-      mutate(Gender = ifelse(is.na(Gender), "No Response", Gender),
-             Gender = factor(Gender, levels = c("Woman", "Man",
-                                                "Non-binary", "No Response"))) %>%
-      group_by(Gender) %>%
-      summarize(count = n()) %>%
+    gender_count %>%
       plot_ly(labels = ~Gender, values = ~count,
               textinfo = "label", # "label+percent"
               textfont = list(size = 10),
-              marker = list(colors = colors_gender)) %>%
+              marker = list(colors = colors_temp)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Gender",  
              showlegend = FALSE,
@@ -157,7 +165,20 @@ function(input, output, session) {
    # Education donut
 
   output$edu_donut <- renderPlotly({
-    colors_education <- c("#1b587c", "#9f2936", "#f2f2f2")
+    
+    # Establish universal colors
+    colors_education <- c("Yes" = "#1b587c", "No" = "#9f2936", 
+                          "No Response" = "#f2f2f2")
+    
+    # Wrangle data for donut
+    edu_count <- refine_filtered() %>%
+      mutate(Bach_or_higher = ifelse(is.na(Bach_or_higher), "No Response", Bach_or_higher),
+             Bach_or_higher = factor(Bach_or_higher, levels = c("No", "Yes", "No Response"))) %>%
+      group_by(Bach_or_higher) %>%
+      summarize(count = n()) 
+    
+    # Establish specific colors needed
+    colors_temp <- colors_education[intersect(edu_count$Bach_or_higher, names(colors_education))]
     
     # Do not print if N < = 6
     N <- nrow(refine_filtered())
@@ -165,15 +186,11 @@ function(input, output, session) {
     if(N <= 6) {
       plotly_empty()
     } else {
-    refine_filtered() %>%
-      mutate(Bach_or_higher = ifelse(is.na(Bach_or_higher), "No Response", Bach_or_higher),
-             Bach_or_higher = factor(Bach_or_higher, levels = c("No", "Yes", "No Response"))) %>%
-      group_by(Bach_or_higher) %>%
-      summarize(count = n()) %>%
+    edu_count %>%
       plot_ly(labels = ~Bach_or_higher, values = ~count,
               textinfo = "label", # "label+percent"
               textfont = list(size = 10),
-              marker = list(colors = colors_education)) %>%
+              marker = list(colors = colors_temp)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Bachelor's or higher",  
              showlegend = FALSE,
@@ -188,7 +205,19 @@ function(input, output, session) {
 
   output$race_donut <- renderPlotly({
     
-    colors_white <- c("#1b587c", "#9f2936")
+    # Establish universal colors
+    colors_nonwhite <- c("Non-White" = "#1b587c", "White" = "#9f2936")
+    
+    # Wrangle data for donut
+    nonwhite_count <- refine_filtered() %>%
+      # mutate(non_white = ifelse(is.na(non_white), "No Response", non_white)) %>%
+      group_by(non_white) %>%
+      summarize(count = n()) %>%
+      mutate(non_white = case_when(non_white == 0 ~ "White",
+                                   non_white == 1 ~ "Non-White")) 
+    
+    # Establish specific colors needed
+    colors_temp <- colors_nonwhite[intersect(nonwhite_count$non_white, names(colors_nonwhite))]
     
     # Do not print if N < = 6
     N <- nrow(refine_filtered())
@@ -196,16 +225,11 @@ function(input, output, session) {
     if(N <= 6) {
       plotly_empty()
     } else {
-    refine_filtered() %>%
-      # mutate(non_white = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
-      group_by(non_white) %>%
-      summarize(count = n()) %>%
-      mutate(non_white = case_when(non_white == 0 ~ "White",
-                                   non_white == 1 ~ "Non-White")) %>%
+    nonwhite_count %>%
       plot_ly(labels = ~non_white, values = ~count,
               textinfo = "label", # "label+percent"
               textfont = list(size = 10),
-              marker = list(colors = colors_white)) %>%
+              marker = list(colors = colors_temp)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Identity",  
              showlegend = FALSE,

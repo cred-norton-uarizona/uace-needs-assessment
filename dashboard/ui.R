@@ -94,16 +94,17 @@ navbarPage(
                                     box(
                                       plotOutput("n_indicator", height = 150), 
                                       h3(),
+                                      h3(),
                                       width = NULL
                                     ),
                                     box(
-                                      plotlyOutput("gender_donut", height = 225),
+                                      plotlyOutput("gender_donut", height = 250),
                                       width = NULL),
                                     box(
-                                      plotlyOutput("race_donut", height = 225),
+                                      plotlyOutput("race_donut", height = 250),
                                         width = NULL),
                                     box(
-                                      plotlyOutput("edu_donut", height = 225),
+                                      plotlyOutput("edu_donut", height = 250),
                                       width = NULL))
                              
                              )),
