@@ -6,6 +6,7 @@ library(pins)
 library(arrow)
 library(shinydashboard)
 library(shinyWidgets)
+library(shinycssloaders) #for loading indicator
 library(plotly)
 library(ggforce)
 

@@ -86,7 +86,8 @@ navbarPage(
                     tabPanel("Overall",
                              fluidRow(column(width = 8,
                                              box(
-                                               plotOutput("top20bar", height = 800),
+                                               plotOutput("top20bar", height = 800) %>%
+                                                 withSpinner(type = 8), #loading indicator for plot,
                                                width = NULL),
                              ),
                              column(width = 4,
@@ -114,7 +115,9 @@ navbarPage(
                              ), width = 6)),
                              fluidRow(
                                plotOutput("bytopicbar", height = 800,
-                                          width = 700)
+                                          width = 700)  %>%
+                                 withSpinner(type = 8) #loading indicator for plot,
+                               
                              )))
                     )
         ))

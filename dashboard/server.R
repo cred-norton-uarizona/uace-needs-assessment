@@ -1,7 +1,7 @@
 # Define server logic 
 function(input, output, session) {
 
-  top_20_filtered <- callModule(
+  initial_filtered <- callModule(
     module = selectizeGroupServer,
     id = "my-filters",
     data = data,
@@ -10,8 +10,8 @@ function(input, output, session) {
     inline = FALSE
   )
   
-  refine_top_20 <- reactive({
-    top_20_filtered() %>% 
+  refine_filtered <- reactive({
+    initial_filtered() %>% 
       filter(if_any(all_of(input$race_ethnicity), function(x) {x == 1})) %>% # anonymous functions
       filter(if_any(all_of(input$topical_experience), function(x) {x == 1})) %>%
       filter(if_any(all_of(input$topical_knowledge), function(x) {x == 1}))
@@ -19,7 +19,7 @@ function(input, output, session) {
   
   # Make a function to arrange filtered data for top20 bar chart
   data_Evimp <- reactive({
-    refine_top_20() %>% 
+    refine_filtered() %>% 
       summarize(across(
         ends_with("Evimp"),
         ~ sum(.x == 1, na.rm = TRUE) / sum(!is.na(.x)) 
@@ -44,10 +44,19 @@ function(input, output, session) {
   
   output$top20bar <- renderPlot({
     colors <- c("Health and Well-Being" = "#604878", "Natural Resources" = "#1B587C", "Agriculture" = "#4E8542", "Community and Economic Development" = "#C09001", "Education" = "#C65A11")
+     
+    # Do not print if N < = 6
+    N <- nrow(refine_filtered())
     
+    if(N <= 6) {
+      ggplot() +
+        annotate("text", x = 1, y = 1, size = 8,
+                 label = "Low sample size, data not visualized") +
+        theme_void()
+    } else {
     # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
     ggplot(data_Evimp(), aes(x = row, y = Percentage)) +
-      geom_col(aes(fill = Topic), width = 0.9, ) +
+      geom_col(aes(fill = Topic), width = 0.9) +
       geom_text(aes(label = paste(Description, scales::percent(Percentage, accuracy = 1), sep = ", ")), vjust = 0.5, hjust = "right", color = "white", size = 4) +
       scale_y_continuous(expand = c(0, 0)) +
       scale_x_reverse()+
@@ -71,13 +80,14 @@ function(input, output, session) {
         axis.text.y = element_blank()
       ) +
       guides(fill = guide_legend(nrow = 2))
+    }
   })
   
 
   # Sample size indicator
   
   output$n_indicator <- renderPlot({
-    data_filtered <- refine_top_20()
+    data_filtered <- refine_filtered()
     
     df <-
       tibble(
@@ -105,7 +115,7 @@ function(input, output, session) {
         end = end * pi - pi/2,
         fill = category
       )) +
-      annotate(geom = "text", label = nrow(refine_top_20()), x = 0, y = 0.1, size = 12) +
+      annotate(geom = "text", label = nrow(refine_filtered()), x = 0, y = 0.1, size = 12) +
       scale_fill_manual(values = c("#418ab3", "white")) +
       coord_equal() +
       theme_void() +
@@ -116,11 +126,16 @@ function(input, output, session) {
   # Gender donut
 
   output$gender_donut <- renderPlotly({
-    
+
     colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", 
                        "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
+    # Do not print if N < = 6
+    N <- nrow(refine_filtered())
     
-    refine_top_20() %>%
+    if(N <= 6) {
+      plotly_empty()
+    } else {
+    refine_filtered() %>%
       mutate(Gender = ifelse(is.na(Gender), "No Response", Gender),
              Gender = factor(Gender, levels = c("Woman", "Man",
                                                 "Non-binary", "No Response"))) %>%
@@ -136,13 +151,21 @@ function(input, output, session) {
              legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    }
   })
   
    # Bach donut
-  colors_education <- c("#1b587c", "#9f2936", "#f2f2f2")
-  
+
   output$bach_donut <- renderPlotly({
-    refine_top_20() %>%
+    colors_education <- c("#1b587c", "#9f2936", "#f2f2f2")
+    
+    # Do not print if N < = 6
+    N <- nrow(refine_filtered())
+    
+    if(N <= 6) {
+      plotly_empty()
+    } else {
+    refine_filtered() %>%
       mutate(Bach_or_higher = ifelse(is.na(Bach_or_higher), "No Response", Bach_or_higher),
              Bach_or_higher = factor(Bach_or_higher, levels = c("No", "Yes", "No Response"))) %>%
       group_by(Bach_or_higher) %>%
@@ -157,14 +180,23 @@ function(input, output, session) {
              legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    }
   })
   
   
   #  Donut for white/non-white
-  
-  colors_white <- c("#1b587c", "#9f2936")
+
   output$race_donut <- renderPlotly({
-    refine_top_20() %>%
+    
+    colors_white <- c("#1b587c", "#9f2936")
+    
+    # Do not print if N < = 6
+    N <- nrow(refine_filtered())
+    
+    if(N <= 6) {
+      plotly_empty()
+    } else {
+    refine_filtered() %>%
       # mutate(non_white = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
       group_by(non_white) %>%
       summarize(count = n()) %>%
@@ -179,6 +211,7 @@ function(input, output, session) {
              showlegend = FALSE,
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    }
     
   })
   
@@ -190,7 +223,7 @@ function(input, output, session) {
     cnames <- labels$Metric[labels$Topic == input$topic] # substitute with input$topic
     
     # Make E + V only for ranking purposes
-    rank_EV <- refine_top_20() %>% # substitute with refine_top_20()
+    rank_EV <- refine_filtered() %>% # substitute with refine_filtered()
       select(all_of(cnames)) %>%
       pivot_longer(cols = everything(),
                    names_to = "Metric",
@@ -209,7 +242,7 @@ function(input, output, session) {
       pull(Description)
     
     # Output long dataset for plotting
-    refine_top_20() %>% # substitute with refine_top_20()
+    refine_filtered() %>% # substitute with refine_filtered()
       select(all_of(cnames)) %>%
       pivot_longer(cols = everything(),
                    names_to = "Metric",
@@ -243,7 +276,7 @@ function(input, output, session) {
     cnames <- labels$Metric[labels$Topic == input$topic] # substitute with input$topic
     
     # For range of sample size (we're not including NAs)
-    refine_top_20() %>% # substitute with refine_top_20()
+    refine_filtered() %>% # substitute with refine_filtered()
       select(all_of(cnames)) %>%
       pivot_longer(cols = everything(),
                    names_to = "Metric",
@@ -260,6 +293,15 @@ function(input, output, session) {
     data_bytopic <- data_bytopic()
     nrange <- nrange()
     
+    # Do not print if N < = 6
+    N <- nrow(refine_filtered())
+    
+    if(N <= 6) {
+      ggplot() +
+        annotate("text", x = 1, y = 1, size = 8,
+                 label = "Low sample size, data not visualized") +
+        theme_void()
+    } else {
     if(input$topic == "Health and Well-Being"){
       colors <- c("Extremely" = "#30243c", "Very" = "#5a4a6a", "Somewhat" = "#a088b7", "A little" = "#bfafcf", "Not at all" = "#dfd7e7")
       } else if(input$topic == "Education") {
@@ -316,6 +358,7 @@ function(input, output, session) {
         axis.text.y = element_text(size = 12, margin = margin(0, 5, 0, 0))
         # axis.text.y = element_blank()
       )
+    }
     
   })
   
