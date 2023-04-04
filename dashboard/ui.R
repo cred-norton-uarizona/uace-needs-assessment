@@ -114,7 +114,7 @@ navbarPage(
                              ), width = 6)),
                              fluidRow(
                                plotOutput("bytopicbar", height = 800,
-                                          width = 700)
+                                          width = NULL)
                              )))
                     )
         ))
