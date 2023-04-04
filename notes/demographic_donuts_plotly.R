@@ -52,16 +52,31 @@ data %>%
 
   
 # GENDER
+colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", 
+                   "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
 data %>%
-  group_by(GENDER) %>%
+  group_by(Gender) %>%
   summarize(count = n()) %>%
-  plot_ly(labels = ~GENDER, values = ~count) %>%
+  plot_ly(labels = ~Gender, values = ~count) %>%
   add_pie(hole = 0.5) %>%
   layout(title = "Gender",  
          showlegend = TRUE,
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
+# Test color levels
+
+data %>%
+  filter(UserLanguage == "ES") %>%
+  group_by(Gender) %>%
+  summarize(count = n()) %>%
+  plot_ly(labels = ~Gender, values = ~count,
+          marker = list(color = ~Gender)) %>%
+  add_pie(hole = 0.5) %>%
+  layout(title = "Gender",  
+         showlegend = TRUE,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   
 # AGE
 data %>%
