@@ -82,25 +82,49 @@ navbarPage(
       
       # Show a plot of the generated distribution
       mainPanel(
-        fluidRow(column(width = 8,
-                        box(
-                          plotOutput("top20bar", height = 800),
-                          width = NULL),
-                        ),
-                 column(width = 4,
-                        box(
-                          plotOutput("n_indicator", height = 200), 
-                          width = NULL
-                        ),
-                        box(
-                          plotlyOutput("gender_donut", height = 300),
-                          width = NULL),
-                        box(plotlyOutput("race_donut", height = 225),
-                            width = NULL))
-                   
-                 )))
+        tabsetPanel(type = "tabs",
+                    tabPanel("Overall",
+                             fluidRow(column(width = 8,
+                                             box(
+                                               plotOutput("top20bar", height = 800) %>%
+                                                 withSpinner(type = 8), #loading indicator for plot,
+                                               width = NULL),
+                             ),
+                             column(width = 4,
+                                    box(
+                                      plotOutput("n_indicator", height = 150), 
+                                      h3(),
+                                      h3(),
+                                      width = NULL
+                                    ),
+                                    box(
+                                      plotlyOutput("gender_donut", height = 250),
+                                      width = NULL),
+                                    box(
+                                      plotlyOutput("race_donut", height = 250),
+                                        width = NULL),
+                                    box(
+                                      plotlyOutput("edu_donut", height = 250),
+                                      width = NULL))
+                             
+                             )),
+                    tabPanel("By Topic",
+                             fluidRow(box(selectInput(
+                               inputId = "topic",
+                               label = "Select Topic",
+                               choices = unique(labels$Topic),
+                               multiple = FALSE
+                             ), width = 6)),
+                             fluidRow(
+                               plotOutput("bytopicbar", height = 800,
+                                          width = NULL)  %>%
+                                 withSpinner(type = 8) #loading indicator for plot,
+                              
+                             )))
+                    )
+        ))
     )
-  )
+  
 
 
   
