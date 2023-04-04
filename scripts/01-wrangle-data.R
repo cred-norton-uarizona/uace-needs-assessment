@@ -1,17 +1,32 @@
-
 library(tidyverse)
 library(readxl)
 library(pins)
-# install.packages("rsconnect")
 
-data <- read_csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_3.23.23 no zip.csv")
-
-
+data <- 
+  read_csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_3.23.23 no zip.csv") %>%
+  select(
+    COUNTY,
+    LIVE_V3,
+    UserLanguage,
+    DEM_11,
+    Low_Income_FPL_185,
+    Gender,
+    AGE,
+    ends_with("EVimp"),
+    AIAN,
+    AS,
+    BL,
+    HL,
+    MR,
+    NHPI,
+    WH,
+    NR,
+    ends_with("EXPERIENCE"),
+    ends_with("KNOWLEDGE")
+  )
 
 board <- board_connect()
 pin_write(board, data, "uace-na", type = "arrow")
-
-
 
 labels <- read_excel("C:/Users/Terrace Ewinghill/Box/Cooperative Extension Needs Assessment 2022/CRED - Incubator Collaboration/Labels for the content areas in survey.xlsx")
 
@@ -24,7 +39,6 @@ labels <- labels %>%
     str_detect(Metric, "CED_") ~ "Community and Economic Development",
     TRUE ~ 'NA'
   ))
-
 
 write_csv(labels, "data/labels.csv")
 write_csv(labels, "dashboard/labels.csv")
