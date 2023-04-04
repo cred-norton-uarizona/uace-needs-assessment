@@ -6,11 +6,13 @@ library(tidyverse)
 # library(maps)
 
 board <- board_connect()
+data <- pin_read(board, "terrace/uace-na")
+# data <- pin_read(board, "ericrscott/uace-sub")
 
 # Define server logic 
 function(input, output, session) {
-  data <- pin_read(board, "terrace/uace-na")
-  
+
+# Filtering ---------------------------------------------------------------
   initial_filtered <- callModule(
     module = selectizeGroupServer,
     id = "my-filters",
@@ -26,7 +28,8 @@ function(input, output, session) {
       filter(if_any(all_of(input$topical_experience), function(x) {x == 1})) %>%
       filter(if_any(all_of(input$topical_knowledge), function(x) {x == 1}))
   })
-  
+
+# Top 20 bar chart --------------------------------------------------------
   # Make a function to arrange filtered data for top20 bar chart
   data_Evimp <- reactive({
     refine_filtered() %>% 
@@ -106,17 +109,16 @@ function(input, output, session) {
   })
   
 
-  # Sample size indicator
+# Sample size indicator ---------------------------------------------------
   
   output$n_indicator <- renderPlot({
-    data_filtered <- refine_filtered()
-    
+    req(refine_filtered())
     df <-
       tibble(
         # get the fraction of rows (observations) for after and before filtering
         fraction = c(
-          nrow(data_filtered)/nrow(data),
-          (nrow(data)-nrow(data_filtered))/nrow(data)
+          nrow(refine_filtered())/nrow(data),
+          (nrow(data)-nrow(refine_filtered()))/nrow(data)
         ),
         category = c("filtered", "total")
       ) |> 
@@ -144,7 +146,8 @@ function(input, output, session) {
       theme(legend.position = "none")
   })
   
-  
+
+# Donut plots -------------------------------------------------------------
   # Gender donut
 
   output$gender_donut <- renderPlotly({
@@ -260,7 +263,9 @@ function(input, output, session) {
     }
     
   })
-  
+
+# By Topic bar chart ------------------------------------------------------
+
   # Make a function to wrangle data for by topic bar charts
   
   data_bytopic <- reactive({
