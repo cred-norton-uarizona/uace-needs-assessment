@@ -141,7 +141,7 @@ function(input, output, session) {
                                                 "Non-binary", "No Response"))) %>%
       group_by(Gender) %>%
       summarize(count = n()) %>%
-      plot_ly(labels = ~Gender, values = ~count, 
+      plot_ly(labels = ~Gender, values = ~count,
               textinfo = "label", # "label+percent"
               textfont = list(size = 10),
               marker = list(colors = colors_gender)) %>%
@@ -153,10 +153,10 @@ function(input, output, session) {
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
     }
   })
-  
-   # Bach donut
 
-  output$bach_donut <- renderPlotly({
+   # Education donut
+
+  output$edu_donut <- renderPlotly({
     colors_education <- c("#1b587c", "#9f2936", "#f2f2f2")
     
     # Do not print if N < = 6

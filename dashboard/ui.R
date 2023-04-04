@@ -92,7 +92,8 @@ navbarPage(
                              ),
                              column(width = 4,
                                     box(
-                                      plotOutput("n_indicator", height = 200), 
+                                      plotOutput("n_indicator", height = 150), 
+                                      h3(),
                                       width = NULL
                                     ),
                                     box(
@@ -102,7 +103,7 @@ navbarPage(
                                       plotlyOutput("race_donut", height = 225),
                                         width = NULL),
                                     box(
-                                      plotlyOutput("bach_donut", height = 225),
+                                      plotlyOutput("edu_donut", height = 225),
                                       width = NULL))
                              
                              )),
@@ -115,9 +116,9 @@ navbarPage(
                              ), width = 6)),
                              fluidRow(
                                plotOutput("bytopicbar", height = 800,
-                                          width = 700)  %>%
+                                          width = NULL)  %>%
                                  withSpinner(type = 8) #loading indicator for plot,
-                               
+                              
                              )))
                     )
         ))
