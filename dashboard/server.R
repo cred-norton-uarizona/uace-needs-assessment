@@ -1,6 +1,11 @@
+library(pins)
+library(arrow)
+board <- board_connect()
+
 # Define server logic 
 function(input, output, session) {
-
+  data <- pin_read(board, "terrace/uace-na")
+  
   initial_filtered <- callModule(
     module = selectizeGroupServer,
     id = "my-filters",

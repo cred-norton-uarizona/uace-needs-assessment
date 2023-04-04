@@ -1,18 +1,12 @@
 library(shiny)
-library(mapproj)
-library(maps)
+# library(mapproj)
+# library(maps)
 library(tidyverse)
-library(pins)
-library(arrow)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinycssloaders) #for loading indicator
 library(plotly)
 library(ggforce)
-
-
-board <- board_connect()
-data <- pin_read(board, "terrace/uace-na")
 
 # read in data
 
