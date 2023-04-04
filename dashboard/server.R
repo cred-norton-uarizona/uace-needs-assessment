@@ -138,7 +138,7 @@ function(input, output, session) {
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
   
-   # Bach donut
+   # Education donut
   colors_education <- c("#1b587c", "#9f2936", "#f2f2f2")
   
   output$bach_donut <- renderPlotly({
