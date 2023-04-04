@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+library(shinycssloaders) #for loading indicator
 
 race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "Asian" = "AS",
