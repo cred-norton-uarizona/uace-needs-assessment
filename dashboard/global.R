@@ -1,7 +1,4 @@
 library(shiny)
-# library(mapproj)
-# library(maps)
-library(tidyverse)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinycssloaders) #for loading indicator
