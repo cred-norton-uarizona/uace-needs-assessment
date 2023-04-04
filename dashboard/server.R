@@ -1,5 +1,7 @@
 library(pins)
 library(arrow)
+library(ggforce)
+
 board <- board_connect()
 
 # Define server logic 
@@ -48,7 +50,14 @@ function(input, output, session) {
   })
   
   output$top20bar <- renderPlot({
-    colors <- c("Health and Well-Being" = "#604878", "Natural Resources" = "#1B587C", "Agriculture" = "#4E8542", "Community and Economic Development" = "#C09001", "Education" = "#C65A11")
+    colors <-
+      c(
+        "Health and Well-Being" = "#604878",
+        "Natural Resources" = "#1B587C",
+        "Agriculture" = "#4E8542",
+        "Community and Economic Development" = "#C09001",
+        "Education" = "#C65A11"
+      )
      
     # Do not print if N < = 6
     N <- nrow(refine_filtered())
@@ -62,16 +71,22 @@ function(input, output, session) {
     # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
     ggplot(data_Evimp(), aes(x = row, y = Percentage)) +
       geom_col(aes(fill = Topic), width = 0.9) +
-      geom_text(aes(label = paste(Description, scales::percent(Percentage, accuracy = 1), sep = ", ")), vjust = 0.5, hjust = "right", color = "white", size = 4) +
-      scale_y_continuous(expand = c(0, 0)) +
+        geom_text(
+          aes(label = paste(
+            Description, scales::percent(Percentage, accuracy = 1), sep = ", "
+          )),
+          vjust = 0.5,
+          hjust = "right",
+          color = "white",
+          size = 4
+        ) +
+        scale_y_continuous(expand = c(0, 0)) +
       scale_x_reverse()+
       scale_fill_manual(values = colors)+
       coord_flip() +
       labs(
-        # title = "Top Priorities", # We can explore how to add more than one county name
         subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
       theme(
-        #legend.position = "none",
         legend.position = "top",
         legend.title = element_blank(),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
@@ -81,7 +96,6 @@ function(input, output, session) {
         axis.ticks = element_blank(),
         axis.title = element_blank(),
         axis.text.x = element_blank(),
-        # axis.text.y = element_text(size = 11, margin = margin(0, 5, 0, 0)),
         axis.text.y = element_blank()
       ) +
       guides(fill = guide_legend(nrow = 2))
@@ -249,10 +263,10 @@ function(input, output, session) {
   data_bytopic <- reactive({
     req(input$topic)
     
-    cnames <- labels$Metric[labels$Topic == input$topic] # substitute with input$topic
+    cnames <- labels$Metric[labels$Topic == input$topic] 
     
     # Make E + V only for ranking purposes
-    rank_EV <- refine_filtered() %>% # substitute with refine_filtered()
+    rank_EV <- refine_filtered() %>% 
       select(all_of(cnames)) %>%
       pivot_longer(cols = everything(),
                    names_to = "Metric",
@@ -271,7 +285,7 @@ function(input, output, session) {
       pull(Description)
     
     # Output long dataset for plotting
-    refine_filtered() %>% # substitute with refine_filtered()
+    refine_filtered() %>% 
       select(all_of(cnames)) %>%
       pivot_longer(cols = everything(),
                    names_to = "Metric",
@@ -302,10 +316,10 @@ function(input, output, session) {
   nrange <- reactive({
     req(input$topic)
     
-    cnames <- labels$Metric[labels$Topic == input$topic] # substitute with input$topic
+    cnames <- labels$Metric[labels$Topic == input$topic]
     
     # For range of sample size (we're not including NAs)
-    refine_filtered() %>% # substitute with refine_filtered()
+    refine_filtered() %>% 
       select(all_of(cnames)) %>%
       pivot_longer(cols = everything(),
                    names_to = "Metric",
@@ -374,7 +388,6 @@ function(input, output, session) {
       labs(subtitle = paste0("Between ", nrange[1], " and ", nrange[2], 
                              " participants responded to each item")) +
       theme(
-        #legend.position = "none",
         legend.position = "top",
         legend.title = element_blank(),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
@@ -385,7 +398,6 @@ function(input, output, session) {
         axis.title = element_blank(),
         axis.text.x = element_blank(),
         axis.text.y = element_text(size = 12, margin = margin(0, 5, 0, 0))
-        # axis.text.y = element_blank()
       )
     }
     

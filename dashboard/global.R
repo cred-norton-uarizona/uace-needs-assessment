@@ -6,7 +6,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(shinycssloaders) #for loading indicator
 library(plotly)
-library(ggforce)
+
 
 # read in data
 
