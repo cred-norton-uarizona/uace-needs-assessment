@@ -11,7 +11,7 @@ library(shinycssloaders) #for loading indicator
 race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "Asian" = "AS",
               "Black or African American" = "BL", 
-              "Hispanic or Latinx" =  "HL",
+              "Hispanic or Latino" =  "HL",
               "Multiracial" = "MR", 
               "Native Hawaiian or Pacific Islander" = "NHPI", 
               "White" = "WH" , 
