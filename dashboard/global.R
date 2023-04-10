@@ -16,3 +16,22 @@ race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "Native Hawaiian or Other Pacific Islander" = "NHPI", 
               "White" = "WH" , 
               "Prefer not to answer" = "NR") 
+
+topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
+                     "Education & Youth Development" = "ED_EXPERIENCE", 
+                     "Health & Well-Being" = "HLTH_EXPERIENCE", 
+                     "Natural Resources" =  "NR_EXPERIENCE", 
+                     "Community & Economic Development" = "CD_EXPERIENCE")
+
+topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
+                     "Education & Youth Development" = "ED_KNOWLEDGE",
+                     "Health & Well-Being" = "HLTH_KNOWLEDGE",
+                     "Natural Resources" = "NR_KNOWLEDGE",
+                     "Community & Economic Development" = "CD_KNOWLEDGE")
+
+county_vec <- data %>%
+  select(COUNTY) %>%
+  unique() %>%
+  drop_na %>%
+  pull() %>%
+  str_sort() 

@@ -40,6 +40,15 @@ function(input, output, session) {
       filter(if_any(all_of(input$topical_experience), function(x) {x == 1})) %>%
       filter(if_any(all_of(input$topical_knowledge), function(x) {x == 1}))
   })
+  
+  # Filtering by county only for demographics tab
+  county_filtered <- callModule(
+    module = selectizeGroupServer,
+    id = "county-filter",
+    data = data,
+    vars = c("COUNTY"), #add new filters here by adding column name in quotes
+    inline = FALSE
+  )
 
 # Top 20 bar chart --------------------------------------------------------
   # Make a function to arrange filtered data for top20 bar chart
@@ -238,7 +247,7 @@ function(input, output, session) {
   })
   
   
-  #  Donut for white/non-white
+  #  Plotly bar graph for race/ethnicity
 
   output$race_bar <- renderPlotly({
     
@@ -426,6 +435,98 @@ function(input, output, session) {
     
   })
   
+  #### Demographics page ####
+  
+  output$county_bar <- renderPlotly({
+    # Static plotly - shows all counties
+    data %>% 
+      group_by(COUNTY) %>%
+      summarize(count = n(),
+                frac = n()/nrow(.)) %>%
+      drop_na() %>%
+      mutate(percent = sprintf("%d%%", round(frac*100))) %>%
+      plot_ly(x = ~frac, y = ~fct_rev(COUNTY),
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              marker = list(color = "#1b587c")) %>% 
+      layout(xaxis = list(title = ''),
+             yaxis = list(title = ''))
+    
+  })
+  
+  output$rural_donut <- renderPlotly({
+    colors_location <- c("Rural" = "#4e8542", "Urban" = "#594a6a", "No Response" = "#9f2936")
+    
+    
+    county_filtered() %>%
+    mutate(LIVE_V3 = ifelse(is.na(LIVE_V3), "No Response", LIVE_V3)) %>%
+      group_by(LIVE_V3) %>%
+      summarize(count = n()) %>%
+      plot_ly(labels = ~LIVE_V3, values = ~count, type = 'pie', hole = 0.5,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              marker = list(colors = colors_location)) %>%
+      layout(title = "Location",  
+             showlegend = FALSE,
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    
+  })
+  
+  output$language_donut <- renderPlotly({
+    color_vec <- c("English" = "#2b556d", "Spanish" = "#9f2936")
+    
+    
+    county_filtered() %>%
+      group_by(UserLanguage) %>%
+      summarize(count = n()) %>%
+      mutate(frac = count / sum(count), 
+             percent = paste0(round(frac*100), "%")) %>%
+      plot_ly(labels = ~paste0(UserLanguage, "<br>", percent), 
+              values = ~count, 
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              type = 'pie', hole = 0.5, 
+              marker = list(colors = color_vec)) %>%
+      layout(title = "Language",  
+             showlegend = FALSE,
+             # legend = list(orientation = "h"),
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    
+  })
+  
+  output$gender_donut_county <- renderPlotly({
+    
+    # Establish universal colors
+    colors_gender <- c("Woman" = "#1b587c", "Man" = "#9f2936", 
+                       "Non-binary" = "#f07f09", "No Response" = "#f2f2f2")
+    
+    # Wrangle data for donut
+    gender_count <- county_filtered() %>%
+      mutate(Gender = ifelse(is.na(Gender), "No Response", Gender),
+             Gender = factor(Gender, levels = c("Woman", "Man",
+                                                "Non-binary", "No Response"))) %>%
+      group_by(Gender) %>%
+      summarize(count = n())
+    
+    # Establish specific colors needed
+    colors_temp <- colors_gender[intersect(gender_count$Gender, names(colors_gender))]
+    
+    gender_count %>%
+        plot_ly(labels = ~Gender, values = ~count,
+                textinfo = "label", # "label+percent"
+                textfont = list(size = 10),
+                marker = list(colors = colors_temp)) %>%
+        add_pie(hole = 0.5) %>%
+        layout(title = "Gender",  
+               showlegend = FALSE,
+               # legend = list(orientation = "h"),
+               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    
+  })
 
 }
 

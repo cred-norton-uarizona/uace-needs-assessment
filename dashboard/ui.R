@@ -8,19 +8,6 @@
 #
 library(shinycssloaders) #for loading indicator
 
-topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
-                     "Education & Youth Development" = "ED_EXPERIENCE", 
-                     "Health & Well-Being" = "HLTH_EXPERIENCE", 
-                     "Natural Resources" =  "NR_EXPERIENCE", 
-                     "Community & Economic Development" = "CD_EXPERIENCE")
-
-topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
-                     "Education & Youth Development" = "ED_KNOWLEDGE",
-                     "Health & Well-Being" = "HLTH_KNOWLEDGE",
-                     "Natural Resources" = "NR_KNOWLEDGE",
-                     "Community & Economic Development" = "CD_KNOWLEDGE")
-
-
 # Application title
 navbarPage(
   title = "University of Arizona Cooperative Extension Needs Assessment",
@@ -37,12 +24,30 @@ navbarPage(
   # Tab panel 1 - Demographics by county
   tabPanel(
     "Demographics",
-    mainPanel(
-      selectInput(inputId = "county",
-                  label = "Select county",
-                  choices = c("Maricopa", "Pima"),
-                  multiple = TRUE))
-    ),
+    fluidPage(
+      fluidRow(column(width = 4,
+                      box(
+                        selectizeGroupUI(
+                          id = "county-filter",
+                          params = list(
+                            COUNTY = list(inputId = "COUNTY", title = "Select County")),
+                          inline = FALSE
+                        ), 
+                        width = NULL),
+                      box(
+                        plotlyOutput("county_bar", height = 350),
+                        width = NULL)
+      ),
+      column(width = 4,
+      box(plotlyOutput("rural_donut", height = 200),
+        width = NULL),
+      box(plotlyOutput("language_donut", height = 200),
+        width =  NULL),
+      box(plotlyOutput("gender_donut_county", height = 200),
+        width =  NULL)
+      )
+      )
+    )),
 
   
   # Tab panel 2 - Top 20 View and By Topic View as subtabs
