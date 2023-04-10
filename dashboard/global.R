@@ -8,6 +8,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(plotly)
 library(ggforce)
+library(forcats)
 
 
 board <- board_connect()
