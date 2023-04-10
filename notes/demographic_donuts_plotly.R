@@ -161,33 +161,38 @@ data %>%
 # race_ethnicity
 
 # Ask Jessica for help getting rid of the percent as decimal
-race_vec <- c("American Indian or Alaska Native" = "American.Indian.or.Alaska.Native",
-              "Asian" = "Asian",
-              "Black or African American" = "Black.or.African.American", 
-              "Hispanic or Latinx" =  "Hispanic.or.Latino" ,
-              "Multiracial" = "Multiracial", 
-              "Native Hawaiian or Pacific Islander" = "Native.Hawaiian.or.Other.Pacific.Islander", 
-              "White" = "White" , 
-              "Prefer not to answer" = "Prefer.not.to.answer")
+race_vec <- c("American Indian or Alaska Native" = "AIAN",
+              "Asian" = "AS",
+              "Black or African American" = "BL", 
+              "Hispanic or Latino" =  "HL",
+              "Multiracial" = "MR", 
+              "Native Hawaiian or Other Pacific Islander" = "NHPI", 
+              "White" = "WH" , 
+              "Prefer not to answer" = "NR") 
+
 data %>%
   select(race_vec) %>%
   pivot_longer(cols = everything(), 
                names_to = "race_ethnicity") %>%
+  mutate(race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
+                                                            "Asian",
+                                                            "Black or African American", 
+                                                            "Hispanic or Latino", 
+                                                            "Multiracial", 
+                                                            "Native Hawaiian or Other Pacific Islander", 
+                                                            "White", "Prefer not to answer"))) %>%
   filter(value == 1) %>%
   group_by(race_ethnicity) %>%
   summarize(count = n(),
             frac = n()/nrow(.)) %>%
   mutate(percent = sprintf("%d%%", round(frac*100))) %>%
-  plot_ly(x = ~frac, y = ~race_ethnicity,
+  plot_ly(x = ~frac, y = ~fct_rev(race_ethnicity),
           type = 'bar',
           orientation = 'h',
           text = ~percent) %>% 
   # ~paste(percent, race_ethnicity)) %>%
   layout(xaxis = list(title = ''),
          yaxis = list(title = ''))
-
-
-
 
 
 
