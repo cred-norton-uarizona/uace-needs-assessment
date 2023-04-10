@@ -34,7 +34,18 @@ navbarPage(
   h6("prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
   ),
   
-  # Tab panel 1 - Top 20 View
+  # Tab panel 1 - Demographics by county
+  tabPanel(
+    "Demographics",
+    mainPanel(
+      selectInput(inputId = "county",
+                  label = "Select county",
+                  choices = c("Maricopa", "Pima"),
+                  multiple = TRUE))
+    ),
+
+  
+  # Tab panel 2 - Top 20 View and By Topic View as subtabs
   tabPanel(
     "Top Priorities",
     sidebarLayout(
@@ -82,7 +93,7 @@ navbarPage(
                                                width = NULL),
                                              box(
                                                plotlyOutput("race_bar", height = 350),
-                                               width = NULL)
+                                               width = 8)
                              ),
                              column(width = 4,
                                     box(
