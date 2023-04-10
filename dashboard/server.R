@@ -240,21 +240,25 @@ function(input, output, session) {
   
   #  Donut for white/non-white
 
-  output$race_donut <- renderPlotly({
-    
-    # Establish universal colors
-    colors_nonwhite <- c("Non-White" = "#1b587c", "White" = "#9f2936")
+  output$race_bar <- renderPlotly({
     
     # Wrangle data for donut
-    nonwhite_count <- refine_filtered() %>%
-      # mutate(non_white = ifelse(is.na(non_white), "No Response", non_white)) %>%
-      group_by(non_white) %>%
-      summarize(count = n()) %>%
-      mutate(non_white = case_when(non_white == 0 ~ "White",
-                                   non_white == 1 ~ "Non-White")) 
-    
-    # Establish specific colors needed
-    colors_temp <- colors_nonwhite[intersect(nonwhite_count$non_white, names(colors_nonwhite))]
+    race_count <- refine_filtered() %>%
+      select(race_vec) %>%
+      pivot_longer(cols = everything(), 
+                   names_to = "race_ethnicity") %>%
+      mutate(race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
+                                                                "Asian",
+                                                                "Black or African American", 
+                                                                "Hispanic or Latino", 
+                                                                "Multiracial", 
+                                                                "Native Hawaiian or Other Pacific Islander", 
+                                                                "White", "Prefer not to answer"))) %>%
+      filter(value == 1) %>%
+      group_by(race_ethnicity) %>%
+      summarize(count = n(),
+                frac = n()/nrow(.)) %>%
+      mutate(percent = sprintf("%d%%", round(frac*100))) 
     
     # Do not print if N < = 6
     N <- nrow(refine_filtered())
@@ -262,16 +266,15 @@ function(input, output, session) {
     if(N <= 6) {
       plotly_empty()
     } else {
-    nonwhite_count %>%
-      plot_ly(labels = ~non_white, values = ~count,
-              textinfo = "label", # "label+percent"
-              textfont = list(size = 10),
-              marker = list(colors = colors_temp)) %>%
-      add_pie(hole = 0.5) %>%
-      layout(title = "Identity",  
-             showlegend = FALSE,
-             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+      race_count %>%
+        plot_ly(x = ~frac, y = ~fct_rev(race_ethnicity),
+                type = 'bar',
+                orientation = 'h',
+                text = ~percent,
+                marker = list(color = "#1b587c")) %>% 
+        # ~paste(percent, race_ethnicity)) %>%
+        layout(xaxis = list(title = ''),
+               yaxis = list(title = ''))
     }
     
   })

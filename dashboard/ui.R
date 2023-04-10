@@ -8,15 +8,6 @@
 #
 library(shinycssloaders) #for loading indicator
 
-race_vec <- c("American Indian or Alaska Native" = "AIAN",
-              "Asian" = "AS",
-              "Black or African American" = "BL", 
-              "Hispanic or Latino" =  "HL",
-              "Multiracial" = "MR", 
-              "Native Hawaiian or Pacific Islander" = "NHPI", 
-              "White" = "WH" , 
-              "Prefer not to answer" = "NR") 
-
 topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
                      "Education & Youth Development" = "ED_EXPERIENCE", 
                      "Health & Well-Being" = "HLTH_EXPERIENCE", 
@@ -89,6 +80,9 @@ navbarPage(
                                                plotOutput("top20bar", height = 800) %>%
                                                  withSpinner(type = 8), #loading indicator for plot,
                                                width = NULL),
+                                             box(
+                                               plotlyOutput("race_bar", height = 350),
+                                               width = NULL)
                              ),
                              column(width = 4,
                                     box(
@@ -100,9 +94,6 @@ navbarPage(
                                     box(
                                       plotlyOutput("gender_donut", height = 250),
                                       width = NULL),
-                                    box(
-                                      plotlyOutput("race_donut", height = 250),
-                                        width = NULL),
                                     box(
                                       plotlyOutput("edu_donut", height = 250),
                                       width = NULL))
