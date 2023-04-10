@@ -161,25 +161,40 @@ function(input, output, session) {
   
   
   #  Donut for white/non-white
+  race_vec <- c("American Indian or Alaska Native" = "American.Indian.or.Alaska.Native",
+                "Asian",
+                "Black or African American" = "Black.or.African.American", 
+                "Hispanic or Latino" = "Hispanic.or.Latino",
+                "Multiracial", 
+                "Native Hawaiian or Other Pacific Islander" = "Native.Hawaiian.or.Other.Pacific.Islander", 
+                "White", 
+                "Prefer not to answer" = "Prefer.not.to.answer") 
+  colors_race <- c("American Indian or Alaska Native" = "#2b556d",
+                   "Asian" = "#4e8542",
+                   "Black or African American" = "#594a6a", 
+                   "Hispanic or Latino" = "#9f2936",
+                   "Multiracial" = "#f5b501", 
+                   "Native Hawaiian or Other Pacific Islander" = "#89c3e5", 
+                   "White" = "#f07f09", 
+                   "Prefer not to answer" = "#8c8c8c")
   
-  colors_white <- c("#1b587c", "#9f2936")
   output$race_donut <- renderPlotly({
     refine_top_20() %>%
-      # mutate(non_white = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
-      group_by(race_vec) %>%
+      mutate(race_group = case_when(race %in% names(race_vec) ~ race,
+                                    TRUE ~ "Other")) %>%
+      group_by(race_group) %>%
       summarize(count = n()) %>%
-      mutate(non_white = case_when(non_white == 0 ~ "White",
-                                   non_white == 1 ~ "Non-White")) %>%
-      plot_ly(labels = ~non_white, values = ~count,
-              textinfo = "label", # "label+percent"
-              textfont = list(size = 10),
-              marker = list(colors = colors_white)) %>%
+      mutate(percent = paste0(round(count/sum(count)*100, 1), "%")) %>%
+      plot_ly(labels = ~race_group, values = ~count,
+              text = ~percent,
+              textinfo = "text+label",
+              textfont = list(size = 16),
+              marker = list(colors = colors_race)) %>%
       add_pie(hole = 0.5) %>%
       layout(title = "Identity",  
              showlegend = FALSE,
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-    
   })
   
   # Make a function to wrangle data for by topic bar charts
