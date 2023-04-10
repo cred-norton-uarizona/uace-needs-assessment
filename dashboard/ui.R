@@ -7,7 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
-names(data)
+# names(data)
 
 race_vec <- c("American Indian or Alaska Native" = "American.Indian.or.Alaska.Native",
               "Asian",

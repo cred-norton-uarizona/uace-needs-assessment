@@ -166,7 +166,7 @@ function(input, output, session) {
   output$race_donut <- renderPlotly({
     refine_top_20() %>%
       # mutate(non_white = ifelse(is.na(Bach_or_higher), "No response", Bach_or_higher)) %>%
-      group_by(non_white) %>%
+      group_by(race_vec) %>%
       summarize(count = n()) %>%
       mutate(non_white = case_when(non_white == 0 ~ "White",
                                    non_white == 1 ~ "Non-White")) %>%
