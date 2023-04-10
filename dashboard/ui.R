@@ -7,15 +7,16 @@
 #    http://shiny.rstudio.com/
 #
 
+names(data)
 
-race_vec <- c("American Indian or Alaska Native" = "AIAN",
-              "Asian" = "AS",
-              "Black or African American" = "BL", 
-              "Hispanic or Latinx" =  "HL",
-              "Multiracial" = "MR", 
-              "Native Hawaiian or Pacific Islander" = "NHPI", 
-              "White" = "WH" , 
-              "Prefer not to answer" = "NR") 
+race_vec <- c("American Indian or Alaska Native" = "American.Indian.or.Alaska.Native",
+              "Asian",
+              "Black or African American" = "Black.or.African.American", 
+              "Hispanic or Latino" = "Hispanic.or.Latino",
+              "Multiracial", 
+              "Native Hawaiian or Other Pacific Islander" = "Native.Hawaiian.or.Other.Pacific.Islander", 
+              "White", 
+              "Prefer not to answer" = "Prefer.not.to.answer") 
 
 topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
                      "Education & Youth Development" = "ED_EXPERIENCE", 
