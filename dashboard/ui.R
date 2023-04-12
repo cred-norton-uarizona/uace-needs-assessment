@@ -36,15 +36,27 @@ navbarPage(
                         width = NULL),
                       box(
                         plotlyOutput("county_bar", height = 350),
-                        width = NULL)
+                        width = NULL),
+                      box(
+                        plotlyOutput("income_bar",height = 250),
+                        width = NULL
+                      )
       ),
-      column(width = 4,
-      box(plotlyOutput("rural_donut", height = 200),
-        width = NULL),
-      box(plotlyOutput("language_donut", height = 200),
-        width =  NULL),
-      box(plotlyOutput("gender_donut_county", height = 200),
-        width =  NULL)
+      column(width = 3,
+             box(plotlyOutput("rural_donut", height = 200),
+                 width = NULL),
+             box(plotlyOutput("language_donut", height = 200),
+                 width =  NULL),
+             box(plotlyOutput("gender_donut_county", height = 200),
+                 width =  NULL)
+      ),
+      column(width = 5,
+             box(plotlyOutput("race_bar2", height = 250),
+                 width = NULL),
+             box(plotlyOutput("age_bar", height = 200),
+                 width = NULL),
+             box(plotlyOutput("edu_bar", height = 250),
+                 width = NULL)
       )
       )
     )),
@@ -98,7 +110,7 @@ navbarPage(
                                                width = NULL),
                                              box(
                                                plotlyOutput("race_bar", height = 350),
-                                               width = 8)
+                                               width = NULL)
                              ),
                              column(width = 4,
                                     box(

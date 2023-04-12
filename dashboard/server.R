@@ -5,7 +5,7 @@ library(tidyverse)
 # library(mapproj)
 # library(maps)
 
-# funtion to break strings for ggplot
+# function to break strings for ggplot
 break_string <- function(x, n) {
   # x is a character string
   # n is number of characters before the break
@@ -14,6 +14,17 @@ break_string <- function(x, n) {
   
   ifelse(out_n == 1, out_string, 
          paste0(out_string[1], "\n", out_string[2]))
+}
+
+# function to break strings for plotly
+break_string2 <- function(x, n) {
+  # x is a character string
+  # n is number of characters before the break
+  out_string <- stringi::stri_wrap(x, n)
+  out_n <- length(out_string)
+  
+  ifelse(out_n == 1, out_string, 
+         paste0(out_string[1], "<br>", out_string[2]))
 }
 
 
@@ -256,18 +267,23 @@ function(input, output, session) {
       select(race_vec) %>%
       pivot_longer(cols = everything(), 
                    names_to = "race_ethnicity") %>%
-      mutate(race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
+        filter(value == 1) %>%
+      group_by(race_ethnicity) %>%
+      summarize(count = n(),
+                frac = n()/nrow(.)) %>%
+      mutate(percent = sprintf("%d%%", round(frac*100)),
+             race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
                                                                 "Asian",
                                                                 "Black or African American", 
                                                                 "Hispanic or Latino", 
                                                                 "Multiracial", 
                                                                 "Native Hawaiian or Other Pacific Islander", 
                                                                 "White", "Prefer not to answer"))) %>%
-      filter(value == 1) %>%
-      group_by(race_ethnicity) %>%
-      summarize(count = n(),
-                frac = n()/nrow(.)) %>%
-      mutate(percent = sprintf("%d%%", round(frac*100))) 
+      arrange(race_ethnicity)
+    
+    # Add string breaks
+    race_count$race_labs <- sapply(race_count$race_ethnicity, break_string2, 25)
+    race_count$race_labs <- factor(race_count$race_labs, levels = race_count$race_labs)
     
     # Do not print if N < = 6
     N <- nrow(refine_filtered())
@@ -276,13 +292,14 @@ function(input, output, session) {
       plotly_empty()
     } else {
       race_count %>%
-        plot_ly(x = ~frac, y = ~fct_rev(race_ethnicity),
+        plot_ly(x = ~count, y = ~fct_rev(race_labs),
                 type = 'bar',
                 orientation = 'h',
                 text = ~percent,
                 marker = list(color = "#1b587c")) %>% 
         # ~paste(percent, race_ethnicity)) %>%
-        layout(xaxis = list(title = ''),
+        layout(title = "Race/Ethnicity",
+               xaxis = list(title = ''),
                yaxis = list(title = ''))
     }
     
@@ -438,6 +455,17 @@ function(input, output, session) {
   #### Demographics page ####
   
   output$county_bar <- renderPlotly({
+    # Create color vec to highlight selected counties
+    sel <- county_filtered() %>%
+      select(COUNTY) %>%
+      drop_na() %>%
+      pull() %>%
+      unique() %>%
+      str_sort()
+    
+    ind <- county_vec %in% sel
+    color_vec <- ifelse(ind == TRUE, "#2b556d", "#89c3e5")
+
     # Static plotly - shows all counties
     data %>% 
       group_by(COUNTY) %>%
@@ -445,50 +473,70 @@ function(input, output, session) {
                 frac = n()/nrow(.)) %>%
       drop_na() %>%
       mutate(percent = sprintf("%d%%", round(frac*100))) %>%
-      plot_ly(x = ~frac, y = ~fct_rev(COUNTY),
+      plot_ly(x = ~count, y = ~fct_rev(COUNTY),
               type = 'bar',
               orientation = 'h',
               text = ~percent,
-              marker = list(color = "#1b587c")) %>% 
-      layout(xaxis = list(title = ''),
-             yaxis = list(title = ''))
+              marker = list(color = color_vec)) %>% 
+      layout(title = "Respondents by county",
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
     
   })
   
   output$rural_donut <- renderPlotly({
-    colors_location <- c("Rural" = "#4e8542", "Urban" = "#594a6a", "No Response" = "#9f2936")
+    # Establish universal colors
+    colors_location <- c("Rural" = "#4e8542", "Urban" = "#594a6a", "No Response" = "#f2f2f2")
     
-    
-    county_filtered() %>%
+    # Wrangle data for donut
+    location_count <- county_filtered() %>%
     mutate(LIVE_V3 = ifelse(is.na(LIVE_V3), "No Response", LIVE_V3)) %>%
       group_by(LIVE_V3) %>%
-      summarize(count = n()) %>%
-      plot_ly(labels = ~LIVE_V3, values = ~count, type = 'pie', hole = 0.5,
+      summarize(count = n())
+      
+    # Establish specific colors needed
+    colors_temp <- colors_location[intersect(location_count$LIVE_V3, 
+                                         names(colors_location))]
+    
+    location_count %>%
+      plot_ly(labels = ~LIVE_V3, values = ~count,
               textinfo = "label", # "label+percent"
               textfont = list(size = 10),
-              marker = list(colors = colors_location)) %>%
+              marker = list(colors = colors_temp)) %>%
+      add_pie(hole = 0.5) %>%
       layout(title = "Location",  
+             # margin = list( top = 200, b = 50, l = 50, r = 50 ),
              showlegend = FALSE,
+             # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
     
   })
   
   output$language_donut <- renderPlotly({
-    color_vec <- c("English" = "#2b556d", "Spanish" = "#9f2936")
+    # Establish universal colors
+    colors_lang <- c("English" = "#2b556d", "Spanish" = "#9f2936")
     
-    
-    county_filtered() %>%
+    # Wrangle data for donut
+    lang_count <- county_filtered() %>%
       group_by(UserLanguage) %>%
-      summarize(count = n()) %>%
-      mutate(frac = count / sum(count), 
-             percent = paste0(round(frac*100), "%")) %>%
-      plot_ly(labels = ~paste0(UserLanguage, "<br>", percent), 
+      summarize(count = n()) 
+    # %>%
+    #   mutate(frac = count / sum(count), 
+    #          percent = paste0(round(frac*100), "%"))  
+    
+    # Establish specific colors needed
+    colors_temp <- colors_lang[intersect(lang_count$UserLanguage, 
+                                         names(colors_lang))]
+    
+
+    lang_count %>%
+      plot_ly(labels = ~UserLanguage, 
               values = ~count, 
               textinfo = "label", # "label+percent"
               textfont = list(size = 10),
-              type = 'pie', hole = 0.5, 
-              marker = list(colors = color_vec)) %>%
+              marker = list(colors = colors_temp)) %>%
+      add_pie(hole = 0.5) %>%
       layout(title = "Language",  
              showlegend = FALSE,
              # legend = list(orientation = "h"),
@@ -525,6 +573,126 @@ function(input, output, session) {
                # legend = list(orientation = "h"),
                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    
+  })
+  
+  # Race barchart for demographics tab only
+  output$race_bar2 <- renderPlotly({
+    
+    # Wrangle data for bar chart
+    race_count <- county_filtered() %>% # 
+      select(race_vec) %>%
+      pivot_longer(cols = everything(), 
+                   names_to = "race_ethnicity") %>%
+      filter(value == 1) %>%
+      group_by(race_ethnicity) %>%
+      summarize(count = n(),
+                frac = n()/nrow(.)) %>%
+      mutate(percent = sprintf("%d%%", round(frac*100)),
+             race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
+                                                                "Asian",
+                                                                "Black or African American", 
+                                                                "Hispanic or Latino", 
+                                                                "Multiracial", 
+                                                                "Native Hawaiian or Other Pacific Islander", 
+                                                                "White", "Prefer not to answer"))) %>%
+      arrange(race_ethnicity)
+    
+    race_count$race_labs <- sapply(race_count$race_ethnicity, break_string2, 25)
+    race_count$race_labs <- factor(race_count$race_labs, levels = race_count$race_labs)
+    
+    race_count %>%
+        plot_ly(x = ~count, y = ~fct_rev(race_labs),
+                type = 'bar',
+                orientation = 'h',
+                text = ~percent,
+                marker = list(color = "#1b587c")) %>% 
+        # ~paste(percent, race_ethnicity)) %>%
+        layout(title = "Race/Ethnicity",  
+               xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+               yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
+    
+    
+  })
+  
+  # Age bar chart
+  output$age_bar <- renderPlotly({
+    
+    county_filtered() %>%
+      group_by(AGE) %>%
+      summarize(count = n(),
+                frac = n()/nrow(.)) %>%
+      mutate(percent = sprintf("%d%%", round(frac*100))) %>%
+      plot_ly(x = ~count, y = ~fct_rev(AGE),
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              marker = list(color = "#4e8542")) %>% 
+      layout(title = "Age",
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
+    
+  })
+  
+  output$edu_bar <- renderPlotly({
+    
+    edu_count <- county_filtered() %>%
+      drop_na(DEM_11) %>%
+      mutate(DEM_11 = factor(DEM_11, levels = c("Less than high school diploma",
+                                                "High school diploma or GED",
+                                                "Some college",
+                                                "Trade/technical/vocational training",
+                                                "Associate's degree",
+                                                "Bachelor's degree",
+                                                "Graduate or professional degree"))) %>%
+      group_by(DEM_11) %>%
+      summarize(count = n()) %>%
+      arrange(desc(count)) %>%
+      mutate(percent = paste0(round(count/sum(count)*100, 1), "%"))
+    
+    edu_count$edu_labs <- sapply(edu_count$DEM_11, break_string2, 20)
+    edu_count$edu_labs <- factor(edu_count$edu_labs, levels = edu_count$edu_labs)
+    
+    edu_count %>%
+      plot_ly(x = ~count, y = ~edu_labs,
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              marker = list(color = "#f07f09")) %>%
+      layout(title = "Educational Attainment",
+             showlegend = FALSE,
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
+    
+  })
+  
+  output$income_bar <- renderPlotly({
+    county_filtered() %>%
+      drop_na(DEM_13) %>%
+      mutate(DEM_13 = fct_relevel(factor(DEM_13), rev(c("$200,000 and above",
+                                                        "$150,000 to $199,999",
+                                                        "$100,000 to $149,999",
+                                                        "$75,000 to $99,999",
+                                                        "$50,000 to $74,999",
+                                                        "$35,000 to $49,999",
+                                                        "$25,000 to $34,999",
+                                                        "Less than $25,000")))) %>%
+      group_by(DEM_13) %>%
+      summarize(count = n()) %>%
+      arrange(desc(count)) %>%
+      mutate(percent = paste0(round(count/sum(count)*100, 1), "%")) %>%
+      plot_ly(x = ~count, y = ~fct_rev(DEM_13),
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              marker = list(color = "#594a6a")) %>%
+      layout(title = "Household Income",
+             showlegend = FALSE,
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
+    
+    
+    
     
   })
 
