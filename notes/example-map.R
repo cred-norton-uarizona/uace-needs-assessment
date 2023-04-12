@@ -33,13 +33,15 @@ az_counties <- map_data("county", region = "arizona") %>%
 # Count the number of responses by county
 response_count <- data %>%
   group_by(COUNTY) %>%
-  summarize(count = n())
+  summarize(count = n()) %>% 
+  mutate(COUNTY = str_to_title(COUNTY)) %>% 
+  drop_na()
 
 # Merge response counts with county map data
-az_counties <- left_join(az_counties, response_count, by = "COUNTY")
+az_counties_respondents <- left_join(az_counties, response_count, by = "COUNTY")
 
 # Plot the map with the fill colors based on the response counts
-ggplot(data = az_counties,
+ggplot(data = az_counties_respondents,
        mapping = aes(x = long, y = lat,
                      group = group, fill = count)) + 
   geom_polygon(color = "black", show.legend = FALSE) +
@@ -55,12 +57,14 @@ ggplot(data = az_counties,
 data_filtered <- data %>%
   filter(!is.na(FCHS_8)) %>%
   group_by(COUNTY) %>%
-  summarize(selected_4_count = sum(FCHS_8 == 4),
+  summarize(selected_3_4_count = sum(FCHS_8 %in% 3:4),
             total_count = n()) %>%
-  mutate(selected_percentage = selected_4_count / total_count)
+  mutate(selected_percentage = selected_3_4_count / total_count,
+         COUNTY = str_to_title(COUNTY)) %>% 
+  drop_na()
 
-# Join the data with the map data
-az_counties <- left_join(az_counties, data_filtered, by = c("COUNTY" = "COUNTY"))
+
+az_counties_filtered <- left_join(az_counties, data_filtered, by = "COUNTY")
 
 # Define a color palette to use for the fill colors
 color_palette <- colorRampPalette(c("white", "darkblue"))
@@ -75,7 +79,7 @@ fill_color_func <- function(x) {
 }
 
 # Plot the map with the fill colors based on the percentage values
-ggplot(data = az_counties,
+ggplot(data = az_counties_filtered,
        mapping = aes(x = long, y = lat,
                      group = group, fill = selected_percentage)) + 
   geom_polygon(color = "black", show.legend = FALSE) +
