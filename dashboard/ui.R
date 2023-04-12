@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-library(shinycssloaders) #for loading indicator
+
 
 # Application title
 navbarPage(

@@ -1,9 +1,4 @@
-library(pins)
-library(arrow)
-library(ggforce)
-library(tidyverse)
-# library(mapproj)
-# library(maps)
+## Custom functions
 
 # function to break strings for ggplot
 break_string <- function(x, n) {
@@ -27,10 +22,6 @@ break_string2 <- function(x, n) {
          paste0(out_string[1], "<br>", out_string[2]))
 }
 
-
-board <- board_connect()
-data <- pin_read(board, "terrace/uace-na")
-# data <- pin_read(board, "ericrscott/uace-sub")
 
 # Define server logic 
 function(input, output, session) {

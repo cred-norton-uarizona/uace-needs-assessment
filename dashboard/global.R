@@ -1,9 +1,19 @@
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
+library(shinycssloaders) #for loading indicator
 library(plotly)
-library(Cairo)
+library(tidyverse)
+library(stringr)
+library(Cairo) # for graphics
+library(pins)
+library(arrow)
+library(ggforce)
 options(shiny.usecairo = TRUE)
+
+# read in pinned data
+board <- board_connect()
+data <- pin_read(board, "terrace/uace-na")
 
 # read in data needed for both ui and server
 labels <- read.csv("labels.csv")
