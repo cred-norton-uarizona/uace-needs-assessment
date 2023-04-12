@@ -290,8 +290,8 @@ function(input, output, session) {
                 marker = list(color = "#1b587c")) %>% 
         # ~paste(percent, race_ethnicity)) %>%
         layout(title = "Race/Ethnicity",
-               xaxis = list(title = ''),
-               yaxis = list(title = ''))
+               xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+               yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
     }
     
   })
