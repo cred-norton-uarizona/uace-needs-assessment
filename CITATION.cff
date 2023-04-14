@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: Code for "University of Arizona Cooperative Extension Needs Assessment 2022 Dashboard"
+authors:
+  - family-names: "Ewinghill"
+    given-names: "Terrace"
+  - family-names: "Scott"
+    given-names: "Eric R."
+    orcid: "https://orcid.org/0000-0002-7430-7879"
+  - family-names: "Guo"
+    given-names: "Jessica"
+url: https://github.com/cct-datascience/uace-needs-assessment
+#doi: TBD
+#date-released: TBD
