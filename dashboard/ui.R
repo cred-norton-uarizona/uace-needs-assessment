@@ -6,28 +6,6 @@
 #
 #    http://shiny.rstudio.com/
 #
-library(shinycssloaders) #for loading indicator
-
-race_vec <- c("American Indian or Alaska Native" = "AIAN",
-              "Asian" = "AS",
-              "Black or African American" = "BL", 
-              "Hispanic or Latinx" =  "HL",
-              "Multiracial" = "MR", 
-              "Native Hawaiian or Pacific Islander" = "NHPI", 
-              "White" = "WH" , 
-              "Prefer not to answer" = "NR") 
-
-topical_exp_vec <- c("Agriculture" = "AG_EXPERIENCE", 
-                     "Education & Youth Development" = "ED_EXPERIENCE", 
-                     "Health & Well-Being" = "HLTH_EXPERIENCE", 
-                     "Natural Resources" =  "NR_EXPERIENCE", 
-                     "Community & Economic Development" = "CD_EXPERIENCE")
-
-topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
-                     "Education & Youth Development" = "ED_KNOWLEDGE",
-                     "Health & Well-Being" = "HLTH_KNOWLEDGE",
-                     "Natural Resources" = "NR_KNOWLEDGE",
-                     "Community & Economic Development" = "CD_KNOWLEDGE")
 
 
 # Application title
@@ -43,7 +21,48 @@ navbarPage(
   h6("prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
   ),
   
-  # Tab panel 1 - Top 20 View
+  # Tab panel 1 - Demographics by county
+  tabPanel(
+    "Demographics",
+    fluidPage(
+      fluidRow(column(width = 4,
+                      box(
+                        selectizeGroupUI(
+                          id = "county-filter",
+                          params = list(
+                            COUNTY = list(inputId = "COUNTY", title = "Select County")),
+                          inline = FALSE
+                        ), 
+                        width = NULL),
+                      box(
+                        plotlyOutput("county_bar", height = 350),
+                        width = NULL),
+                      box(
+                        plotlyOutput("income_bar",height = 250),
+                        width = NULL
+                      )
+      ),
+      column(width = 3,
+             box(plotlyOutput("rural_donut", height = 200),
+                 width = NULL),
+             box(plotlyOutput("language_donut", height = 200),
+                 width =  NULL),
+             box(plotlyOutput("gender_donut_county", height = 200),
+                 width =  NULL)
+      ),
+      column(width = 5,
+             box(plotlyOutput("race_bar2", height = 250),
+                 width = NULL),
+             box(plotlyOutput("age_bar", height = 200),
+                 width = NULL),
+             box(plotlyOutput("edu_bar", height = 250),
+                 width = NULL)
+      )
+      )
+    )),
+
+  
+  # Tab panel 2 - Top 20 View and By Topic View as subtabs
   tabPanel(
     "Top Priorities",
     sidebarLayout(
@@ -89,6 +108,9 @@ navbarPage(
                                                plotOutput("top20bar", height = 800) %>%
                                                  withSpinner(type = 8), #loading indicator for plot,
                                                width = NULL),
+                                             box(
+                                               plotlyOutput("race_bar", height = 350),
+                                               width = NULL)
                              ),
                              column(width = 4,
                                     box(
@@ -100,9 +122,6 @@ navbarPage(
                                     box(
                                       plotlyOutput("gender_donut", height = 250),
                                       width = NULL),
-                                    box(
-                                      plotlyOutput("race_donut", height = 250),
-                                        width = NULL),
                                     box(
                                       plotlyOutput("edu_donut", height = 250),
                                       width = NULL))
