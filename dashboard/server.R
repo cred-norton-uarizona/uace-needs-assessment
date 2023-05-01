@@ -635,7 +635,8 @@ function(input, output, session) {
                                                 "Trade/technical/vocational training",
                                                 "Associate's degree",
                                                 "Bachelor's degree",
-                                                "Graduate or professional degree"))) %>%
+                                                "Graduate or professional degree",
+                                                "Prefer not to answer"))) %>%
       group_by(DEM_11) %>%
       summarize(count = n()) %>%
       arrange(desc(count)) %>%
