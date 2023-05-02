@@ -639,10 +639,10 @@ function(input, output, session) {
                                                 "Some college",
                                                 "High school diploma or GED",
                                                 "Less than high school diploma",
-                                                "Prefer not to answer"))) %>%
+                                                "Prefer not to answer" = NA))) %>%
       group_by(DEM_11) %>%
       summarize(count = n()) %>%
-      arrange(desc(DEM_11 == "Prefer not to answer"), desc(count)) %>%
+      arrange(desc(count)) %>%
       mutate(percent = paste0(round(count/sum(count)*100, 1), "%"))
     
     
