@@ -370,7 +370,7 @@ function(input, output, session) {
       pull(range)
   })
   
-  # By topic bar charts
+   # By topic bar charts
   
   output$bytopicbar <- renderPlot({
     data_bytopic <- data_bytopic()
@@ -402,7 +402,7 @@ function(input, output, session) {
       filter(Response %in% c("Extremely", "Very", "Somewhat")) %>% 
       arrange(Description, desc(Response)) %>%
       group_by(Description) %>%
-      mutate(location_half = percent/2,
+      mutate(location_half = percent/2, 
              location_prev = lag(percent),
              location_prev2 = lag(location_prev),
              y = rowSums(across(starts_with("location")), 
@@ -413,7 +413,7 @@ function(input, output, session) {
     
     ggplot() +
       geom_col(data = data_bytopic, aes(x = fct_rev(Description), 
-                                        y = percent,
+                                        y = percent, 
                                         fill = Response)) +
       geom_text(data = percent_labels,
                 aes(x = fct_rev(Description), 
@@ -532,7 +532,8 @@ function(input, output, session) {
              showlegend = FALSE,
              # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 100)) # You can adjust t to see how it looks on the plot
     
   })
   
@@ -629,32 +630,19 @@ function(input, output, session) {
     
     edu_count <- county_filtered() %>%
       drop_na(DEM_11) %>%
-      mutate(DEM_11 = factor(DEM_11, levels = c("Less than high school diploma",
-                                                "High school diploma or GED",
-                                                "Some college",
-                                                "Trade/technical/vocational training",
-                                                "Associate's degree",
+      mutate(DEM_11 = factor(DEM_11, levels = c("Graduate or professional degree",
                                                 "Bachelor's degree",
-                                                "Graduate or professional degree",
+                                                "Associate's degree",
+                                                "Trade/technical/vocational training",
+                                                "Some college",
+                                                "High school diploma or GED",
+                                                "Less than high school diploma",
                                                 "Prefer not to answer"))) %>%
       group_by(DEM_11) %>%
       summarize(count = n()) %>%
-      arrange(desc(count)) %>%
+      arrange(desc(DEM_11 == "Prefer not to answer"), desc(count)) %>%
       mutate(percent = paste0(round(count/sum(count)*100, 1), "%"))
     
-    edu_count$edu_labs <- sapply(edu_count$DEM_11, break_string2, 20)
-    edu_count$edu_labs <- factor(edu_count$edu_labs, levels = edu_count$edu_labs)
-    
-    edu_count %>%
-      plot_ly(x = ~count, y = ~edu_labs,
-              type = 'bar',
-              orientation = 'h',
-              text = ~percent,
-              marker = list(color = "#f07f09")) %>%
-      layout(title = "Educational Attainment",
-             showlegend = FALSE,
-             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
-             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
     
   })
   
