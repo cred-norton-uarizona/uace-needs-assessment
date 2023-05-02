@@ -35,15 +35,13 @@ data %>%
 
 
 # Information DEM_11
+# Terrace, need to pick up here with additions
 
+# I think I need a "NR" version for no response to any of the following built in
 info_vec <- data %>% c("Physical brochure, fact sheet, article, or similar" = DEM_14_1,
                        "Talk with an expert" = DEM_14_2,
                        "In-person class or workshop" = DEM_14_3, 
-                       "Hispanic or Latino" =  "HL",
-                       "Multiracial" = "MR", 
-                       "Native Hawaiian or Other Pacific Islander" = "NHPI", 
-                       "White" = "WH" , 
-                       "Prefer not to answer" = "NR") 
+                       ) 
 
 
 
