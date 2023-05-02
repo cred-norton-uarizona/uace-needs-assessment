@@ -10,6 +10,9 @@ library(pins)
 library(arrow)
 library(ggforce)
 options(shiny.usecairo = TRUE)
+library(htmltools)
+library(usethis)
+# Use pr_finish to close old branches
 
 # read in pinned data
 board <- board_connect()
