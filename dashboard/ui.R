@@ -9,21 +9,21 @@
 
 # Application title
 navbarPage(
-  title = "University of Arizona Cooperative Extension Needs Assessment",
-  header =  mainPanel(
-    p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
-  2022 to better understand community needs and priorities. Cooperative Extension users,
-  topical experts, and members of the general public from each county were invited to
-  participate via online or paper survey. Participants were shown 99 items across topics
-  relevant to Cooperative Extension and asked to rank how important it is to prioritize each
-  item in their community on a 5-point scale."),
-  h6("prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
-  ),
+  title = "University of Arizona Cooperative Extension",
+  # header =  mainPanel(
+  #   p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall
+  # 2022 to better understand community needs and priorities. Cooperative Extension users,
+  # topical experts, and members of the general public from each county were invited to
+  # participate via online or paper survey. Participants were shown 99 items across topics
+  # relevant to Cooperative Extension and asked to rank how important it is to prioritize each
+  # item in their community on a 5-point scale."),
+  # h6("prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona")
+  # ),
   
   # Tab panel 1 - instructions
   tabPanel("Needs Assessment",
            img(src = "CE_logo.png", height = "100px"),
-           h1("University of Arizona Cooperative Extension 2022 Needs Assessment Survey", 
+           h1("2022 Needs Assessment Survey", 
               style = "font-weight: bold;"),
            p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall 2022 to better understand community needs as a basis for examining and prioritizing Extension activities. Cooperative Extension users, topical experts, and members of the general public from each county were invited to participate via online or paper survey (available in English and Spanish). Participants were shown 99 items across topics relevant to Cooperative Extension and asked to rank how important it is to prioritize each item in their community on a 5-point scale."),
            br(),
@@ -64,6 +64,8 @@ navbarPage(
                         AGE = list(inputId = "AGE", title = "Age")),
                       inline = FALSE
                     ), 
+                    br(),
+                    hr(style = "border-top: 1px solid #000000;"),
                     selectInput(inputId = "race_ethnicity",
                                 label = "Race/Ethnicity",
                                 choices = race_vec,
