@@ -37,14 +37,73 @@ data %>%
 # Information DEM_11
 # Terrace, need to pick up here with additions
 
-# I think I need a "NR" version for no response to any of the following built in
-info_vec <- data %>% c("Physical brochure, fact sheet, article, or similar" = DEM_14_1,
-                       "Talk with an expert" = DEM_14_2,
-                       "In-person class or workshop" = DEM_14_3, 
-                       ) 
+info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
+                       "Talk with an expert" = "DEM_14_2",
+                       "In-person class or workshop" = "DEM_14_3",
+                       "Online class or workshop" = "DEM_14_4",
+                       "Radio" = "DEM_14_6",
+                      "Website or online article" = "DEM_14_7",
+                       "Video" = "DEM_14_8",
+                      "Social media" = "DEM_14_9",
+              "Listening session/ community conversation" = "DEM_14_10"
+               ) 
+# Note: There isn't a 5 and that is an error in Qualtrics survey creation
+
+data %>%
+  select(info_vec) %>%
+  pivot_longer(cols = everything(), 
+               names_to = "information_type") %>%
+  mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+                                                                "Talk with an expert",
+                                                                "In-person class or workshop",
+                                                                "Online class or workshop",
+                                                                "Radio",
+                                                                "Website or online article",
+                                                                "Video",
+                                                                "Social media",
+                                                                "Listening session/ community conversation"
+  ))) %>%
+  filter(!is.na(value)) %>%
+  group_by(information_type) %>%
+  summarize(count = n(),
+            frac = n()/nrow(.)) %>%
+  mutate(percent = paste0(round(frac * 100), "%")) %>%
+  plot_ly(x = ~frac, y = ~fct_rev(information_type),
+          type = 'bar',
+          orientation = 'h',
+          text = ~percent,
+          hoverinfo = "text",
+          marker = list(color = "#594a6a")) %>% 
+  layout(xaxis = list(title = ''),
+         yaxis = list(title = ''),
+         title = list(text = "Information Sources Preferred by Respondents",
+                      font = list(size = 20)),
+         margin = list(l = 150, b = 150, t = 50, r = 50))
 
 
 
+
+
+
+data %>%
+  select(info_vec) %>%
+  pivot_longer(cols = everything(), 
+               names_to = "information_type") %>%
+  mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+                                                                "Talk with an expert",
+                                                                "In-person class or workshop"))) %>%
+  filter(!is.na(value)) %>%
+  group_by(information_type) %>%
+  summarize(count = n(),
+            frac = n()/nrow(.)) %>%
+  mutate(percent = sprintf("%d%%", round(frac*100))) %>%
+  plot_ly(x = ~frac, y = ~fct_rev(information_type),
+          type = 'bar',
+          orientation = 'h',
+          text = ~percent) %>% 
+  # ~paste(percent, race_ethnicity)) %>%
+  layout(xaxis = list(title = ''),
+         yaxis = list(title = ''))
 
 
 
