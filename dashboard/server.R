@@ -118,6 +118,7 @@ function(input, output, session) {
       theme(
         legend.position = "top",
         legend.title = element_blank(),
+        legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
         plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "gray"),
         panel.background = element_rect(fill = NA),
@@ -430,6 +431,7 @@ function(input, output, session) {
       theme(
         legend.position = "top",
         legend.title = element_blank(),
+        legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
         plot.subtitle = element_text(size = 14, margin = margin(10, 0, 10, 0), color = "gray"),
         panel.background = element_rect(fill = NA),

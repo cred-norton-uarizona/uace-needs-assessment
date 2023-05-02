@@ -83,49 +83,7 @@ navbarPage(
                       multiple = TRUE
                     )
       ),
-  # Tab panel 3 - Demographics by county
-  tabPanel(
-    "Demographics",
-    fluidPage(
-      fluidRow(column(width = 4,
-                      box(
-                        selectizeGroupUI(
-                          id = "county-filter",
-                          params = list(
-                            COUNTY = list(inputId = "COUNTY", title = "Select County")),
-                          inline = FALSE
-                        ), 
-                        width = NULL),
-                      box(
-                        plotlyOutput("county_bar", height = 350),
-                        width = NULL),
-                      box(
-                        plotlyOutput("income_bar",height = 250),
-                        width = NULL
-                      )
-      ),
-      column(width = 3,
-             box(plotlyOutput("rural_donut", height = 200),
-                 width = NULL),
-             box(plotlyOutput("language_donut", height = 200),
-                 width =  NULL),
-             box(plotlyOutput("gender_donut_county", height = 200),
-                 width =  NULL)
-      ),
-      column(width = 5,
-             box(plotlyOutput("race_bar2", height = 250),
-                 width = NULL),
-             box(plotlyOutput("age_bar", height = 200),
-                 width = NULL),
-             box(plotlyOutput("edu_bar", height = 250),
-                 width = NULL)
-      )
-      )
-    )),
-
   
-
-      
       # Show a plot of the generated distribution
       mainPanel(
         tabsetPanel(type = "tabs",
@@ -168,8 +126,49 @@ navbarPage(
                               
                              )))
                     )
-        ))
-    )
+        )),
+  
+  # Tab panel 3 - Demographics by county
+  tabPanel(
+    "Demographics",
+    fluidPage(
+      fluidRow(column(width = 4,
+                      box(
+                        selectizeGroupUI(
+                          id = "county-filter",
+                          params = list(
+                            COUNTY = list(inputId = "COUNTY", title = "Select County")),
+                          inline = FALSE
+                        ), 
+                        width = NULL),
+                      box(
+                        plotlyOutput("county_bar", height = 350),
+                        width = NULL),
+                      box(
+                        plotlyOutput("income_bar",height = 250),
+                        width = NULL
+                      )
+      ),
+      column(width = 3,
+             box(plotlyOutput("rural_donut", height = 200),
+                 width = NULL),
+             box(plotlyOutput("language_donut", height = 200),
+                 width =  NULL),
+             box(plotlyOutput("gender_donut_county", height = 200),
+                 width =  NULL)
+      ),
+      column(width = 5,
+             box(plotlyOutput("race_bar2", height = 250),
+                 width = NULL),
+             box(plotlyOutput("age_bar", height = 200),
+                 width = NULL),
+             box(plotlyOutput("edu_bar", height = 250),
+                 width = NULL)
+      )
+      )
+    ))
+  )
+
   
 
 
