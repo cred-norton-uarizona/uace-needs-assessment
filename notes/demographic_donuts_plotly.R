@@ -84,28 +84,28 @@ data %>%
 
 
 
-
-data %>%
-  select(info_vec) %>%
-  pivot_longer(cols = everything(), 
-               names_to = "information_type") %>%
-  mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
-                                                                "Talk with an expert",
-                                                                "In-person class or workshop"))) %>%
-  filter(!is.na(value)) %>%
-  group_by(information_type) %>%
-  summarize(count = n(),
-            frac = n()/nrow(.)) %>%
-  mutate(percent = sprintf("%d%%", round(frac*100))) %>%
-  plot_ly(x = ~frac, y = ~fct_rev(information_type),
-          type = 'bar',
-          orientation = 'h',
-          text = ~percent) %>% 
-  # ~paste(percent, race_ethnicity)) %>%
-  layout(xaxis = list(title = ''),
-         yaxis = list(title = ''))
-
-
+# 
+# data %>%
+#   select(info_vec) %>%
+#   pivot_longer(cols = everything(), 
+#                names_to = "information_type") %>%
+#   mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+#                                                                 "Talk with an expert",
+#                                                                 "In-person class or workshop"))) %>%
+#   filter(!is.na(value)) %>%
+#   group_by(information_type) %>%
+#   summarize(count = n(),
+#             frac = n()/nrow(.)) %>%
+#   mutate(percent = sprintf("%d%%", round(frac*100))) %>%
+#   plot_ly(x = ~frac, y = ~fct_rev(information_type),
+#           type = 'bar',
+#           orientation = 'h',
+#           text = ~percent) %>% 
+#   # ~paste(percent, race_ethnicity)) %>%
+#   layout(xaxis = list(title = ''),
+#          yaxis = list(title = ''))
+# 
+# 
 
 # Demographic distribution/donut plots, interactive
 # Urban or Rural
