@@ -54,6 +54,8 @@ data %>%
 
 # Bar chart for Familiar with Extension, Extension User
 
+
+
 # Bar chart of race/ethnicity
 
 # Bar chart of educational attainment
