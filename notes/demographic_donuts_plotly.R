@@ -10,6 +10,44 @@ data <- pin_read(board, "terrace/uace-na")
 # names(data)
 
 
+# Cooperative Extension User and Familiar
+data %>%
+  pivot_longer(cols = c("CE_USER", "CE_EXPOSED"), 
+               names_to = "variable") %>%
+  filter(value == "Yes") %>%
+  group_by(variable) %>%
+  summarize(count = n(),
+            frac = count/nrow(data)) %>%
+  mutate(variable = ifelse(variable == "CE_USER", "User of Extension", "Familiar with Extension"),
+         percent = paste0(round(frac * 100), "%")) %>%
+  plot_ly(x = ~frac, y = ~variable,
+          type = 'bar',
+          orientation = 'h',
+          text = ~percent,
+          hoverinfo = "text",
+          marker = list(color = "#9f2936")) %>% 
+  layout(xaxis = list(title = ""),
+         yaxis = list(title = ""),
+         title = list(text = "Extension Usage and Familiarity Among Respondents",
+                      font = list(size = 20)),
+         margin = list(l = 150, b = 150))
+
+
+
+# Information DEM_11
+
+info_vec <- data %>% c("Physical brochure, fact sheet, article, or similar" = DEM_14_1,
+                       "Talk with an expert" = DEM_14_2,
+                       "In-person class or workshop" = DEM_14_3, 
+                       "Hispanic or Latino" =  "HL",
+                       "Multiracial" = "MR", 
+                       "Native Hawaiian or Other Pacific Islander" = "NHPI", 
+                       "White" = "WH" , 
+                       "Prefer not to answer" = "NR") 
+
+
+
+
 
 
 # Demographic distribution/donut plots, interactive
@@ -196,34 +234,6 @@ data %>%
 
 
 
-# Cooperative Extension User and Familiar
-
-
-
-data %>%
-  pivot_longer(cols = c("CE_USER", "CE_EXPOSED"), 
-               names_to = "variable") %>%
-  filter(value == "Yes") %>%
-  group_by(variable) %>%
-  summarize(count = n(),
-            frac = count/nrow(data)) %>%
-  mutate(variable = ifelse(variable == "CE_USER", "User of Extension", "Familiar with Extension"),
-         percent = paste0(round(frac * 100), "%")) %>%
-  plot_ly(x = ~frac, y = ~variable,
-          type = 'bar',
-          orientation = 'h',
-          text = ~percent,
-          hoverinfo = "text",
-          marker = list(color = "#9f2936")) %>% 
-  layout(xaxis = list(title = ""),
-         yaxis = list(title = ""),
-         title = list(text = "Extension Usage and Familiarity Among Respondents",
-                      font = list(size = 20)),
-         margin = list(l = 150, b = 150))
-
-
-
-
 
 
 
@@ -251,44 +261,45 @@ topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
 
 
 
-# Gauge chart for sample size
-
-fig <- plot_ly(
-  domain = list(x = c(0, 1), y = c(0, 1)),
-  value = nrow(data), # substitute with actual sample size
-  title = list(text = "Sample size"),
-  type = "indicator",
-  mode = "gauge+number",
-  # delta = list(reference = 380),
-  gauge = list(
-    axis =list(range = list(NULL, nrow(data)),# include maximum
-               nticks = 5), 
-    threshold = list(
-      line = list(color = "red", width = 4),
-      thickness = 0.75,
-      value = nrow(data))))  # include maximum
-fig <- fig %>%
-  layout(margin = list(l=20,r=30))
-fig
-
-# CE_EXPOSED
-data %>%
-  group_by(CE_EXPOSED) %>%
-  summarize(count = n()) %>%
-  plot_ly(labels = ~CE_EXPOSED, values = ~count) %>%
-  add_pie(hole = 0.5) %>%
-  layout(title = "County Extension Exposure",  
-         showlegend = TRUE,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
-# CE_USER
-data %>%
-  group_by(CE_USER) %>%
-  summarize(count = n()) %>%
-  plot_ly(labels = ~CE_USER, values = ~count) %>%
-  add_pie(hole = 0.5) %>%
-  layout(title = "County Extension User",  
-         showlegend = TRUE,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+# 
+# # Gauge chart for sample size
+# 
+# fig <- plot_ly(
+#   domain = list(x = c(0, 1), y = c(0, 1)),
+#   value = nrow(data), # substitute with actual sample size
+#   title = list(text = "Sample size"),
+#   type = "indicator",
+#   mode = "gauge+number",
+#   # delta = list(reference = 380),
+#   gauge = list(
+#     axis =list(range = list(NULL, nrow(data)),# include maximum
+#                nticks = 5), 
+#     threshold = list(
+#       line = list(color = "red", width = 4),
+#       thickness = 0.75,
+#       value = nrow(data))))  # include maximum
+# fig <- fig %>%
+#   layout(margin = list(l=20,r=30))
+# fig
+# 
+# # CE_EXPOSED
+# data %>%
+#   group_by(CE_EXPOSED) %>%
+#   summarize(count = n()) %>%
+#   plot_ly(labels = ~CE_EXPOSED, values = ~count) %>%
+#   add_pie(hole = 0.5) %>%
+#   layout(title = "County Extension Exposure",  
+#          showlegend = TRUE,
+#          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+#          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+# 
+# # CE_USER
+# data %>%
+#   group_by(CE_USER) %>%
+#   summarize(count = n()) %>%
+#   plot_ly(labels = ~CE_USER, values = ~count) %>%
+#   add_pie(hole = 0.5) %>%
+#   layout(title = "County Extension User",  
+#          showlegend = TRUE,
+#          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+#          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
