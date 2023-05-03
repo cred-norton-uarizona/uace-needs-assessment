@@ -63,7 +63,8 @@ data_bytopic <- data %>% # substitute with refine_top_20()
   group_by(Metric) %>%
   mutate(total = sum(n)) %>%
   ungroup() %>%
-  mutate(percent = round(n/total*100)) %>%
+  mutate(percent_round = round(n/total*100),
+         percent = n/total*100) %>%
   left_join(labels, by = "Metric") %>%
   mutate(Description = factor(Description, levels = rank_EV),
          Response = case_when(Response == 0 ~ "Not at all",
@@ -102,7 +103,7 @@ ggplot() +
   geom_text(data = percent_labels,
             aes(x = fct_rev(Description), 
                 y = y, 
-                label = paste0(percent, "%")),
+                label = paste0(percent_round, "%")),
             vjust = 0.5, hjust = 0.5,
             color = "white", size = 3.5) +
   scale_x_discrete(labels = xlabs) +
