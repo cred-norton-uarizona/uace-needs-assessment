@@ -49,6 +49,16 @@ info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
                ) 
 # Note: There isn't a 5 and that is an error in Qualtrics survey creation
 
+answered_data <- data %>%
+  select(starts_with("DEM_14")) %>% 
+  rowwise() %>% 
+  mutate(answered_info = if_else(
+    sum(!is.na(c_across(starts_with("DEM_14")))) >= 1, 1, 0
+  )
+  ) 
+
+
+
 data %>%
   select(info_vec) %>%
   pivot_longer(cols = everything(), 
@@ -66,9 +76,9 @@ data %>%
   filter(!is.na(value)) %>%
   group_by(information_type) %>%
   summarize(count = n(),
-            frac = n()/nrow(.)) %>%
+            frac = n()/sum(answered_data$answered_info)) %>%
   mutate(percent = paste0(round(frac * 100), "%")) %>%
-  plot_ly(x = ~frac, y = ~fct_rev(information_type),
+  plot_ly(x = ~count, y = ~fct_rev(information_type),
           type = 'bar',
           orientation = 'h',
           text = ~percent,
@@ -279,6 +289,7 @@ data %>%
   filter(value == 1) %>%
   group_by(race_ethnicity) %>%
   summarize(count = n(),
+            row_n = nrow(.),
             frac = n()/nrow(.)) %>%
   mutate(percent = sprintf("%d%%", round(frac*100))) %>%
   plot_ly(x = ~frac, y = ~fct_rev(race_ethnicity),
