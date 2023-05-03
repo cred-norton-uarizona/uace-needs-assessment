@@ -262,7 +262,7 @@ function(input, output, session) {
         filter(value == 1) %>%
       group_by(race_ethnicity) %>%
       summarize(count = n(),
-                frac = n()/nrow(.)) %>%
+                frac = n()/nrow(refine_filtered())) %>%
       mutate(percent = sprintf("%d%%", round(frac*100)),
              race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
                                                                 "Asian",
@@ -581,7 +581,7 @@ function(input, output, session) {
       filter(value == 1) %>%
       group_by(race_ethnicity) %>%
       summarize(count = n(),
-                frac = n()/nrow(.)) %>%
+                frac = n()/nrow(county_filtered())) %>%
       mutate(percent = sprintf("%d%%", round(frac*100)),
              race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
                                                                 "Asian",
