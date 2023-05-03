@@ -93,8 +93,9 @@ function(input, output, session) {
     
     if(N <= 6) {
       ggplot() +
-        annotate("text", x = 1, y = 1, size = 8,
-                 label = "Low sample size, data not visualized") +
+        annotate("text", x = 1, y = 1, size = 5,
+                 label = expression(atop("The filters you have applied result in too small a sample to support data visualization. "),
+                                         "Please remove one or more of your filters")) +
         theme_void()
     } else {
     # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
@@ -337,7 +338,8 @@ function(input, output, session) {
       group_by(Metric) %>%
       mutate(total = sum(n)) %>%
       ungroup() %>%
-      mutate(percent = round(n/total*100)) %>%
+      mutate(percent_round = round(n/total*100),
+             percent = n/total*100) %>%
       left_join(labels, by = "Metric") %>%
       mutate(Description = factor(Description, levels = rank_EV),
              Response = case_when(Response == 0 ~ "Not at all",
@@ -382,8 +384,8 @@ function(input, output, session) {
     
     if(N <= 6) {
       ggplot() +
-        annotate("text", x = 1, y = 1, size = 8,
-                 label = "Low sample size, data not visualized") +
+        annotate("text", x = 1, y = 1, size = 5,
+                 label = "The filters you have applied result in too small a sample to support data visualization. Please remove one or more of your filters") +
         theme_void()
     } else {
     if(input$topic == "Health and Well-Being"){
@@ -419,7 +421,7 @@ function(input, output, session) {
       geom_text(data = percent_labels,
                 aes(x = fct_rev(Description), 
                     y = y, 
-                    label = paste0(percent, "%")),
+                    label = paste0(percent_round, "%")),
                 vjust = 0.5, hjust = 0.5,
                 color = "white", size = 4) +
       scale_fill_manual(values = colors) +
