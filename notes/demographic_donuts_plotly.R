@@ -103,12 +103,22 @@ info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
               "Prefer not to answer" = "Prefer not to answer"
 ) 
 
+
 answered_data <- data %>%
   select(starts_with("DEM_14")) %>% 
   rowwise() %>% 
-  mutate("Prefer not to answer" = if_else(
-    sum(!is.na(c_across(starts_with("DEM_14")))) >= 1, NA, "Prefer not to answer")
-    )
+  mutate("Prefer not to answer" = if(sum(!is.na(c_across(starts_with("DEM_14"))))) {
+    NA
+  } else {
+    "Prefer not to answer"
+  })
+
+# answered_data <- data %>%
+#   select(starts_with("DEM_14")) %>% 
+#   rowwise() %>% 
+#   mutate("Prefer not to answer" = if_else(
+#     sum(!is.na(c_across(starts_with("DEM_14")))) >= 1, NA, "Prefer not to answer")
+#     )
 
 answered_data %>%
   select(info_vec) %>%
