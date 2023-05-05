@@ -94,8 +94,7 @@ function(input, output, session) {
     if(N <= 6) {
       ggplot() +
         annotate("text", x = 1, y = 1, size = 5,
-                 label = expression(atop("The filters you have applied result in too small a sample to support data visualization. "),
-                                         "Please remove one or more of your filters")) +
+                 label = 'The filters you have applied result in too small a sample to support data visualization. \n Please remove one or more of your filters') +
         theme_void()
     } else {
     # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
@@ -138,6 +137,25 @@ function(input, output, session) {
   
   output$n_indicator <- renderPlot({
     req(refine_filtered())
+    
+    if(nrow(refine_filtered()) <= 6) {
+      ggplot() +
+        geom_arc_bar(aes(
+          x0 = 0,
+          y0 = 0, 
+          r0 = 0.5,
+          r = 1,
+          #convert to radians and shift by 180º counterclockwise
+          start = -pi/2, 
+          end = pi/2,
+          
+        ), fill = "white") +
+        annotate(geom = "text", label = "Data \n suppressed", x = 0, y = 0.2, size = 6) +
+        coord_equal() +
+        theme_void() +
+        theme(legend.position = "none")
+    } else{
+    
     df <-
       tibble(
         # get the fraction of rows (observations) for after and before filtering
@@ -168,7 +186,8 @@ function(input, output, session) {
       scale_fill_manual(values = c("#418ab3", "white")) +
       coord_equal() +
       theme_void() +
-      theme(legend.position = "none")
+      theme(legend.position = "none")   
+    }
   })
   
 
