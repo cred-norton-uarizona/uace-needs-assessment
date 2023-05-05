@@ -115,7 +115,7 @@ function(input, output, session) {
       scale_fill_manual(values = colors)+
       coord_flip() +
       labs(
-        subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
+        subtitle = "Percent of respondents who indicated it was “extremely” or “very important” to prioritize this issue in their community") +
       theme(
         legend.position = "top",
         legend.title = element_blank(),
