@@ -493,7 +493,7 @@ function(input, output, session) {
               orientation = 'h',
               text = ~percent,
               marker = list(color = color_vec)) %>% 
-      layout(title = "Respondents by county",
+      layout(title = "Respondents by County",
              xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
              yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
     
