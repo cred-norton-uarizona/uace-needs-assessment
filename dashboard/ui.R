@@ -54,6 +54,7 @@ navbarPage(
     "Top Priorities",
     sidebarLayout(
       sidebarPanel( width = 3,
+                    plotOutput("n_indicator", height = 150),
                     selectizeGroupUI(
                       id = "my-filters",
                       params = list(
@@ -102,12 +103,12 @@ navbarPage(
                                                width = NULL)
                              ),
                              column(width = 4,
-                                    box(
-                                      plotOutput("n_indicator", height = 150), 
-                                      h3(),
-                                      h3(),
-                                      width = NULL
-                                    ),
+                                    # box(
+                                    #   # plotOutput("n_indicator", height = 150), 
+                                    #   h3(),
+                                    #   h3(),
+                                    #   width = NULL
+                                    # ),
                                     box(
                                       plotlyOutput("gender_donut", height = 250),
                                       width = NULL),
