@@ -103,12 +103,6 @@ navbarPage(
                                                width = NULL)
                              ),
                              column(width = 4,
-                                    # box(
-                                    #   # plotOutput("n_indicator", height = 150), 
-                                    #   h3(),
-                                    #   h3(),
-                                    #   width = NULL
-                                    # ),
                                     box(
                                       plotlyOutput("gender_donut", height = 250),
                                       width = NULL),
