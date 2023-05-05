@@ -1,4 +1,5 @@
 ## Custom functions
+# TODO: not sure if these custom functions are used anymore
 
 # function to break strings for ggplot
 break_string <- function(x, n) {
@@ -551,7 +552,7 @@ function(input, output, session) {
               textfont = list(size = 10),
               marker = list(colors = colors_temp)) %>%
       add_pie(hole = 0.5) %>%
-      layout(title = "Language",  
+      layout(title = "Language", 
              showlegend = FALSE,
              # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
@@ -660,11 +661,22 @@ function(input, output, session) {
                                                 "Some college",
                                                 "High school diploma or GED",
                                                 "Less than high school diploma",
-                                                "Prefer not to answer" = NA))) %>%
+                                                "Prefer not to answer"))) %>%
       group_by(DEM_11) %>%
       summarize(count = n()) %>%
       arrange(desc(count)) %>%
       mutate(percent = paste0(round(count/sum(count)*100, 1), "%"))
+
+    edu_count %>%
+      plot_ly(x = ~count, y = ~fct_rev(DEM_11),
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              marker = list(color = "#f07f09")) %>%
+      layout(title = "Educational Attainment",
+             showlegend = FALSE,
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
     
     
   })
