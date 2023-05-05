@@ -121,7 +121,7 @@ function(input, output, session) {
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "black"),
+        plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "#808080"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
@@ -455,7 +455,7 @@ function(input, output, session) {
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 14, margin = margin(10, 0, 10, 0), color = "black"),
+        plot.subtitle = element_text(size = 14, margin = margin(10, 0, 10, 0), color = "#808080"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
@@ -524,7 +524,8 @@ function(input, output, session) {
              showlegend = FALSE,
              # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) # You can adjust t to see how it looks on the plot)
     
   })
   
@@ -557,7 +558,7 @@ function(input, output, session) {
              # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             margin = list(t = 100)) # You can adjust t to see how it looks on the plot
+             margin = list(t = 50)) # You can adjust t to see how it looks on the plot
     
   })
   
@@ -588,7 +589,8 @@ function(input, output, session) {
                showlegend = FALSE,
                # legend = list(orientation = "h"),
                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               margin = list(t = 50)) # You can adjust t to see how it looks on the plot
     
   })
   
