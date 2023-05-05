@@ -10,7 +10,7 @@
 # Application title
 navbarPage(
   title = "University of Arizona Cooperative Extension",
-
+  
   
   # Tab panel 1 - instructions
   tabPanel("Needs Assessment",
@@ -54,7 +54,7 @@ navbarPage(
                         LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
                         UserLanguage = list(inputId = "UserLanguage", title = "Survey Language"),
                         DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment"),
-                        Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income Status"),
+                        Low_Income_FPL_185 = list(inputId = "Low_Income_FPL_185", title = "Low-income (<185% FPL)"),
                         Gender = list(inputId = "Gender", title = "Gender"),
                         AGE = list(inputId = "AGE", title = "Age")),
                       inline = FALSE
@@ -68,10 +68,11 @@ navbarPage(
                     
                     selectInput(
                       inputId = "topical_experience",
-                      label = "Topical Experience",
+                      label = HTML("Topical Experience <br> (education, work, volunteer)"),
                       choices = topical_exp_vec,
                       multiple = TRUE
-                    ),
+                    )
+                    ,
                     
                     selectInput(
                       inputId = "topical_knowledge",
