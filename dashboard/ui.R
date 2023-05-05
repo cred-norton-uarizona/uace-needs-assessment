@@ -49,7 +49,7 @@ navbarPage(
            p(HTML("Do we want to <a href='https://extension.arizona.edu/statewide-needs-assessment?_gl=1*1p34zv*_ga*OTkxOTgzOTAzLjE2NzkzNDg3NDg.*_ga_7PV3540XS3*MTY4MjUzMjkxMC4zNC4xLjE2ODI1MzI5MTMuNTcuMC4w' target='_blank'>link</a> to the Extension page where the other products are posted?"))
   ),
   
-    # Tab panel 2 - Top 20 View and By Topic View as subtabs
+  # Tab panel 2 - Top 20 View and By Topic View as subtabs
   tabPanel(
     "Top Priorities",
     sidebarLayout(
@@ -88,29 +88,20 @@ navbarPage(
                       multiple = TRUE
                     )
       ),
-  
+      
       # Show a plot of the generated distribution
       mainPanel(
         tabsetPanel(type = "tabs",
                     tabPanel("Overall",
-                             fluidRow(column(width = 8,
-                                             box(
-                                               plotOutput("top20bar", height = 800) %>%
-                                                 withSpinner(type = 8), #loading indicator for plot,
-                                               width = NULL),
-                                             box(
-                                               plotlyOutput("race_bar", height = 350),
-                                               width = NULL)
-                             ),
-                             column(width = 4,
-                                    box(
+                             fluidRow(plotOutput("top20bar", height = 800) %>% withSpinner(type = 8)),
+                             fluidRow(
+                               column(width = 8, 
+                                      plotlyOutput("race_bar", height = 500)),
+                               column(width = 4,
                                       plotlyOutput("gender_donut", height = 250),
-                                      width = NULL),
-                                    box(
-                                      plotlyOutput("edu_donut", height = 250),
-                                      width = NULL))
-                             
-                             )),
+                                      plotlyOutput("edu_donut", height = 250))
+                             )
+                    ),
                     tabPanel("By Topic",
                              fluidRow(box(selectInput(
                                inputId = "topic",
@@ -122,10 +113,10 @@ navbarPage(
                                plotOutput("bytopicbar", height = 800,
                                           width = NULL)  %>%
                                  withSpinner(type = 8) #loading indicator for plot,
-                              
+                               
                              )))
-                    )
-        )),
+      )
+    )),
   
   # Tab panel 3 - Demographics by county
   tabPanel(
@@ -166,10 +157,10 @@ navbarPage(
       )
       )
     ))
-  )
-
-  
+)
 
 
-  
+
+
+
 
