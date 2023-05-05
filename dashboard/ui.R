@@ -38,7 +38,7 @@ navbarPage(
            br(),
            p("Prepared by the Community Research, Evaluation and Development (CRED) team and the Communication and Cyber Technologies Data Science Team, University of Arizona"),
            br(),
-           p(HTML("Do we want to <a href='https://extension.arizona.edu/statewide-needs-assessment?_gl=1*1p34zv*_ga*OTkxOTgzOTAzLjE2NzkzNDg3NDg.*_ga_7PV3540XS3*MTY4MjUzMjkxMC4zNC4xLjE2ODI1MzI5MTMuNTcuMC4w' target='_blank'>link</a> to the Extension page where the other products are posted?"))
+           p(HTML("Click this <a href='https://extension.arizona.edu/statewide-needs-assessment?_gl=1*1p34zv*_ga*OTkxOTgzOTAzLjE2NzkzNDg3NDg.*_ga_7PV3540XS3*MTY4MjUzMjkxMC4zNC4xLjE2ODI1MzI5MTMuNTcuMC4w' target='_blank'>link</a> to see the other products for this assessment."))
   ),
   
   # Tab panel 2 - Top 20 View and By Topic View as subtabs
