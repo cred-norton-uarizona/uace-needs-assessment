@@ -673,7 +673,7 @@ function(input, output, session) {
       group_by(DEM_11) %>%
       summarize(count = n()) %>%
       arrange(desc(count)) %>%
-      mutate(percent = paste0(round(count/sum(count)*100, 1), "%"))
+      mutate(percent = paste0(round(count/sum(count)*100), "%"))
 
     edu_count %>%
       plot_ly(x = ~count, y = ~fct_rev(DEM_11),
