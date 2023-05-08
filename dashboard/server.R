@@ -600,6 +600,68 @@ function(input, output, session) {
     
   })
   
+  # CE_USER donut
+  
+  output$ce_user_donut <- renderPlotly({
+    
+    # Establish universal colors
+    colors_ce_user <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+    
+    # Wrangle count data
+    ceuser_count <- county_filtered() %>%
+      group_by(CE_USER) %>%
+      summarize(count = n()) %>%
+      mutate(frac = count / sum(count), 
+             percent = paste0(round(frac*100), "%"))
+    
+    # Establish specific colors needed
+    colors_temp <- colors_ce_user[intersect(ceuser_count$CE_USER, names(colors_ce_user))]
+    
+    ceuser_count %>%
+      plot_ly(labels = ~CE_USER, values = ~count,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              marker = list(colors = colors_temp)) %>%
+      add_pie(hole = 0.5) %>%
+      layout(title = "User of Extension",  
+             showlegend = FALSE,
+             # legend = list(orientation = "h"),
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) 
+  })
+  
+  # CE_EXPOSED donut
+  
+  output$ce_exposed_donut <- renderPlotly({
+    
+    # Establish universal colors
+    colors_ce_exposed <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+    
+    # Wrangle count data
+    ceexposed_count <- county_filtered() %>%
+      group_by(CE_EXPOSED) %>%
+      summarize(count = n()) %>%
+      mutate(frac = count / sum(count), 
+             percent = paste0(round(frac*100), "%"))
+    
+    # Establish specific colors needed
+    colors_temp <- colors_ce_exposed[intersect(ceexposed_count$CE_USER, names(colors_ce_exposed))]
+    
+    ceexposed_count %>%
+      plot_ly(labels = ~CE_EXPOSED, values = ~count,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              marker = list(colors = colors_temp)) %>%
+      add_pie(hole = 0.5) %>%
+      layout(title = "Familiar with Extension",  
+             showlegend = FALSE,
+             # legend = list(orientation = "h"),
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) 
+  })
+  
   # Race barchart for demographics tab only
   output$race_bar2 <- renderPlotly({
     
@@ -719,6 +781,61 @@ function(input, output, session) {
     
     
     
+  })
+  
+  # Information source bar
+  output$info_bar <- renderPlotly({
+    info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
+                  "Talk with an expert" = "DEM_14_2",
+                  "In-person class or workshop" = "DEM_14_3",
+                  "Online class or workshop" = "DEM_14_4",
+                  "Radio" = "DEM_14_6",
+                  "Website or online article" = "DEM_14_7",
+                  "Video" = "DEM_14_8",
+                  "Social media" = "DEM_14_9",
+                  "Listening session/ community conversation" = "DEM_14_10",
+                  "Prefer not to answer" = "DEM_14_NR"
+    )
+    
+    
+    info_count <- county_filtered() %>%
+      select(all_of(info_vec)) %>%
+      pivot_longer(cols = everything(), 
+                   names_to = "information_type") %>%
+      mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+                                                                    "Talk with an expert",
+                                                                    "In-person class or workshop",
+                                                                    "Online class or workshop",
+                                                                    "Radio",
+                                                                    "Website or online article",
+                                                                    "Video",
+                                                                    "Social media",
+                                                                    "Listening session/ community conversation",
+                                                                    "Prefer not to answer"
+      ))) %>%
+      filter(!is.na(value)) %>%
+      group_by(information_type) %>%
+      summarize(count = n(),
+                frac = n()/nrow(answered_data)) %>%
+      mutate(percent = paste0(round(frac * 100), "%"))
+    
+    # Add string breaks
+    info_count$info_labs <- sapply(info_count$information_type, break_string2, 30)
+    info_count$info_labs <- factor(info_count$info_labs, levels = info_count$info_labs)
+    
+    
+      info_count %>%
+        plot_ly(x = ~count, y = ~fct_rev(info_labs),
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              # hoverinfo = "text",
+              marker = list(color = "#594a6a")) %>% 
+      layout(xaxis = list(title = ''),
+             yaxis = list(title = ''),
+             title = list(text = "Preferred Information Sources",
+                          font = list(size = 20)),
+             margin = list(l = 150, b = 150, t = 50, r = 50))
   })
 
 }

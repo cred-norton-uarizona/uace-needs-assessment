@@ -89,10 +89,10 @@ navbarPage(
                              fluidRow(plotOutput("top20bar", height = 800) %>% withSpinner(type = 8)),
                              fluidRow(
                                column(width = 8, 
-                                      plotlyOutput("race_bar", height = 500)),
+                                      plotlyOutput("race_bar", height = 400)),
                                column(width = 4,
-                                      plotlyOutput("gender_donut", height = 250),
-                                      plotlyOutput("edu_donut", height = 250))
+                                      plotlyOutput("gender_donut", height = 200),
+                                      plotlyOutput("edu_donut", height = 200))
                              )
                     ),
                     tabPanel("By Topic",
@@ -133,12 +133,16 @@ navbarPage(
                       )
       ),
       column(width = 3,
-             box(plotlyOutput("rural_donut", height = 200),
+             box(plotlyOutput("rural_donut", height = 220),
                  width = NULL),
-             box(plotlyOutput("language_donut", height = 200),
+             box(plotlyOutput("language_donut", height = 220),
                  width =  NULL),
-             box(plotlyOutput("gender_donut_county", height = 200),
-                 width =  NULL)
+             box(plotlyOutput("gender_donut_county", height = 220),
+                 width =  NULL),
+             box(plotlyOutput("ce_user_donut", height = 220),
+                 width =  NULL),
+             box(plotlyOutput("ce_exposed_donut", height = 220),
+                 width =  NULL),
       ),
       column(width = 5,
              box(plotlyOutput("race_bar2", height = 250),
@@ -146,6 +150,8 @@ navbarPage(
              box(plotlyOutput("age_bar", height = 200),
                  width = NULL),
              box(plotlyOutput("edu_bar", height = 250),
+                 width = NULL),
+             box(plotlyOutput("info_bar", height = 500),
                  width = NULL)
       )
       )
