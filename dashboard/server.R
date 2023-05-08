@@ -844,7 +844,7 @@ function(input, output, session) {
       filter(!is.na(value)) %>%
       group_by(information_type) %>%
       summarize(count = n(),
-                frac = n()/nrow(answered_data)) %>%
+                frac = n()/nrow(county_filtered())) %>%
       mutate(percent = paste0(round(frac * 100), "%"))
     
     # Add string breaks
