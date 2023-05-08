@@ -96,7 +96,8 @@ function(input, output, session) {
       ggplot() +
         annotate("text", x = 1, y = 1, size = 5,
                  label = 'The filters you have applied result in too small a sample to support data visualization. \n Please remove one or more of your filters') +
-        theme_void()
+        theme_void() +
+        theme(text = element_text(family = "Open Sans"))
     } else {
     # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
     ggplot(data_Evimp(), aes(x = row, y = Percentage)) +
@@ -117,11 +118,12 @@ function(input, output, session) {
       labs(
         subtitle = "Percent of respondents who indicated it was “extremely” or “very important” to prioritize this issue in their community") +
       theme(
+        text = element_text(family = "Open Sans"),
         legend.position = "top",
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "#808080"),
+        plot.subtitle = element_text(size = 16, margin = margin(10, 10, 10, 10), color = "black"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
@@ -154,7 +156,8 @@ function(input, output, session) {
         annotate(geom = "text", label = "Data \n suppressed", x = 0, y = 0.2, size = 6) +
         coord_equal() +
         theme_void() +
-        theme(legend.position = "none")
+        theme(legend.position = "none",
+              text = element_text(family = "Open Sans"))
     } else{
     
     df <-
@@ -187,7 +190,8 @@ function(input, output, session) {
       scale_fill_manual(values = c("#418ab3", "white")) +
       coord_equal() +
       theme_void() +
-      theme(legend.position = "none")   
+      theme(legend.position = "none",
+            text = element_text(family = "Open Sans"))   
     }
   })
   
@@ -406,7 +410,8 @@ function(input, output, session) {
       ggplot() +
         annotate("text", x = 1, y = 1, size = 5,
                  label = "The filters you have applied result in too small a sample to support data visualization. Please remove one or more of your filters") +
-        theme_void()
+        theme_void() +
+        theme(text = element_text(family = "Open Sans"))
     } else {
     if(input$topic == "Health and Well-Being"){
       colors <- c("Extremely" = "#30243c", "Very" = "#5a4a6a", "Somewhat" = "#a088b7", "A little" = "#bfafcf", "Not at all" = "#dfd7e7")
@@ -451,17 +456,18 @@ function(input, output, session) {
       labs(subtitle = paste0("Between ", nrange[1], " and ", nrange[2], 
                              " participants responded to each item")) +
       theme(
+        text = element_text(family = "Open Sans"),
         legend.position = "top",
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 14, margin = margin(10, 0, 10, 0), color = "#808080"),
+        plot.subtitle = element_text(size = 16, margin = margin(10, 10, 10, 10), color = "black"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
         axis.title = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 12, margin = margin(0, 5, 0, 0))
+        axis.text.y = element_text(size = 12, margin = margin(0, 5, 0, 0), color = "black")
       )
     }
     
@@ -686,18 +692,20 @@ function(input, output, session) {
   output$income_bar <- renderPlotly({
     county_filtered() %>%
       drop_na(DEM_13) %>%
-      mutate(DEM_13 = fct_relevel(factor(DEM_13), rev(c("$200,000 and above",
+      mutate(DEM_13 = fct_relevel(factor(DEM_13), c("$200,000 and above",
                                                         "$150,000 to $199,999",
                                                         "$100,000 to $149,999",
                                                         "$75,000 to $99,999",
                                                         "$50,000 to $74,999",
                                                         "$35,000 to $49,999",
                                                         "$25,000 to $34,999",
-                                                        "Less than $25,000")))) %>%
+                                                        "Less than $25,000",
+                                                        "I don't know", 
+                                                        "Prefer not to answer"))) %>%
       group_by(DEM_13) %>%
       summarize(count = n()) %>%
       arrange(desc(count)) %>%
-      mutate(percent = paste0(round(count/sum(count)*100, 1), "%")) %>%
+      mutate(percent = paste0(round(count/sum(count)*100), "%")) %>%
       plot_ly(x = ~count, y = ~fct_rev(DEM_13),
               type = 'bar',
               orientation = 'h',
