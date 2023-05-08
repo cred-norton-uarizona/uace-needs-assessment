@@ -475,6 +475,34 @@ function(input, output, session) {
   
   #### Demographics page ####
   
+  output$az_map <- renderPlot({
+    # Unique counties
+    counties <- unique(county_filtered()$COUNTY)
+    
+    # Create map of selected counties
+    az_counties <- map_data("county", region = "arizona") |>
+      mutate(COUNTY = str_to_title(subregion),
+             selected = case_when(COUNTY %in% counties ~ TRUE,
+                                  .default = FALSE))
+    
+    # Label with sample size of respondents
+    N <- nrow(county_filtered())
+    
+    ggplot(data = az_counties,
+           mapping = aes(x = long, y = lat,
+                         group = group, fill = selected)) + 
+      geom_polygon(color = "black", show.legend = FALSE) +
+      scale_fill_manual(values = c("TRUE" = "#2b556d", "FALSE" = "#89c3e5")) +
+      coord_map() +
+      theme_void() +
+      annotate("text", x = -118, y = 34.5, label = paste0("N = \n", N),
+               size = 10,
+               vjust = 0.25,
+               hjust = 0) +
+      theme(text = element_text(family = "Open Sans"))
+    
+  })
+  
   output$county_bar <- renderPlotly({
     # Create color vec to highlight selected counties
     sel <- county_filtered() %>%
@@ -831,11 +859,10 @@ function(input, output, session) {
               text = ~percent,
               # hoverinfo = "text",
               marker = list(color = "#594a6a")) %>% 
-      layout(xaxis = list(title = ''),
-             yaxis = list(title = ''),
-             title = list(text = "Preferred Information Sources",
-                          font = list(size = 20)),
-             margin = list(l = 150, b = 150, t = 50, r = 50))
+      layout(title = "Preferred Information Sources",
+             showlegend = FALSE,
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
   })
 
 }

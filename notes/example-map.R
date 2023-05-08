@@ -16,12 +16,18 @@ az_counties <- map_data("county", region = "arizona") |>
 
 
 #join data by column `subregion`
-
+test <- az_counties %>%
+  mutate(selected = case_when(COUNTY == "Maricopa" ~ TRUE,
+                              .default = FALSE))
 # Plot --------------------------------------------------------------------
-ggplot(data = az_counties,
+ggplot(data = test,
        mapping = aes(x = long, y = lat,
                      group = group, fill = selected)) + 
   geom_polygon(color = "black", show.legend = FALSE) +
-  scale_fill_manual(values = c("TRUE" = "darkblue", "FALSE" = "grey")) +
+  scale_fill_manual(values = c("TRUE" = "#2b556d", "FALSE" = "#89c3e5")) +
   coord_map() +
-  theme_void()
+  theme_void() +
+  annotate("text", x = -118, y = 34.5, label = "N = \n3236",
+           size = 10,
+           vjust = 0.25,
+           hjust = 0)

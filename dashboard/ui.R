@@ -124,24 +124,30 @@ navbarPage(
                           inline = FALSE
                         ), 
                         width = NULL),
+                      br(),
+                      box(
+                        plotOutput("az_map", height = 200),
+                        width = NULL),
+                      br(),
                       box(
                         plotlyOutput("county_bar", height = 350),
                         width = NULL),
+                      br(),
                       box(
-                        plotlyOutput("income_bar",height = 250),
+                        plotlyOutput("income_bar",height = 350),
                         width = NULL
                       )
       ),
       column(width = 3,
-             box(plotlyOutput("rural_donut", height = 220),
+             box(plotlyOutput("rural_donut", height = 210),
                  width = NULL),
-             box(plotlyOutput("language_donut", height = 220),
+             box(plotlyOutput("language_donut", height = 210),
                  width =  NULL),
-             box(plotlyOutput("gender_donut_county", height = 220),
+             box(plotlyOutput("gender_donut_county", height = 210),
                  width =  NULL),
-             box(plotlyOutput("ce_user_donut", height = 220),
+             box(plotlyOutput("ce_user_donut", height = 210),
                  width =  NULL),
-             box(plotlyOutput("ce_exposed_donut", height = 220),
+             box(plotlyOutput("ce_exposed_donut", height = 210),
                  width =  NULL),
       ),
       column(width = 5,
@@ -151,7 +157,7 @@ navbarPage(
                  width = NULL),
              box(plotlyOutput("edu_bar", height = 250),
                  width = NULL),
-             box(plotlyOutput("info_bar", height = 500),
+             box(plotlyOutput("info_bar", height = 350),
                  width = NULL)
       )
       )
