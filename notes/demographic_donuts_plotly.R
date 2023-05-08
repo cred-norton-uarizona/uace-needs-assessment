@@ -37,7 +37,7 @@ data %>%
                       font = list(size = 20)),
          margin = list(l = 150, b = 150))
 
-# CE_USER bar
+# CE_USER donut
 colors_ce_user <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
 
 data %>%
@@ -45,15 +45,19 @@ data %>%
   summarize(count = n()) %>%
   mutate(frac = count / sum(count), 
          percent = paste0(round(frac*100), "%")) %>%
-  plot_ly(labels = ~paste0(CE_USER, "<br>", percent), values = ~count, 
-          type = 'pie', hole = 0.5, 
+  plot_ly(labels = ~CE_USER, values = ~count,
+          textinfo = "label", # "label+percent"
+          textfont = list(size = 10),
           marker = list(colors = colors_ce_user)) %>%
+  add_pie(hole = 0.5) %>%
   layout(title = "User of Extension",  
-         showlegend = TRUE,
+         showlegend = FALSE,
+         # legend = list(orientation = "h"),
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         margin = list(t = 50)) 
 
-# CE_USER bar
+# CE_USER donut
 colors_ce_familiar <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
 
 data %>%
@@ -136,7 +140,7 @@ info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
               "Video" = "DEM_14_8",
               "Social media" = "DEM_14_9",
               "Listening session/ community conversation" = "DEM_14_10",
-              "Prefer not to answer" = "Prefer not to answer"
+              "Prefer not to answer" = "DEM_14_NR"
 ) 
 
 
@@ -156,8 +160,8 @@ answered_data <- data %>%
 #     sum(!is.na(c_across(starts_with("DEM_14")))) >= 1, NA, "Prefer not to answer")
 #     )
 
-answered_data %>%
-  select(info_vec) %>%
+data %>%
+  select(all_of(info_vec)) %>%
   pivot_longer(cols = everything(), 
                names_to = "information_type") %>%
   mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
