@@ -12,15 +12,20 @@ data <- pin_read(board, "terrace/uace-na")
 
 # Cooperative Extension User and Familiar
 data %>%
+  select("CE_USER", "CE_EXPOSED") %>%
   pivot_longer(cols = c("CE_USER", "CE_EXPOSED"), 
                names_to = "variable") %>%
-  filter(value == "Yes") %>%
+  filter(!is.na(value)) %>% # remove non-response from denominator
+  group_by(variable, value) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
   group_by(variable) %>%
-  summarize(count = n(),
-            frac = count/nrow(data)) %>%
-  mutate(variable = ifelse(variable == "CE_USER", "User of Extension", "Familiar with Extension"),
+  mutate(denom = sum(count), # calculate sum of yes and no
+         frac = count/denom,
+         variable = ifelse(variable == "CE_USER", "User of Extension", "Familiar with Extension"),
          percent = paste0(round(frac * 100), "%")) %>%
-  plot_ly(x = ~frac, y = ~variable,
+  filter(value == "Yes") %>%
+  plot_ly(x = ~count, y = ~variable,
           type = 'bar',
           orientation = 'h',
           text = ~percent,
@@ -32,6 +37,37 @@ data %>%
                       font = list(size = 20)),
          margin = list(l = 150, b = 150))
 
+# CE_USER bar
+colors_ce_user <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+
+data %>%
+  group_by(CE_USER) %>%
+  summarize(count = n()) %>%
+  mutate(frac = count / sum(count), 
+         percent = paste0(round(frac*100), "%")) %>%
+  plot_ly(labels = ~paste0(CE_USER, "<br>", percent), values = ~count, 
+          type = 'pie', hole = 0.5, 
+          marker = list(colors = colors_ce_user)) %>%
+  layout(title = "User of Extension",  
+         showlegend = TRUE,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+# CE_USER bar
+colors_ce_familiar <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+
+data %>%
+  group_by(CE_EXPOSED) %>%
+  summarize(count = n()) %>%
+  mutate(frac = count / sum(count), 
+         percent = paste0(round(frac*100), "%")) %>%
+  plot_ly(labels = ~paste0(CE_EXPOSED, "<br>", percent), values = ~count, 
+          type = 'pie', hole = 0.5, 
+          marker = list(colors = colors_ce_familiar)) %>%
+  layout(title = "Familiar with Extension",  
+         showlegend = TRUE,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 
 # Information DEM_11
