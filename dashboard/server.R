@@ -674,7 +674,7 @@ function(input, output, session) {
               type = 'bar',
               orientation = 'h',
               text = ~percent,
-              marker = list(color = "#f07f09")) %>%
+              marker = list(color = "#9f2936")) %>%
       layout(title = "Educational Attainment",
              showlegend = FALSE,
              xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
