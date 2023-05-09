@@ -132,6 +132,10 @@ navbarPage(
                     multiple = TRUE)
       ),
       mainPanel(
+        sliderTextInput("importance",
+                    label = "Importance level(s)",
+                    selected = c(0, 4),
+                    choices = importance_vec),
         dataTableOutput("data_table") %>%
           withSpinner(type = 8) #loading indicator for plot
       )

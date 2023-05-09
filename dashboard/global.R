@@ -46,5 +46,13 @@ county_vec <- data %>%
   pull() %>%
   str_sort() 
 
+# Named vector for items 
 item_vec <- labels$Metric
 names(item_vec) <- labels$Description
+
+# Named vector for importance
+importance_vec <- c("Extremely" = 4,
+                    "Very" = 3,
+                    "Somewhat" = 2,
+                    "A little" = 1,
+                    "Not at all" = 0)
