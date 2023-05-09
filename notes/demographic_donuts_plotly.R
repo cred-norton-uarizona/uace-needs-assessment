@@ -10,7 +10,214 @@ data <- pin_read(board, "terrace/uace-na")
 # names(data)
 
 
+# Cooperative Extension User and Familiar
+data %>%
+  select("CE_USER", "CE_EXPOSED") %>%
+  pivot_longer(cols = c("CE_USER", "CE_EXPOSED"), 
+               names_to = "variable") %>%
+  filter(!is.na(value)) %>% # remove non-response from denominator
+  group_by(variable, value) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  group_by(variable) %>%
+  mutate(denom = sum(count), # calculate sum of yes and no
+         frac = count/denom,
+         variable = ifelse(variable == "CE_USER", "User of Extension", "Familiar with Extension"),
+         percent = paste0(round(frac * 100), "%")) %>%
+  filter(value == "Yes") %>%
+  plot_ly(x = ~count, y = ~variable,
+          type = 'bar',
+          orientation = 'h',
+          text = ~percent,
+          hoverinfo = "text",
+          marker = list(color = "#9f2936")) %>% 
+  layout(xaxis = list(title = ""),
+         yaxis = list(title = ""),
+         title = list(text = "Extension Usage and Familiarity Among Respondents",
+                      font = list(size = 20)),
+         margin = list(l = 150, b = 150))
 
+# CE_USER donut
+colors_ce_user <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+
+data %>%
+  group_by(CE_USER) %>%
+  summarize(count = n()) %>%
+  mutate(frac = count / sum(count), 
+         percent = paste0(round(frac*100), "%")) %>%
+  plot_ly(labels = ~CE_USER, values = ~count,
+          textinfo = "label", # "label+percent"
+          textfont = list(size = 10),
+          marker = list(colors = colors_ce_user)) %>%
+  add_pie(hole = 0.5) %>%
+  layout(title = "User of Extension",  
+         showlegend = FALSE,
+         # legend = list(orientation = "h"),
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         margin = list(t = 50)) 
+
+# CE_USER donut
+colors_ce_familiar <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+
+data %>%
+  group_by(CE_EXPOSED) %>%
+  summarize(count = n()) %>%
+  mutate(frac = count / sum(count), 
+         percent = paste0(round(frac*100), "%")) %>%
+  plot_ly(labels = ~paste0(CE_EXPOSED, "<br>", percent), values = ~count, 
+          type = 'pie', hole = 0.5, 
+          marker = list(colors = colors_ce_familiar)) %>%
+  layout(title = "Familiar with Extension",  
+         showlegend = TRUE,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+
+# Information DEM_11
+# Terrace, need to pick up here with additions
+
+info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
+                       "Talk with an expert" = "DEM_14_2",
+                       "In-person class or workshop" = "DEM_14_3",
+                       "Online class or workshop" = "DEM_14_4",
+                       "Radio" = "DEM_14_6",
+                      "Website or online article" = "DEM_14_7",
+                       "Video" = "DEM_14_8",
+                      "Social media" = "DEM_14_9",
+              "Listening session/ community conversation" = "DEM_14_10"
+               ) 
+# Note: There isn't a 5 and that is an error in Qualtrics survey creation
+
+# This wrangling is if we include only folks who selected an answer in the denominator
+answered_data <- data %>%
+  select(starts_with("DEM_14")) %>% 
+  rowwise() %>% 
+  mutate(answered_info = if_else(
+    sum(!is.na(c_across(starts_with("DEM_14")))) >= 1, 1, 0
+  )
+  ) 
+
+data %>%
+  select(info_vec) %>%
+  pivot_longer(cols = everything(), 
+               names_to = "information_type") %>%
+  mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+                                                                "Talk with an expert",
+                                                                "In-person class or workshop",
+                                                                "Online class or workshop",
+                                                                "Radio",
+                                                                "Website or online article",
+                                                                "Video",
+                                                                "Social media",
+                                                                "Listening session/ community conversation"
+  ))) %>%
+  filter(!is.na(value)) %>%
+  group_by(information_type) %>%
+  summarize(count = n(),
+            frac = n()/sum(answered_data$answered_info)) %>%
+  mutate(percent = paste0(round(frac * 100), "%")) %>%
+  plot_ly(x = ~count, y = ~fct_rev(information_type),
+          type = 'bar',
+          orientation = 'h',
+          text = ~percent,
+          hoverinfo = "text",
+          marker = list(color = "#594a6a")) %>% 
+  layout(xaxis = list(title = ''),
+         yaxis = list(title = ''),
+         title = list(text = "Information Sources Preferred by Respondents",
+                      font = list(size = 20)),
+         margin = list(l = 150, b = 150, t = 50, r = 50))
+
+# This wrangling is if we add a "Prefer not to answer"
+
+info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
+              "Talk with an expert" = "DEM_14_2",
+              "In-person class or workshop" = "DEM_14_3",
+              "Online class or workshop" = "DEM_14_4",
+              "Radio" = "DEM_14_6",
+              "Website or online article" = "DEM_14_7",
+              "Video" = "DEM_14_8",
+              "Social media" = "DEM_14_9",
+              "Listening session/ community conversation" = "DEM_14_10",
+              "Prefer not to answer" = "DEM_14_NR"
+) 
+
+
+answered_data <- data %>%
+  select(starts_with("DEM_14")) %>% 
+  rowwise() %>% 
+  mutate("Prefer not to answer" = if(sum(!is.na(c_across(starts_with("DEM_14"))))) {
+    NA
+  } else {
+    "Prefer not to answer"
+  })
+
+# answered_data <- data %>%
+#   select(starts_with("DEM_14")) %>% 
+#   rowwise() %>% 
+#   mutate("Prefer not to answer" = if_else(
+#     sum(!is.na(c_across(starts_with("DEM_14")))) >= 1, NA, "Prefer not to answer")
+#     )
+
+data %>%
+  select(all_of(info_vec)) %>%
+  pivot_longer(cols = everything(), 
+               names_to = "information_type") %>%
+  mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+                                                                "Talk with an expert",
+                                                                "In-person class or workshop",
+                                                                "Online class or workshop",
+                                                                "Radio",
+                                                                "Website or online article",
+                                                                "Video",
+                                                                "Social media",
+                                                                "Listening session/ community conversation",
+                                                                "Prefer not to answer"
+  ))) %>%
+  filter(!is.na(value)) %>%
+  group_by(information_type) %>%
+  summarize(count = n(),
+            frac = n()/nrow(answered_data)) %>%
+  mutate(percent = paste0(round(frac * 100), "%")) %>%
+  plot_ly(x = ~count, y = ~fct_rev(information_type),
+          type = 'bar',
+          orientation = 'h',
+          text = ~percent,
+          hoverinfo = "text",
+          marker = list(color = "#594a6a")) %>% 
+  layout(xaxis = list(title = ''),
+         yaxis = list(title = ''),
+         title = list(text = "Information Sources Preferred by Respondents",
+                      font = list(size = 20)),
+         margin = list(l = 150, b = 150, t = 50, r = 50))
+
+
+
+
+
+# 
+# data %>%
+#   select(info_vec) %>%
+#   pivot_longer(cols = everything(), 
+#                names_to = "information_type") %>%
+#   mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+#                                                                 "Talk with an expert",
+#                                                                 "In-person class or workshop"))) %>%
+#   filter(!is.na(value)) %>%
+#   group_by(information_type) %>%
+#   summarize(count = n(),
+#             frac = n()/nrow(.)) %>%
+#   mutate(percent = sprintf("%d%%", round(frac*100))) %>%
+#   plot_ly(x = ~frac, y = ~fct_rev(information_type),
+#           type = 'bar',
+#           orientation = 'h',
+#           text = ~percent) %>% 
+#   # ~paste(percent, race_ethnicity)) %>%
+#   layout(xaxis = list(title = ''),
+#          yaxis = list(title = ''))
+# 
+# 
 
 # Demographic distribution/donut plots, interactive
 # Urban or Rural
@@ -170,6 +377,10 @@ race_vec <- c("American Indian or Alaska Native" = "AIAN",
               "White" = "WH" , 
               "Prefer not to answer" = "NR") 
 
+test2 <- data %>%
+  select(race_vec)
+  
+
 data %>%
   select(race_vec) %>%
   pivot_longer(cols = everything(), 
@@ -184,7 +395,7 @@ data %>%
   filter(value == 1) %>%
   group_by(race_ethnicity) %>%
   summarize(count = n(),
-            frac = n()/nrow(.)) %>%
+            frac = n()/nrow(data)) %>%
   mutate(percent = sprintf("%d%%", round(frac*100))) %>%
   plot_ly(x = ~frac, y = ~fct_rev(race_ethnicity),
           type = 'bar',
@@ -193,34 +404,6 @@ data %>%
   # ~paste(percent, race_ethnicity)) %>%
   layout(xaxis = list(title = ''),
          yaxis = list(title = ''))
-
-
-
-# Cooperative Extension User and Familiar
-
-
-
-data %>%
-  pivot_longer(cols = c("CE_USER", "CE_EXPOSED"), 
-               names_to = "variable") %>%
-  filter(value == "Yes") %>%
-  group_by(variable) %>%
-  summarize(count = n(),
-            frac = count/nrow(data)) %>%
-  mutate(variable = ifelse(variable == "CE_USER", "User of Extension", "Familiar with Extension"),
-         percent = paste0(round(frac * 100), "%")) %>%
-  plot_ly(x = ~frac, y = ~variable,
-          type = 'bar',
-          orientation = 'h',
-          text = ~percent,
-          hoverinfo = "text",
-          marker = list(color = "#9f2936")) %>% 
-  layout(xaxis = list(title = ""),
-         yaxis = list(title = ""),
-         title = list(text = "Extension Usage and Familiarity Among Respondents",
-                      font = list(size = 20)),
-         margin = list(l = 150, b = 150))
-
 
 
 
@@ -251,44 +434,45 @@ topical_knw_vec <- c("Agriculture" = "AG_KNOWLEDGE",
 
 
 
-# Gauge chart for sample size
-
-fig <- plot_ly(
-  domain = list(x = c(0, 1), y = c(0, 1)),
-  value = nrow(data), # substitute with actual sample size
-  title = list(text = "Sample size"),
-  type = "indicator",
-  mode = "gauge+number",
-  # delta = list(reference = 380),
-  gauge = list(
-    axis =list(range = list(NULL, nrow(data)),# include maximum
-               nticks = 5), 
-    threshold = list(
-      line = list(color = "red", width = 4),
-      thickness = 0.75,
-      value = nrow(data))))  # include maximum
-fig <- fig %>%
-  layout(margin = list(l=20,r=30))
-fig
-
-# CE_EXPOSED
-data %>%
-  group_by(CE_EXPOSED) %>%
-  summarize(count = n()) %>%
-  plot_ly(labels = ~CE_EXPOSED, values = ~count) %>%
-  add_pie(hole = 0.5) %>%
-  layout(title = "County Extension Exposure",  
-         showlegend = TRUE,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
-# CE_USER
-data %>%
-  group_by(CE_USER) %>%
-  summarize(count = n()) %>%
-  plot_ly(labels = ~CE_USER, values = ~count) %>%
-  add_pie(hole = 0.5) %>%
-  layout(title = "County Extension User",  
-         showlegend = TRUE,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+# 
+# # Gauge chart for sample size
+# 
+# fig <- plot_ly(
+#   domain = list(x = c(0, 1), y = c(0, 1)),
+#   value = nrow(data), # substitute with actual sample size
+#   title = list(text = "Sample size"),
+#   type = "indicator",
+#   mode = "gauge+number",
+#   # delta = list(reference = 380),
+#   gauge = list(
+#     axis =list(range = list(NULL, nrow(data)),# include maximum
+#                nticks = 5), 
+#     threshold = list(
+#       line = list(color = "red", width = 4),
+#       thickness = 0.75,
+#       value = nrow(data))))  # include maximum
+# fig <- fig %>%
+#   layout(margin = list(l=20,r=30))
+# fig
+# 
+# # CE_EXPOSED
+# data %>%
+#   group_by(CE_EXPOSED) %>%
+#   summarize(count = n()) %>%
+#   plot_ly(labels = ~CE_EXPOSED, values = ~count) %>%
+#   add_pie(hole = 0.5) %>%
+#   layout(title = "County Extension Exposure",  
+#          showlegend = TRUE,
+#          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+#          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+# 
+# # CE_USER
+# data %>%
+#   group_by(CE_USER) %>%
+#   summarize(count = n()) %>%
+#   plot_ly(labels = ~CE_USER, values = ~count) %>%
+#   add_pie(hole = 0.5) %>%
+#   layout(title = "County Extension User",  
+#          showlegend = TRUE,
+#          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+#          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))

@@ -1,0 +1,82 @@
+---
+title: "Untitled"
+author: "Terrace Ewinghill"
+date: "5/3/2023"
+output: html_document
+runtime: shiny
+---
+Prep the data and run the map
+```{r}
+# Load necessary packages
+
+library(leaflet)
+library(dplyr)
+library(sf)
+library(geojsonio)
+library(RCurl)
+library(httr)
+library(tidyverse)
+library(pins)
+
+# Connect to the data source
+board <- board_connect()
+data <- pin_read(board, "terrace/uace-na")
+data <- data %>% mutate(COUNTY = tolower(COUNTY))
+
+# Count the number of responses by county
+response_count <- data %>%
+  group_by(COUNTY) %>%
+  summarize(count = n()) %>% 
+  mutate(COUNTY = str_to_title(COUNTY)) %>% 
+  drop_na() %>% 
+  mutate(count = as.numeric(count)) %>% 
+  select(COUNTY, count) # Select only COUNTY and count columns
+
+# Load county data from the shapefile
+file_path <- "data/Arizona_County_Boundaries.geojson"
+county_sf <- st_read(file_path)
+county_sf <- county_sf %>% rename(
+  COUNTY = NAME
+) %>% 
+  mutate(COUNTY = str_to_title(COUNTY))%>% 
+  select(COUNTY, everything())
+
+
+# Merge the response counts with county geojson data and remove any missing values in count
+county_geojson <- left_join(county_sf, response_count, by = "COUNTY") %>%
+  na.omit()
+
+
+# Define a color palette to use for the fill colors
+color_palette <- colorRampPalette(c("lightgrey", "black"))
+
+# Create a function to map the response counts to fill colors
+fill_color_func <- function(x) {
+  if (x == 0) {
+    return("lightgrey")
+  } else {
+    return(color_palette(100)[as.integer(x/100 * 99) + 1])
+  }
+}
+
+# Create the leaflet map
+leaflet() %>%
+  addProviderTiles(providers$Esri.WorldImagery) %>%
+  addPolygons(data = county_geojson,
+              fillColor = ~fill_color_func(count),
+              weight = 1,
+              opacity = 1,
+              color = "white",
+              fillOpacity = 0.8,
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  bringToFront = TRUE),
+              label = ~paste(COUNTY, "<br>", "Responses:", count, sep = " ")) %>%
+  addLegend(pal = color_palette(100),
+            values = county_geojson$count,
+            title = "Response Count",
+            position = "bottomright")
+
+
+
+```
+

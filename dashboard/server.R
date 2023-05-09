@@ -1,4 +1,5 @@
 ## Custom functions
+# TODO: not sure if these custom functions are used anymore
 
 # function to break strings for ggplot
 break_string <- function(x, n) {
@@ -93,9 +94,10 @@ function(input, output, session) {
     
     if(N <= 6) {
       ggplot() +
-        annotate("text", x = 1, y = 1, size = 8,
-                 label = "Low sample size, data not visualized") +
-        theme_void()
+        annotate("text", x = 1, y = 1, size = 5,
+                 label = 'The filters you have applied result in too small a sample to support data visualization. \n Please remove one or more of your filters') +
+        theme_void() +
+        theme(text = element_text(family = "Open Sans"))
     } else {
     # Remember that, because you're using 'reactive', you need to put () after the df to make it into a function
     ggplot(data_Evimp(), aes(x = row, y = Percentage)) +
@@ -114,12 +116,14 @@ function(input, output, session) {
       scale_fill_manual(values = colors)+
       coord_flip() +
       labs(
-        subtitle = "Percent of respondents who selected 'extremely' or 'very' important") +
+        subtitle = "Percent of respondents who indicated it was “extremely” or “very important” to prioritize this issue in their community") +
       theme(
+        text = element_text(family = "Open Sans"),
         legend.position = "top",
         legend.title = element_blank(),
+        legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 12, margin = margin(10, 0, 10, 0), color = "gray"),
+        plot.subtitle = element_text(size = 16, margin = margin(10, 10, 10, 10), color = "black"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
@@ -136,6 +140,26 @@ function(input, output, session) {
   
   output$n_indicator <- renderPlot({
     req(refine_filtered())
+    
+    if(nrow(refine_filtered()) <= 6) {
+      ggplot() +
+        geom_arc_bar(aes(
+          x0 = 0,
+          y0 = 0, 
+          r0 = 0.5,
+          r = 1,
+          #convert to radians and shift by 180º counterclockwise
+          start = -pi/2, 
+          end = pi/2,
+          
+        ), fill = "white") +
+        annotate(geom = "text", label = "Data \n suppressed", x = 0, y = 0.2, size = 6) +
+        coord_equal() +
+        theme_void() +
+        theme(legend.position = "none",
+              text = element_text(family = "Open Sans"))
+    } else{
+    
     df <-
       tibble(
         # get the fraction of rows (observations) for after and before filtering
@@ -166,7 +190,9 @@ function(input, output, session) {
       scale_fill_manual(values = c("#418ab3", "white")) +
       coord_equal() +
       theme_void() +
-      theme(legend.position = "none")
+      theme(legend.position = "none",
+            text = element_text(family = "Open Sans"))   
+    }
   })
   
 
@@ -261,7 +287,7 @@ function(input, output, session) {
         filter(value == 1) %>%
       group_by(race_ethnicity) %>%
       summarize(count = n(),
-                frac = n()/nrow(.)) %>%
+                frac = n()/nrow(refine_filtered())) %>%
       mutate(percent = sprintf("%d%%", round(frac*100)),
              race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
                                                                 "Asian",
@@ -336,7 +362,8 @@ function(input, output, session) {
       group_by(Metric) %>%
       mutate(total = sum(n)) %>%
       ungroup() %>%
-      mutate(percent = round(n/total*100)) %>%
+      mutate(percent_round = round(n/total*100),
+             percent = n/total*100) %>%
       left_join(labels, by = "Metric") %>%
       mutate(Description = factor(Description, levels = rank_EV),
              Response = case_when(Response == 0 ~ "Not at all",
@@ -370,7 +397,7 @@ function(input, output, session) {
       pull(range)
   })
   
-  # By topic bar charts
+   # By topic bar charts
   
   output$bytopicbar <- renderPlot({
     data_bytopic <- data_bytopic()
@@ -381,9 +408,10 @@ function(input, output, session) {
     
     if(N <= 6) {
       ggplot() +
-        annotate("text", x = 1, y = 1, size = 8,
-                 label = "Low sample size, data not visualized") +
-        theme_void()
+        annotate("text", x = 1, y = 1, size = 5,
+                 label = "The filters you have applied result in too small a sample to support data visualization. Please remove one or more of your filters") +
+        theme_void() +
+        theme(text = element_text(family = "Open Sans"))
     } else {
     if(input$topic == "Health and Well-Being"){
       colors <- c("Extremely" = "#30243c", "Very" = "#5a4a6a", "Somewhat" = "#a088b7", "A little" = "#bfafcf", "Not at all" = "#dfd7e7")
@@ -402,7 +430,7 @@ function(input, output, session) {
       filter(Response %in% c("Extremely", "Very", "Somewhat")) %>% 
       arrange(Description, desc(Response)) %>%
       group_by(Description) %>%
-      mutate(location_half = percent/2,
+      mutate(location_half = percent/2, 
              location_prev = lag(percent),
              location_prev2 = lag(location_prev),
              y = rowSums(across(starts_with("location")), 
@@ -413,12 +441,12 @@ function(input, output, session) {
     
     ggplot() +
       geom_col(data = data_bytopic, aes(x = fct_rev(Description), 
-                                        y = percent,
+                                        y = percent, 
                                         fill = Response)) +
       geom_text(data = percent_labels,
                 aes(x = fct_rev(Description), 
                     y = y, 
-                    label = paste0(percent, "%")),
+                    label = paste0(percent_round, "%")),
                 vjust = 0.5, hjust = 0.5,
                 color = "white", size = 4) +
       scale_fill_manual(values = colors) +
@@ -428,22 +456,52 @@ function(input, output, session) {
       labs(subtitle = paste0("Between ", nrange[1], " and ", nrange[2], 
                              " participants responded to each item")) +
       theme(
+        text = element_text(family = "Open Sans"),
         legend.position = "top",
         legend.title = element_blank(),
+        legend.text = element_text(size = 12),
         plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 14, margin = margin(10, 0, 10, 0), color = "gray"),
+        plot.subtitle = element_text(size = 16, margin = margin(10, 10, 10, 10), color = "black"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
         axis.title = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 12, margin = margin(0, 5, 0, 0))
+        axis.text.y = element_text(size = 12, margin = margin(0, 5, 0, 0), color = "black")
       )
     }
     
   })
   
   #### Demographics page ####
+  
+  output$az_map <- renderPlot({
+    # Unique counties
+    counties <- unique(county_filtered()$COUNTY)
+    
+    # Create map of selected counties
+    az_counties <- map_data("county", region = "arizona") |>
+      mutate(COUNTY = str_to_title(subregion),
+             selected = case_when(COUNTY %in% counties ~ TRUE,
+                                  .default = FALSE))
+    
+    # Label with sample size of respondents
+    N <- nrow(county_filtered())
+    
+    ggplot(data = az_counties,
+           mapping = aes(x = long, y = lat,
+                         group = group, fill = selected)) + 
+      geom_polygon(color = "black", show.legend = FALSE) +
+      scale_fill_manual(values = c("TRUE" = "#2b556d", "FALSE" = "#89c3e5")) +
+      coord_map() +
+      theme_void() +
+      annotate("text", x = -118, y = 34.5, label = paste0("N = \n", N),
+               size = 10,
+               vjust = 0.25,
+               hjust = 0) +
+      theme(text = element_text(family = "Open Sans"))
+    
+  })
   
   output$county_bar <- renderPlotly({
     # Create color vec to highlight selected counties
@@ -469,7 +527,7 @@ function(input, output, session) {
               orientation = 'h',
               text = ~percent,
               marker = list(color = color_vec)) %>% 
-      layout(title = "Respondents by county",
+      layout(title = "Respondents by County",
              xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
              yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
     
@@ -500,7 +558,8 @@ function(input, output, session) {
              showlegend = FALSE,
              # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) # You can adjust t to see how it looks on the plot)
     
   })
   
@@ -528,11 +587,12 @@ function(input, output, session) {
               textfont = list(size = 10),
               marker = list(colors = colors_temp)) %>%
       add_pie(hole = 0.5) %>%
-      layout(title = "Language",  
+      layout(title = "Language", 
              showlegend = FALSE,
              # legend = list(orientation = "h"),
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) # You can adjust t to see how it looks on the plot
     
   })
   
@@ -563,8 +623,71 @@ function(input, output, session) {
                showlegend = FALSE,
                # legend = list(orientation = "h"),
                xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               margin = list(t = 50)) # You can adjust t to see how it looks on the plot
     
+  })
+  
+  # CE_USER donut
+  
+  output$ce_user_donut <- renderPlotly({
+    
+    # Establish universal colors
+    colors_ce_user <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+    
+    # Wrangle count data
+    ceuser_count <- county_filtered() %>%
+      group_by(CE_USER) %>%
+      summarize(count = n()) %>%
+      mutate(frac = count / sum(count), 
+             percent = paste0(round(frac*100), "%"))
+    
+    # Establish specific colors needed
+    colors_temp <- colors_ce_user[intersect(ceuser_count$CE_USER, names(colors_ce_user))]
+    
+    ceuser_count %>%
+      plot_ly(labels = ~CE_USER, values = ~count,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              marker = list(colors = colors_temp)) %>%
+      add_pie(hole = 0.5) %>%
+      layout(title = "User of Extension",  
+             showlegend = FALSE,
+             # legend = list(orientation = "h"),
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) 
+  })
+  
+  # CE_EXPOSED donut
+  
+  output$ce_exposed_donut <- renderPlotly({
+    
+    # Establish universal colors
+    colors_ce_exposed <- c("Yes" = "#2b556d", "No" = "#9f2936", "No Response" = "#f2f2f2")
+    
+    # Wrangle count data
+    ceexposed_count <- county_filtered() %>%
+      group_by(CE_EXPOSED) %>%
+      summarize(count = n()) %>%
+      mutate(frac = count / sum(count), 
+             percent = paste0(round(frac*100), "%"))
+    
+    # Establish specific colors needed
+    colors_temp <- colors_ce_exposed[intersect(ceexposed_count$CE_EXPOSED, names(colors_ce_exposed))]
+    
+    ceexposed_count %>%
+      plot_ly(labels = ~CE_EXPOSED, values = ~count,
+              textinfo = "label", # "label+percent"
+              textfont = list(size = 10),
+              marker = list(colors = colors_temp)) %>%
+      add_pie(hole = 0.5) %>%
+      layout(title = "Familiar with Extension",  
+             showlegend = FALSE,
+             # legend = list(orientation = "h"),
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             margin = list(t = 50)) 
   })
   
   # Race barchart for demographics tab only
@@ -578,7 +701,7 @@ function(input, output, session) {
       filter(value == 1) %>%
       group_by(race_ethnicity) %>%
       summarize(count = n(),
-                frac = n()/nrow(.)) %>%
+                frac = n()/nrow(county_filtered())) %>%
       mutate(percent = sprintf("%d%%", round(frac*100)),
              race_ethnicity = factor(race_ethnicity, levels = c("American Indian or Alaska Native", 
                                                                 "Asian",
@@ -629,49 +752,50 @@ function(input, output, session) {
     
     edu_count <- county_filtered() %>%
       drop_na(DEM_11) %>%
-      mutate(DEM_11 = factor(DEM_11, levels = c("Less than high school diploma",
-                                                "High school diploma or GED",
-                                                "Some college",
-                                                "Trade/technical/vocational training",
-                                                "Associate's degree",
+      mutate(DEM_11 = factor(DEM_11, levels = c("Graduate or professional degree",
                                                 "Bachelor's degree",
-                                                "Graduate or professional degree"))) %>%
+                                                "Associate's degree",
+                                                "Trade/technical/vocational training",
+                                                "Some college",
+                                                "High school diploma or GED",
+                                                "Less than high school diploma",
+                                                "Prefer not to answer"))) %>%
       group_by(DEM_11) %>%
       summarize(count = n()) %>%
       arrange(desc(count)) %>%
-      mutate(percent = paste0(round(count/sum(count)*100, 1), "%"))
-    
-    edu_count$edu_labs <- sapply(edu_count$DEM_11, break_string2, 20)
-    edu_count$edu_labs <- factor(edu_count$edu_labs, levels = edu_count$edu_labs)
-    
+      mutate(percent = paste0(round(count/sum(count)*100), "%"))
+
     edu_count %>%
-      plot_ly(x = ~count, y = ~edu_labs,
+      plot_ly(x = ~count, y = ~fct_rev(DEM_11),
               type = 'bar',
               orientation = 'h',
               text = ~percent,
-              marker = list(color = "#f07f09")) %>%
+              marker = list(color = "#9f2936")) %>%
       layout(title = "Educational Attainment",
              showlegend = FALSE,
              xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
              yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
+    
     
   })
   
   output$income_bar <- renderPlotly({
     county_filtered() %>%
       drop_na(DEM_13) %>%
-      mutate(DEM_13 = fct_relevel(factor(DEM_13), rev(c("$200,000 and above",
+      mutate(DEM_13 = fct_relevel(factor(DEM_13), c("$200,000 and above",
                                                         "$150,000 to $199,999",
                                                         "$100,000 to $149,999",
                                                         "$75,000 to $99,999",
                                                         "$50,000 to $74,999",
                                                         "$35,000 to $49,999",
                                                         "$25,000 to $34,999",
-                                                        "Less than $25,000")))) %>%
+                                                        "Less than $25,000",
+                                                        "I don't know", 
+                                                        "Prefer not to answer"))) %>%
       group_by(DEM_13) %>%
       summarize(count = n()) %>%
       arrange(desc(count)) %>%
-      mutate(percent = paste0(round(count/sum(count)*100, 1), "%")) %>%
+      mutate(percent = paste0(round(count/sum(count)*100), "%")) %>%
       plot_ly(x = ~count, y = ~fct_rev(DEM_13),
               type = 'bar',
               orientation = 'h',
@@ -685,6 +809,60 @@ function(input, output, session) {
     
     
     
+  })
+  
+  # Information source bar
+  output$info_bar <- renderPlotly({
+    info_vec <- c("Physical brochure, fact sheet, article, or similar" = "DEM_14_1",
+                  "Talk with an expert" = "DEM_14_2",
+                  "In-person class or workshop" = "DEM_14_3",
+                  "Online class or workshop" = "DEM_14_4",
+                  "Radio" = "DEM_14_6",
+                  "Website or online article" = "DEM_14_7",
+                  "Video" = "DEM_14_8",
+                  "Social media" = "DEM_14_9",
+                  "Listening session/ community conversation" = "DEM_14_10",
+                  "Prefer not to answer" = "DEM_14_NR"
+    )
+    
+    
+    info_count <- county_filtered() %>%
+      select(all_of(info_vec)) %>%
+      pivot_longer(cols = everything(), 
+                   names_to = "information_type") %>%
+      mutate(information_type = factor(information_type, levels = c("Physical brochure, fact sheet, article, or similar", 
+                                                                    "Talk with an expert",
+                                                                    "In-person class or workshop",
+                                                                    "Online class or workshop",
+                                                                    "Radio",
+                                                                    "Website or online article",
+                                                                    "Video",
+                                                                    "Social media",
+                                                                    "Listening session/ community conversation",
+                                                                    "Prefer not to answer"
+      ))) %>%
+      filter(!is.na(value)) %>%
+      group_by(information_type) %>%
+      summarize(count = n(),
+                frac = n()/nrow(county_filtered())) %>%
+      mutate(percent = paste0(round(frac * 100), "%"))
+    
+    # Add string breaks
+    info_count$info_labs <- sapply(info_count$information_type, break_string2, 30)
+    info_count$info_labs <- factor(info_count$info_labs, levels = info_count$info_labs)
+    
+    
+      info_count %>%
+        plot_ly(x = ~count, y = ~fct_rev(info_labs),
+              type = 'bar',
+              orientation = 'h',
+              text = ~percent,
+              # hoverinfo = "text",
+              marker = list(color = "#594a6a")) %>% 
+      layout(title = "Preferred Information Sources",
+             showlegend = FALSE,
+             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
   })
 
 }

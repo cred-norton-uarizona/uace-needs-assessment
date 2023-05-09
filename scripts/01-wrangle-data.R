@@ -20,7 +20,7 @@ write_csv(labels, "dashboard/labels.csv")
 
 
 data <- 
-  read_csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_3.23.23 no zip.csv") %>%
+  read_csv("//corner2.sfcs.cals.arizona.edu/ERDU$/Shared/Projects/Cooperative Extension/Statewide Needs assessment 2022/Data/clean-data/scena_survey_wrangled_5.1.2023.csv") %>%
   select(
     COUNTY,
     LIVE_V3,
