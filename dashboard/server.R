@@ -44,6 +44,23 @@ function(input, output, session) {
       filter(if_any(all_of(input$topical_knowledge), function(x) {x == 1}))
   })
   
+  # Filtering by topic/item for map tab
+  initial_filtered2 <- callModule(
+    module = selectizeGroupServer,
+    id = "my-filters2",
+    data = data,
+    vars = c("LIVE_V3", "DEM_11"), #add new filters here by adding column name in quotes
+    inline = FALSE
+  )
+  
+  map_filtered <- reactive({
+    req(input$item)
+    
+    initial_filtered2() %>%
+      filter(if_any(all_of(input$topical_knowledge2), function(x) {x == 1})) %>%
+      select(COUNTY, item_vec[input$item])
+  })
+  
   # Filtering by county only for demographics tab
   county_filtered <- callModule(
     module = selectizeGroupServer,
@@ -473,6 +490,31 @@ function(input, output, session) {
     
   })
   
+  
+  #### Maps page ####
+  
+  # Dynamic/responsive UI for selecting items
+  output$select_item <- renderUI({
+    req(input$topic2)
+    
+    temp <- labels %>%
+      filter(Topic == input$topic2) %>% 
+      pull(Description)
+    
+    selectInput(inputId = "item",
+                label = "Select Item",
+                choices = temp,
+                multiple = FALSE)
+  })
+  
+  output$data_table <- renderDataTable(
+    map_filtered() %>%
+      group_by(COUNTY, get(input$item)) %>%
+      count()
+  )
+
+  
+  
   #### Demographics page ####
   
   output$az_map <- renderPlot({
@@ -864,6 +906,8 @@ function(input, output, session) {
              xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
              yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
   })
+  
+  
 
 }
 

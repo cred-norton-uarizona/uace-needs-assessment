@@ -61,25 +61,21 @@ navbarPage(
                     ), 
                     br(),
                     hr(style = "border-top: 1px solid #000000;"),
-                    selectInput(inputId = "race_ethnicity",
-                                label = "Race/Ethnicity",
-                                choices = race_vec,
-                                multiple = TRUE),
-                    
+                    selectInput(
+                      inputId = "race_ethnicity",
+                      label = "Race/Ethnicity",
+                      choices = race_vec,
+                      multiple = TRUE),
                     selectInput(
                       inputId = "topical_experience",
                       label = HTML("Topical Experience <br> (education, work, volunteer)"),
                       choices = topical_exp_vec,
-                      multiple = TRUE
-                    )
-                    ,
-                    
+                      multiple = TRUE),
                     selectInput(
                       inputId = "topical_knowledge",
                       label = "Topical Knowledge",
                       choices = topical_knw_vec,
-                      multiple = TRUE
-                    )
+                      multiple = TRUE)
       ),
       
       # Show a plot of the generated distribution
@@ -111,7 +107,38 @@ navbarPage(
       )
     )),
   
-  # Tab panel 3 - Demographics by county
+  # Tab panel 3 - County-level comparisons
+  tabPanel(
+    "County-level Maps",
+    sidebarLayout(
+      sidebarPanel(
+        selectInput(inputId = "topic2",
+                    label = "Select Topic",
+                    choices = unique(labels$Topic),
+                    multiple = FALSE),
+        uiOutput("select_item"),
+        selectizeGroupUI(
+          id = "my-filters2",
+          params = list(
+            LIVE_V3 = list(inputId = "LIVE_V3", title = "Urban or Rural"),
+            DEM_11 = list(inputId = "DEM_11", title = "Educational Attainment")),
+          inline = FALSE
+        ),
+        br(),
+        hr(style = "border-top: 1px solid #000000;"),
+        selectInput(inputId = "topical_knowledge2",
+                    label = "Topical Knowledge",
+                    choices = topical_knw_vec,
+                    multiple = TRUE)
+      ),
+      mainPanel(
+        dataTableOutput("data_table") %>%
+          withSpinner(type = 8) #loading indicator for plot
+      )
+    )
+  ),
+  
+  # Tab panel 4 - Demographics by county
   tabPanel(
     "Demographics",
     fluidPage(
