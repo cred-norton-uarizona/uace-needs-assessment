@@ -674,7 +674,7 @@ function(input, output, session) {
              percent = paste0(round(frac*100), "%"))
     
     # Establish specific colors needed
-    colors_temp <- colors_ce_exposed[intersect(ceexposed_count$CE_USER, names(colors_ce_exposed))]
+    colors_temp <- colors_ce_exposed[intersect(ceexposed_count$CE_EXPOSED, names(colors_ce_exposed))]
     
     ceexposed_count %>%
       plot_ly(labels = ~CE_EXPOSED, values = ~count,
