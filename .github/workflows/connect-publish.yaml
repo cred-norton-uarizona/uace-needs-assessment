@@ -10,28 +10,31 @@ name: connect-publish
 jobs:
   connect-publish:
     runs-on: ubuntu-latest
+    env:
+      APP_NAME: "uace-needs" #edit this to change the custom URL of the app
+      APP_DIR: "dashboard" #edit this if you rename or move the contents of the app
+      APP_ACCESS: "logged-in" #See https://github.com/rstudio/actions/tree/main/connect-publish#access-type
     steps:
       - uses: actions/checkout@v2
       - name: Install R
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: 4.2.2 #freeze R version
-          use-public-rspm: true #use R Studio Package Manager instead of CRAN
+          r-version: 4.2.2 #freezes R version
+          use-public-rspm: true #use R Studio Package Manager to speed up install
       
       - name: Restore packages
         uses: r-lib/actions/setup-renv@v2
       
-      - name: Create manifest.json
+      - name: Create manifest.json #necessary for publishing to Connect
         shell: Rscript {0}
         run: |
-          rsconnect::writeManifest(appDir = "dashboard")
+          rsconnect::writeManifest(appDir = "${{ env.APP_DIR }}")
           
       - name: Publish Connect content
         uses: rstudio/actions/connect-publish@main
         with:
           url: https://${{ secrets.CONNECT_API_KEY }}@${{ secrets.CONNECT_SERVER }}
-          # api-key: ${{ secrets.CONNECT_API_KEY }}
-          access-type: logged_in
+          access-type: ${{ env.APP_ACCESS }}
           dir: |
-            ./dashboard/:uace-needs
+            ./${{ env.APP_DIR }}/:${{ env.APP_NAME }}
             
