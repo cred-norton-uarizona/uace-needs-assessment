@@ -15,7 +15,7 @@ jobs:
     env:
       APP_NAME: "uace-needs" #edit this to change the custom URL of the app
       APP_DIR: "dashboard" #edit this if you rename or move the contents of the app
-      APP_ACCESS: "logged-in" #See https://github.com/rstudio/actions/tree/main/connect-publish#access-type
+      APP_ACCESS: "all" #See https://github.com/rstudio/actions/tree/main/connect-publish#access-type
     steps:
       - uses: actions/checkout@v2
       - name: Install R
