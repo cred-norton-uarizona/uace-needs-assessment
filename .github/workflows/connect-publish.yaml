@@ -24,6 +24,10 @@ jobs:
           r-version: 4.2.2 #freezes R version
           use-public-rspm: true #use R Studio Package Manager to speed up install
       
+      - name: Remove `.Rprofile`
+        shell: bash
+        run: |
+          rm .Rprofile
       - name: Restore packages
         uses: r-lib/actions/setup-renv@v2
       
