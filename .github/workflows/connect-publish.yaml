@@ -29,8 +29,8 @@ jobs:
       - name: Publish Connect content
         uses: rstudio/actions/connect-publish@main
         with:
-          url: ${{ secrets.CONNECT_SERVER }}
-          api-key: ${{ secrets.CONNECT_API_KEY }}
+          url: https://${{ secrets.CONNECT_API_KEY }}@${{ secrets.CONNECT_SERVER }}
+          # api-key: ${{ secrets.CONNECT_API_KEY }}
           access-type: logged_in
           dir: |
             ./dashboard/:uace-needs
