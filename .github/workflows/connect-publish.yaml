@@ -1,8 +1,10 @@
+# Sources: 
+# https://github.com/rstudio/actions/tree/main/connect-publish
+# https://solutions.posit.co/operations/deploy-methods/ci-cd/github-actions/
+# https://github.com/kellirichardson/biofeedback-vis/blob/main/.github/workflows/deploy-to-connect.yaml
 
 on:
   push:
-    branches: [main] 
-  pull_request:
     branches: [main] 
     
 name: connect-publish
