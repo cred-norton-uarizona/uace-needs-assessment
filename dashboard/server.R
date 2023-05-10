@@ -113,16 +113,17 @@ function(input, output, session) {
         ) +
         scale_y_continuous(expand = c(0, 0)) +
       scale_x_reverse()+
-      scale_fill_manual(values = colors)+
+      scale_fill_manual(name = "Topics: ", 
+                        values = colors)+
       coord_flip() +
       labs(
         subtitle = "Percent of respondents who indicated it was “extremely” or “very important” to prioritize this issue in their community") +
       theme(
         text = element_text(family = "Open Sans"),
         legend.position = "top",
-        legend.title = element_blank(),
+        legend.title = element_text(size = 14, face = "bold"),
         legend.text = element_text(size = 12),
-        plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
+        # plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
         plot.subtitle = element_text(size = 16, margin = margin(10, 10, 10, 10), color = "black"),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
@@ -449,7 +450,8 @@ function(input, output, session) {
                     label = paste0(percent_round, "%")),
                 vjust = 0.5, hjust = 0.5,
                 color = "white", size = 4) +
-      scale_fill_manual(values = colors) +
+      scale_fill_manual(name = "Importance level: ",
+                        values = colors) +
       scale_x_discrete(labels = xlabs) +
       coord_flip() +
       guides(fill = guide_legend(reverse = TRUE)) +
@@ -458,10 +460,10 @@ function(input, output, session) {
       theme(
         text = element_text(family = "Open Sans"),
         legend.position = "top",
-        legend.title = element_blank(),
+        legend.title = element_text(size = 14, face = "bold"),
         legend.text = element_text(size = 12),
-        plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)),
-        plot.subtitle = element_text(size = 16, margin = margin(10, 10, 10, 10), color = "black"),
+        # plot.title = element_text(size = 18, margin = margin(10, 0, 0, 0)), 
+        plot.subtitle = element_text(size = 16, hjust = -2.2, color = "black"), # margin = margin(10, 10, 10, 10),
         panel.background = element_rect(fill = NA),
         panel.grid.major = element_blank(),
         axis.ticks = element_blank(),
