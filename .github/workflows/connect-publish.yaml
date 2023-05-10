@@ -24,7 +24,7 @@ jobs:
       - name: Create manifest.json
         shell: Rscript {0}
         run: |
-          rsconnect::writeManifest()
+          rsconnect::writeManifest(appDir = "dashboard")
           
       - name: Publish Connect content
         uses: rstudio/actions/connect-publish@main
