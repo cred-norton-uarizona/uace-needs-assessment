@@ -10,7 +10,7 @@
 # Application title
 navbarPage(
   title = "University of Arizona Cooperative Extension",
-  
+  tags$style(type = "text/css", ".irs-grid-pol.small {height: 0px;}"),
   
   # Tab panel 1 - instructions
   tabPanel("Needs Assessment",
@@ -134,8 +134,13 @@ navbarPage(
       mainPanel(
         sliderTextInput("importance",
                     label = "Importance level(s)",
-                    selected = c(0, 4),
-                    choices = importance_vec),
+                    selected = c("Extremely", "Very"),
+                    choices = c("Extremely",
+                                "Very",
+                                "Somewhat",
+                                "A little",
+                                "Not at all"),
+                    grid = TRUE),
         dataTableOutput("data_table") %>%
           withSpinner(type = 8) #loading indicator for plot
       )

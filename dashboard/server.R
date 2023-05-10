@@ -507,11 +507,31 @@ function(input, output, session) {
                 multiple = FALSE)
   })
   
-  output$data_table <- renderDataTable(
+  output$data_table <- renderDataTable({
+
+    # Convert input$importance to numeric
+    sel <- importance_vec[input$importance]
+    
+    # Calculate total respondents by county (denominator), including NA's
+    denom <- map_filtered() %>%
+      filter(!is.na(COUNTY)) %>%
+      group_by(COUNTY) %>%
+      summarize(total = n())
+    
+    # Make summarized and filtered dataset
     map_filtered() %>%
+      filter(get(input$item) <= sel[1],
+             get(input$item) >= sel[2],
+             !is.na(COUNTY)) %>%
       group_by(COUNTY, get(input$item)) %>%
-      count()
-  )
+      count() %>%
+      ungroup() %>%
+      group_by(COUNTY) %>%
+      summarize(numer = sum(n)) %>%
+      left_join(denom, by = "COUNTY") %>%
+      mutate(frac = sprintf("%d%%", round(numer/total*100)),
+             frac = if_else(total <= 6, NA, frac)) # response variable frac to show up as NA/gray if sample size is <= 6
+  })
 
   
   
