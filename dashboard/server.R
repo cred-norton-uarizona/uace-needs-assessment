@@ -529,7 +529,7 @@ function(input, output, session) {
       group_by(COUNTY) %>%
       summarize(numer = sum(n)) %>%
       left_join(denom, by = "COUNTY") %>%
-      mutate(frac = sprintf("%d%%", round(numer/total*100)),
+      mutate(frac = round(numer/total*100),
              frac = if_else(total <= 6, NA, frac)) # response variable frac to show up as NA/gray if sample size is <= 6
   })
 
