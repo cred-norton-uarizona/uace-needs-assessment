@@ -18,3 +18,6 @@ To contribute to this project, please create a new branch for your changes and m
 One easy way to do this from within R is with the `usethis` package and the `pr_*` functions.
 `pr_init("branch-name")` begins a new branch locally, `pr_push()` helps you create a new pull request, and after it is merged you can use `pr_finish()` to clean things up.
 More about this workflow [here](https://usethis.r-lib.org/articles/pr-functions.html).
+
+If you use this code or want to cite this app, please use this citation as follows:
+Ewinghill, Terrace, Scott, Eric R., & Guo, Jessica. (2023). Code for "University of Arizona Cooperative Extension Needs Assessment 2022 Dashboard" (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.7931082
