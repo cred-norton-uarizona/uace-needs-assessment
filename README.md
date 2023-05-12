@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![connect-publish](https://github.com/cred-norton-uarizona/uace-needs-assessment/actions/workflows/connect-publish.yaml/badge.svg)](https://github.com/cred-norton-uarizona/uace-needs-assessment/actions/workflows/connect-publish.yaml)
+[![DOI](https://zenodo.org/badge/598697516.svg)](https://zenodo.org/badge/latestdoi/598697516)
 <!-- badges: end -->
 
 The goal of uace-needs-assessment is to ...
