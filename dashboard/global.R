@@ -1,19 +1,35 @@
+
+# Load packages -----------------------------------------------------------
+# Shiny
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinycssloaders) #for loading indicator
-library(plotly)
+library(Cairo) # for graphics
+options(shiny.usecairo = TRUE)
+
+# General data wrangling
 library(tidyverse)
 library(stringr)
-library(Cairo) # for graphics
+
+# Using data as pins on Posit Connect
 library(pins)
 library(arrow)
+library(rsconnect)
+
+# For plots and maps
+library(plotly)
 library(ggforce)
-options(shiny.usecairo = TRUE)
 library(htmltools)
+library(maps)
+library(mapproj)
+
+# Not actually used in app
 library(usethis)
 # Use pr_finish to close old branches
 
+
+# Prepare Data ------------------------------------------------------------
 # read in pinned data
 board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
