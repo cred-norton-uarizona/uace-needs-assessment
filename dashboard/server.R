@@ -346,7 +346,7 @@ function(input, output, session) {
       filter(Response %in% 3:4) %>%
       summarize(totalEV = sum(n),
                 total = unique(total)) %>%
-      mutate(percentEV = round(totalEV/total*100)) %>%
+      mutate(percentEV = totalEV/total*100) %>% 
       arrange(desc(percentEV)) %>%
       left_join(labels, by = "Metric") %>%
       pull(Description)
