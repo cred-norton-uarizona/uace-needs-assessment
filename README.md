@@ -19,5 +19,10 @@ One easy way to do this from within R is with the `usethis` package and the `pr_
 `pr_init("branch-name")` begins a new branch locally, `pr_push()` helps you create a new pull request, and after it is merged you can use `pr_finish()` to clean things up.
 More about this workflow [here](https://usethis.r-lib.org/articles/pr-functions.html).
 
-If you use this code or want to cite this app, please use this citation as follows:
+If you'd like to cite this project, please give credit to the Community Research, Evaluaiton and Development (CRED) Team in UArizona's Norton School of Human Ecology.
+
+**UACE Statewide Needs Assessment 2022**
+Gildersleeve, R., Leih, R., deBlois, M., Tanoue, K. H., Avery, D., Dominguez, V., Walsh, M., & Ewinghill, T. (2023). UA Cooperative Extension Statewide Needs Assessment 2022 | Community Research, Evaluation and Development (CRED) Team in the Norton School of Human Ecology. https://norton.cals.arizona.edu/uace-needs-assessment-2022
+
+**If you use this code or want to cite this app, please use this citation as follows:**
 Ewinghill, Terrace, Scott, Eric R., & Guo, Jessica. (2023). Code for "University of Arizona Cooperative Extension Needs Assessment 2022 Dashboard" (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.7931081
