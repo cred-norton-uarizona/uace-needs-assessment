@@ -10,5 +10,5 @@ authors:
   - family-names: "Guo"
     given-names: "Jessica"
 url: https://github.com/cct-datascience/uace-needs-assessment
-#doi: TBD
-#date-released: TBD
+doi: 10.5281/zenodo.7931081 
+date-released: 2023-05-12

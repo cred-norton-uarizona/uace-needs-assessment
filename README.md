@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 [![connect-publish](https://github.com/cred-norton-uarizona/uace-needs-assessment/actions/workflows/connect-publish.yaml/badge.svg)](https://github.com/cred-norton-uarizona/uace-needs-assessment/actions/workflows/connect-publish.yaml)
-[![DOI](https://zenodo.org/badge/598697516.svg)](https://zenodo.org/badge/latestdoi/598697516)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7931081.svg)](https://doi.org/10.5281/zenodo.7931081)
 <!-- badges: end -->
 
 The goal of uace-needs-assessment is to ...
@@ -20,4 +20,4 @@ One easy way to do this from within R is with the `usethis` package and the `pr_
 More about this workflow [here](https://usethis.r-lib.org/articles/pr-functions.html).
 
 If you use this code or want to cite this app, please use this citation as follows:
-Ewinghill, Terrace, Scott, Eric R., & Guo, Jessica. (2023). Code for "University of Arizona Cooperative Extension Needs Assessment 2022 Dashboard" (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.7931082
+Ewinghill, Terrace, Scott, Eric R., & Guo, Jessica. (2023). Code for "University of Arizona Cooperative Extension Needs Assessment 2022 Dashboard" (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.7931081
