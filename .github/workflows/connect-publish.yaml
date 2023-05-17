@@ -13,7 +13,7 @@ jobs:
   connect-publish:
     runs-on: ubuntu-latest
     env:
-      APP_NAME: uace-needs-assessment #edit this to change the custom URL of the app
+      APP_NAME: uace-eric #edit this to change the custom URL of the app
       APP_DIR: dashboard #edit this if you rename or move the contents of the app
       APP_ACCESS: all #See https://github.com/rstudio/actions/tree/main/connect-publish#access-type
     steps:
@@ -43,4 +43,7 @@ jobs:
           access-type: ${{ env.APP_ACCESS }}
           dir: |
             ./${{ env.APP_DIR }}/:${{ env.APP_NAME }}
+          require-vanity-path: true
+          show-logs: true
+          
             
