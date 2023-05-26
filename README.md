@@ -5,7 +5,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7931081.svg)](https://doi.org/10.5281/zenodo.7931081)
 <!-- badges: end -->
 
-University of Arizona Extension (UACE) undertook a statewide needs assessment process in Fall 2022, led by the Community Research, Evaluation, and Development (CRED) team. The purpose of the needs assessment was to understand community needs and assets across the state as a basis for examining and prioritizing Extension activities to maximize our impact now and into the future. This code produces a Shiny interactive dashboard that will enable users to look at the results by different filters including sociodemographics, knowledge of and experience with Extension, and how much respondents said they knew about content areas.
+University of Arizona Extension (UACE) undertook a statewide needs assessment process in Fall 2022, led by the Community Research, Evaluation, and Development (CRED) team. The purpose of the needs assessment was to understand community needs and assets across the state as a basis for examining and prioritizing Extension activities to maximize our impact now and into the future. This code produces a `Shiny interactive dashboard` (https://viz.datascience.arizona.edu/uace-needs-assessment/) that will enable users to look at the results by different filters including sociodemographics, knowledge of and experience with Extension, and how much respondents said they knew about content areas.
 
 Learn more about this project here: https://norton.arizona.edu/uace-needs-assessment-2022
 
