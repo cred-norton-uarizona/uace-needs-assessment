@@ -43,4 +43,7 @@ jobs:
           access-type: ${{ env.APP_ACCESS }}
           dir: |
             ./${{ env.APP_DIR }}/:${{ env.APP_NAME }}
+          require-vanity-path: true
+          show-logs: true
+          
             
