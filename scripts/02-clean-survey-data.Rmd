@@ -1,0 +1,1490 @@
+---
+title: "SCENA Survey Cleaning"
+author: "Terrace Ewinghill"
+date: "10/18/2022"
+output: html_document
+---
+
+# LOAD PACKAGES AND THE DATA
+```{r}
+# Clear global environment
+rm(list=ls())
+
+# Load packages
+library(readxl)
+library(tidyverse)
+library(psych)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(stringr)
+
+
+# getwd()
+# Load the data and turn the empty strings into NAs
+data <- read.csv('path/to/file/here', na.strings = c("NA", ""))
+
+labels <- read_csv("path/to/file/here")
+
+
+
+```
+
+
+# EXPLORE THE DATA & FIX MINOR TYPOS
+```{r}
+
+# What are the variable names?
+# names(data)
+
+data <- data %>% rename(
+  `YD_8` = `YD_8Â.`,
+  `NR_10` = `NR_10Â.`
+  )
+ 
+# names(data)
+
+# What types of variables do we have in this data frame?
+# str(data)
+
+# This data frame is really large.  Perhaps using str() isn't the best option.
+
+# What are some overall trends in the data?  (Ex: mean, sd, etc.)
+# describe(data)
+
+
+
+```
+# FILTERS AND EXCLUSIONS
+
+```{r}
+
+# Keep the data labels as a reference
+data_labels <- data[1:2,]
+
+# class(data_labels)
+
+
+# Subset the data to exclude the data labels (which were the first two rows)
+# This code will need to be adjusted to include all rows for the full data set
+data <- data[3:3623,]
+
+# Select the relevant columns
+data <- data %>% select(c(UserLanguage, COUNTY:ZIP_2))
+
+# Exclude folks who have been identified as needed to be excluded.
+# I confirmed using the filter feature in Excel that this is working as intended
+data <- data %>% filter(is.na(EXCLUDE))
+
+```
+
+# CREATE NUMERIC EQUIVALENTS
+```{r}
+# For the likert scale questions, convert the answers to numeric versions
+# Identify which columns should be converted to numerical values
+data_numeric <- data %>% mutate_at(c(5:31, 33: 47,49:71,73:94,96:112), ~ case_when(
+  . == "A lot" ~ 3,
+  . == "Some" ~ 2,
+  . == "A little bit" ~ 1,
+  . == "Nothing" ~ 0,
+  . == "Extremely" ~ 4, 
+  . == "Very" ~ 3,
+  . == "Somewhat" ~ 2,
+  . == "A little" ~ 1, 
+  . == "No at all" ~ 0,
+  . == "Not at all" ~ 0,
+  . == "Don't know" ~ 999))
+
+# Recode the 999s as NA
+data_numeric[data_numeric==999] <- NA
+
+
+```
+
+
+# Rename UserLanguage
+```{r}
+
+data_numeric <- data_numeric %>%
+  mutate(UserLanguage = case_when(
+    UserLanguage == "EN" ~ "English",
+    UserLanguage == "ES" ~ "Spanish",
+    TRUE ~ UserLanguage
+  ))
+
+  
+```
+
+
+# COOPERATIVE EXTENSION EXPOSURE LABELS
+```{r}
+data_numeric <- data_numeric %>% 
+  mutate(
+    CE_EXPOSED = case_when(
+      is.na(DEM_1) & is.na(DEM_2) & is.na(DEM_3) & is.na(DEM_4) ~ "No Response",
+      DEM_1 == "Some" | DEM_1 == "A lot" | DEM_2 == "Yes" | DEM_3 == "Yes" | DEM_4 == "Yes" ~ "Yes",
+      TRUE ~ "No"
+    )
+  )
+
+data_numeric %>% count(CE_EXPOSED)
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    CE_USER = case_when(
+      is.na(DEM_2) & is.na(DEM_3) & is.na(DEM_4) ~ "No Response",
+      DEM_2 == "Yes" | DEM_3 == "Yes" | DEM_4 == "Yes" ~ "Yes",
+      TRUE ~ "No"
+    )
+  )
+
+```
+
+# CREATE VARIABLE FOR FOLKS WHO DID NOT RESPOND TO RACE/ETHNICITY
+```{r}
+# First, account for everyone who selected at least one race/ethnicity
+# Then account for folks who did not respond even in text form
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    `Prefer not to answer multiple choice` = if_else(
+      if_all(c(DEM_10_1, DEM_10_2, DEM_10_3, DEM_10_4, DEM_10_5, DEM_10_6, DEM_10_7), ~ is.na(.)),
+      1,
+      0
+    )
+  )
+
+# Options for checking the data
+# table(data_numeric$No Response)
+# data_NR_mc <- data_numeric %>% select(DEM_10_1: DEM_10_7, `Prefer not to answer multiple choice`) %>% print()
+
+```
+
+# RACE/ETHNICITY BINARY VARIABLES
+```{r}
+
+data_numeric <- data_numeric %>%
+  mutate(AIAN = case_when(
+    DEM_10_1 == "American Indian or Alaska Native" | RACE_ETH == "American Indian or Alaska Native" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+# Code to check whether this is working as intended
+# data_AIAN <- data_numeric %>% select(DEM_10_1, RACE_ETH,`Prefer not to answer multiple choice` , `American Indian or Alaska Native`)
+
+# data_AIAN %>% filter(is.na(RACE_ETH) & `Prefer not to answer multiple choice` == 1) %>% print()
+
+# data_numeric %>% count(DEM_10_2, sort = TRUE)
+
+# data_numeric <- data_numeric %>% mutate(
+#   `American Indian or Alaska Native` = ifelse(
+#     str_detect(DEM_10_1, pattern = "Native Hawaiian or Other Pacific Islander) | 
+#                   str_detect(RACE_ETH, pattern = "Native Hawaiian or Other Pacific Islander"),1,0))
+
+data_numeric <- data_numeric %>%
+  mutate(NHPI = case_when(
+    DEM_10_2 == "Native Hawaiian or Other Pacific Islander" | RACE_ETH == "Native Hawaiian or Other Pacific Islander" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+
+# data_NHPI <- data_numeric %>% select(DEM_10_2, RACE_ETH, `Native Hawaiian or Pacific Islander`)
+
+# data_numeric %>% count(DEM_10_3, sort = TRUE)
+
+# unique(data_numeric$RACE_ETH)
+
+
+data_numeric <- data_numeric %>%
+  mutate(WH = case_when(
+    DEM_10_3 == "White" | RACE_ETH == "White" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+# data_white <- data_numeric %>% select(DEM_10_3, RACE_ETH,`Prefer not to answer multiple choice`, White) %>% print()
+
+
+# data_numeric %>% count(DEM_10_4, sort = TRUE)
+
+data_numeric <- data_numeric %>%
+  mutate(AS = case_when(
+    DEM_10_4 == "Asian" | RACE_ETH == "Asian" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+# data_Asian <- data_numeric %>% select(DEM_10_4, RACE_ETH, Asian, `Prefer not to answer multiple choice`) %>% print()
+# data_numeric %>% count(DEM_10_5, sort = TRUE)
+
+data_numeric <- data_numeric %>%
+  mutate(BL = case_when(
+    DEM_10_5 == "Black or African American" | RACE_ETH == "Black or African American" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+
+# data_Black <- data_numeric %>% select(DEM_10_5, RACE_ETH, Black, `Prefer not to answer multiple choice`)
+
+# data_numeric %>% count(DEM_10_6, sort = TRUE)
+
+data_numeric <- data_numeric %>%
+  mutate(HL = case_when(
+    DEM_10_6 == "Hispanic or Latino" | RACE_ETH == "Hispanic or Latino" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+# data_Latinx <- data_numeric %>% select(DEM_10_6, RACE_ETH, Latinx)
+
+data_numeric <- data_numeric %>%
+  mutate(MR = case_when(RACE_ETH == "Multiracial" ~ 1,
+    `Prefer not to answer multiple choice` == 1 & (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ NA_real_,
+    TRUE ~ 0
+  ))
+  
+# data_numeric %>% count(DEM_10_7, sort = TRUE)
+
+# unique(data_numeric$RACE_ETH)
+
+# str(data_numeric)
+```
+
+
+# Prefer not to answer the race/ethnicity questions in general
+```{r}
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    NR = case_when(`Prefer not to answer multiple choice` == 1 & 
+                                      (RACE_ETH == "NR" | is.na(RACE_ETH)) ~ 1, 
+                                   TRUE ~ 0)
+  )
+
+# #data_numeric %>% 
+#   select(RACE_ETH, `Prefer not to answer multiple choice`, `Prefer not to answer`) %>% 
+#   print()
+
+
+```
+
+
+# ADD THE 'EXPERT' LABELS
+```{r}
+
+# We did not end up using these labels because we didn't think it represented 'experts' afterall
+# Keeping it here as a reference nonetheless
+
+# AGRICULTURE
+# LIVE – Farm OR Ranch  OR 
+# AG_KNW – 2 or more  OR 
+# DEM_12_1 = Farming OR 
+# DEM_12_2 = Ranching  
+
+data_numeric <- data_numeric %>% mutate(
+  AG_EXPERT = ifelse(LIVE == "Farm or ranch" |
+                AG_KNW >= 2 |
+                DEM_12_1 == "Farming" |
+                DEM_12_2 == "Ranching",1,0))
+
+# AG_exp_data <- data_numeric %>% select(LIVE, AG_KNW, DEM_12_1, DEM_12_2, AG_EXPERT)
+
+
+# EDUCATION
+# ED_KNW (a lot or some) OR 
+# DEM_12_4 OR
+# DEM_12_5 OR
+# DEM_12_6 OR
+# DEM_12_7 
+
+data_numeric <- data_numeric %>% mutate(
+  ED_EXPERT = ifelse(
+                YD_KNW >= 2 |
+                DEM_12_4 == "Early Education or Child Care" |
+                DEM_12_5 == "K-12 Education" |
+                DEM_12_6 == "Social or Community Services (Children and Youth)" |
+                DEM_12_7 == "Social or Community Services (Adults)",1,0))
+
+# ED_exp_data <- data_numeric %>% select(YD_KNW, DEM_12_4,DEM_12_5, DEM_12_6, DEM_12_7, ED_EXPERT)
+
+# HEALTH
+# FCHS_KNW(a lot or some) OR 
+# DEM_12_6 OR
+# DEM_12_7 OR
+# DEM_12_9 
+
+data_numeric <- data_numeric %>% mutate(
+  HLTH_EXPERT = ifelse(
+                FCHS_KNW >= 2 |
+                DEM_12_6 == "Social or Community Services (Children and Youth)" |
+                DEM_12_7 == "Social or Community Services (Adults)" |
+                DEM_12_9 == "Health",1,0))
+
+# HLTH_exp_dat <- data_numeric %>% select(FCHS_KNW, DEM_12_6, DEM_12_7, DEM_12_9, HLTH_EXPERT)
+
+# NATURAL RESOURCES
+# NR_KNOW(a lot or some) OR 
+# DEM_12_3 
+
+data_numeric <- data_numeric %>% mutate(
+  NR_EXPERT = ifelse(
+                NR_KNW >= 2 |
+                DEM_12_3 == "Forestry/Land or Resource Management",1,0))
+
+# NR_exp_data <- data_numeric %>% select(NR_KNW, DEM_12_3, NR_EXPERT)
+
+# COMMUNITY AND ECONOMIC DEVELOPMENT
+# CED_KNW(a lot or some) OR 
+# DEM_12_8 OR
+# DEM_12_6 OR
+# DEM_12_7
+
+data_numeric <- data_numeric %>% mutate(
+  CD_EXPERT = ifelse(
+                CED_KNW >= 2 |
+                DEM_12_6 == "Social or Community Services (Children and Youth)" |
+                DEM_12_7 == "Social or Community Services (Adults)" |
+                DEM_12_8 == "Public sector (e.g., government)",1,0))
+
+# CD_exp_data <- data_numeric %>% select(CED_KNW, DEM_12_6, DEM_12_6, DEM_12_7, DEM_12_8, CD_EXPERT)
+
+
+```
+
+# TOPICAL EXPERIENCE
+```{r}
+
+
+# AGRICULTURE
+# LIVE – Farm OR Ranch 
+# DEM_12_1 = Farming OR 
+# DEM_12_2 = Ranching  
+ 
+data_numeric <- data_numeric %>% 
+  mutate(
+    AG_EXPERIENCE = ifelse(
+      LIVE == "Farm or ranch" |
+      DEM_12_1 == "Farming" |
+      DEM_12_2 == "Ranching",
+      1,
+      ifelse(is.na(LIVE) | is.na(DEM_12_1) | is.na(DEM_12_2), NA_integer_, 0)
+    )
+  )
+
+
+
+
+# EDUCATION
+# DEM_12_4 OR
+# DEM_12_5 OR
+# DEM_12_6 OR
+# DEM_12_7 
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    ED_EXPERIENCE = ifelse(
+      is.na(DEM_12_4) & is.na(DEM_12_5) & is.na(DEM_12_6) & is.na(DEM_12_7),
+      NA_integer_,
+      ifelse(
+        DEM_12_4 == "Early Education or Child Care" |
+        DEM_12_5 == "K-12 Education" |
+        DEM_12_6 == "Social or Community Services (Children and Youth)" |
+        DEM_12_7 == "Social or Community Services (Adults)",
+        1,
+        0
+      )
+    )
+  )
+
+# HEALTH
+# DEM_12_6 OR
+# DEM_12_7 OR
+# DEM_12_9 
+
+data_numeric <- data_numeric %>% 
+  mutate(HLTH_EXPERIENCE = case_when(
+    DEM_12_6 == "Social or Community Services (Children and Youth)" |
+    DEM_12_7 == "Social or Community Services (Adults)" |
+    DEM_12_9 == "Health" ~ 1,
+    is.na(DEM_12_6) & is.na(DEM_12_7) & is.na(DEM_12_9) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+# NATURAL RESOURCES
+
+# DEM_12_3 
+
+data_numeric <- data_numeric %>% 
+  mutate(NR_EXPERIENCE = case_when(
+    is.na(DEM_12_3) ~ NA_real_,
+    DEM_12_3 == "Forestry/Land or Resource Management" ~ 1,
+    TRUE ~ 0
+  ))
+
+
+# NR_exp_data <- data_numeric %>% select(NR_KNW, DEM_12_3, NR_EXPERT)
+
+# COMMUNITY AND ECONOMIC DEVELOPMENT
+# DEM_12_8 OR
+# DEM_12_6 OR
+# DEM_12_7
+
+data_numeric <- data_numeric %>% 
+  mutate(CD_EXPERIENCE = case_when(
+    DEM_12_6 == "Social or Community Services (Children and Youth)" |
+    DEM_12_7 == "Social or Community Services (Adults)" |
+    DEM_12_8 == "Public sector (e.g., government)" ~ 1,
+    all(is.na(c(DEM_12_6, DEM_12_7, DEM_12_8))) ~ NA_real_,
+    TRUE ~ 0
+  ))
+
+```
+
+
+# TOPICAL KNOWLEDGE
+```{r}
+
+# AGRICULTURE
+ # AG_KNW – 2 or more
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    AG_KNOWLEDGE = if_else(is.na(AG_KNW), NA_real_,
+                           if_else(AG_KNW >= 2, 1, as.double(0)))
+  )
+
+# AG_knw_data <- data_numeric %>% select(AG_KNW, AG_KNOWLEDGE)
+
+
+# EDUCATION
+# ED_KNW (a lot or some) 
+
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    ED_KNOWLEDGE = if_else(is.na(YD_KNW), NA_real_,
+                           if_else(YD_KNW >= 2, 1, as.double(0)))
+  )
+
+# data_numeric <- data_numeric %>% mutate(
+#   ED_KNOWLEDGE = ifelse(
+#                 YD_KNW >= 2,1,0))
+
+# ED_knw_data <- data_numeric %>% select(YD_KNW, ED_KNOWLEDGE)
+
+# HEALTH
+# FCHS_KNW(a lot or some) 
+data_numeric <- data_numeric %>% 
+  mutate(
+    HLTH_KNOWLEDGE = if_else(is.na(FCHS_KNW), NA_real_,
+                           if_else(FCHS_KNW >= 2, 1, as.double(0)))
+  )
+
+# data_numeric <- data_numeric %>% mutate(
+#   HLTH_KNOWLEDGE = ifelse(
+#                 FCHS_KNW >= 2,1,0))
+
+# HLTH_knw_dat <- data_numeric %>% select(FCHS_KNW, HLTH_KNOWLEDGE)
+
+# NATURAL RESOURCES
+# NR_KNOW(a lot or some) 
+
+data_numeric <- data_numeric %>% 
+  mutate(
+    NR_KNOWLEDGE = if_else(is.na(NR_KNW), NA_real_,
+                           if_else(NR_KNW >= 2, 1, as.double(0)))
+  )
+
+# data_numeric <- data_numeric %>% mutate(
+#   NR_KNOWLEDGE = ifelse(
+#                 NR_KNW >= 2,1,0))
+
+# NR_knw_data <- data_numeric %>% select(NR_KNW, NR_KNOWLEDGE)
+
+# COMMUNITY AND ECONOMIC DEVELOPMENT
+# CED_KNW(a lot or some) 
+data_numeric <- data_numeric %>% 
+  mutate(
+    CD_KNOWLEDGE = if_else(is.na(CED_KNW), NA_real_,
+                           if_else(CED_KNW >= 2, 1, as.double(0)))
+  )
+# 
+# data_numeric <- data_numeric %>% mutate(
+#   CD_KNOWLEDGE = ifelse(
+#                 CED_KNW >= 2,1,0))
+
+# CD_knw_data <- data_numeric %>% select(CED_KNW, CD_KNOWLEDGE)
+
+
+```
+
+# LIVE COLLAPSED
+```{r}
+
+# To protect tribal data, we collapsed 'tribal' into rural for the public data dashboard
+
+# unique(data_numeric$LIVE)
+
+
+data_numeric <- data_numeric %>% mutate(
+  LIVE_V2 = case_when(
+    LIVE == "City" | LIVE == "Suburb of a city" ~ "Urban",
+    LIVE == "Rural (not a farm or ranch)" | LIVE == "Farm or ranch" | LIVE == "Small town" ~ "Rural",
+    LIVE == "Tribal lands" ~ "Tribal",
+    is.na(LIVE) ~ NA_character_,
+    TRUE ~ NA_character_
+  )
+)
+
+
+
+data_numeric <- data_numeric %>% mutate(
+  LIVE_V3 = case_when(
+    LIVE == "City" | LIVE == "Suburb of a city" ~ "Urban",
+    LIVE == "Rural (not a farm or ranch)" | LIVE == "Farm or ranch" | LIVE == "Small town" | LIVE == "Tribal lands" ~ "Rural",
+    is.na(LIVE) ~ NA_character_,
+    TRUE ~ NA_character_
+  )
+)
+
+  
+# LIVE_v2_data <- data_numeric %>% select(LIVE, LIVE_V2)
+
+
+```
+
+
+# BINARY VARIABLE FOR EXTREMELY AND VERY IMPORTANT FOR ALL TOPICS (not the KNW_ ones)
+# FCHS
+```{r}
+
+# FCHS extremely, very important 
+data_numeric <- data_numeric %>% mutate(
+  FCHS_1_Eimp = ifelse(
+                FCHS_1 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_1_EVimp = ifelse(
+                FCHS_1 >= 3,1,0))
+
+# FCHS_1_data <- data_numeric %>% select(FCHS_1, FCHS_1_Eimp, FCHS_1_EVimp)
+data_numeric <- data_numeric %>% mutate(
+  FCHS_2_Eimp = ifelse(
+                FCHS_2 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_2_EVimp = ifelse(
+                FCHS_2 >= 3,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_3_Eimp = ifelse(
+                FCHS_3 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_3_EVimp = ifelse(
+                FCHS_3 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_4_Eimp = ifelse(
+                FCHS_4 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_4_EVimp = ifelse(
+                FCHS_4 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_5_Eimp = ifelse(
+                FCHS_5 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_5_EVimp = ifelse(
+                FCHS_5 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_6_Eimp = ifelse(
+                FCHS_6 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_6_EVimp = ifelse(
+                FCHS_6 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_7_Eimp = ifelse(
+                FCHS_7 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_7_EVimp = ifelse(
+                FCHS_7 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_8_Eimp = ifelse(
+                FCHS_8 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_8_EVimp = ifelse(
+                FCHS_8 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_9_Eimp = ifelse(
+                FCHS_9 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_9_EVimp = ifelse(
+                FCHS_9 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_10_Eimp = ifelse(
+                FCHS_10 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_10_EVimp = ifelse(
+                FCHS_10 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_11_Eimp = ifelse(
+                FCHS_11 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_11_EVimp = ifelse(
+                FCHS_11 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_12_Eimp = ifelse(
+                FCHS_12 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_12_EVimp = ifelse(
+                FCHS_12 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_13_Eimp = ifelse(
+                FCHS_13 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_13_EVimp = ifelse(
+                FCHS_13 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_14_Eimp = ifelse(
+                FCHS_14 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_14_EVimp = ifelse(
+                FCHS_14 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_15_Eimp = ifelse(
+                FCHS_15 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_15_EVimp = ifelse(
+                FCHS_15 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_16_Eimp = ifelse(
+                FCHS_16 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_16_EVimp = ifelse(
+                FCHS_16 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_17_Eimp = ifelse(
+                FCHS_17 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_17_EVimp = ifelse(
+                FCHS_17 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_18_Eimp = ifelse(
+                FCHS_18 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_18_EVimp = ifelse(
+                FCHS_18 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_19_Eimp = ifelse(
+                FCHS_19 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_19_EVimp = ifelse(
+                FCHS_19 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_20_Eimp = ifelse(
+                FCHS_20 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_20_EVimp = ifelse(
+                FCHS_20 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_21_Eimp = ifelse(
+                FCHS_21 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_21_EVimp = ifelse(
+                FCHS_21 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_22_Eimp = ifelse(
+                FCHS_22 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_22_EVimp = ifelse(
+                FCHS_22 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_23_Eimp = ifelse(
+                FCHS_23 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_23_EVimp = ifelse(
+                FCHS_23 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_24_Eimp = ifelse(
+                FCHS_24 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_24_EVimp = ifelse(
+                FCHS_24 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_25_Eimp = ifelse(
+                FCHS_25 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_25_EVimp = ifelse(
+                FCHS_25 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  FCHS_26_Eimp = ifelse(
+                FCHS_26 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  FCHS_26_EVimp = ifelse(
+                FCHS_26 >= 3,1,0))
+
+
+
+```
+
+
+# BINARY VARIABLE FOR EXTREMELY AND VERY IMPORTANT FOR ALL TOPICS (not the KNW_ ones)
+# EDUCATION/YOUTH DEVELOPMENT
+```{r}
+data_numeric <- data_numeric %>% mutate(
+  YD_1_Eimp = ifelse(
+                YD_1 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_1_EVimp = ifelse(
+                YD_1 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_2_Eimp = ifelse(
+                YD_2 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_2_EVimp = ifelse(
+                YD_2 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_3_Eimp = ifelse(
+                YD_3 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_3_EVimp = ifelse(
+                YD_3 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_4_Eimp = ifelse(
+                YD_4 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_4_EVimp = ifelse(
+                YD_4 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_5_Eimp = ifelse(
+                YD_5 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_5_EVimp = ifelse(
+                YD_5 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_6_Eimp = ifelse(
+                YD_6 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_6_EVimp = ifelse(
+                YD_6 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_7_Eimp = ifelse(
+                YD_7 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_7_EVimp = ifelse(
+                YD_7 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_8_Eimp = ifelse(
+                YD_8 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_8_EVimp = ifelse(
+                YD_8 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_9_Eimp = ifelse(
+                YD_9 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_9_EVimp = ifelse(
+                YD_9 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_10_Eimp = ifelse(
+                YD_10 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_10_EVimp = ifelse(
+                YD_10 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_11_Eimp = ifelse(
+                YD_11 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_11_EVimp = ifelse(
+                YD_11 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_12_Eimp = ifelse(
+                YD_12 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_12_EVimp = ifelse(
+                YD_12 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_13_Eimp = ifelse(
+                YD_13 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_13_EVimp = ifelse(
+                YD_13 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  YD_14_Eimp = ifelse(
+                YD_14 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  YD_14_EVimp = ifelse(
+                YD_14 >= 3,1,0))
+```
+
+# BINARY VARIABLE FOR EXTREMELY AND VERY IMPORTANT FOR ALL TOPICS (not the KNW_ ones)
+# AGRICULTURE
+```{r}
+data_numeric <- data_numeric %>% mutate(
+  AG_1_Eimp = ifelse(AG_1 == 4, 1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_1_EVimp = ifelse(
+                AG_1 >= 3,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_2_Eimp = ifelse(
+                AG_2 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_2_EVimp = ifelse(
+                AG_2 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_3_Eimp = ifelse(
+                AG_3 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_3_EVimp = ifelse(
+                AG_3 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_4_Eimp = ifelse(
+                AG_4 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_4_EVimp = ifelse(
+                AG_4 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_5_Eimp = ifelse(
+                AG_5 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_5_EVimp = ifelse(
+                AG_5 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_6_Eimp = ifelse(
+                AG_6 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_6_EVimp = ifelse(
+                AG_6 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_7_Eimp = ifelse(
+                AG_7 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_7_EVimp = ifelse(
+                AG_7 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_8_Eimp = ifelse(
+                AG_8 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_8_EVimp = ifelse(
+                AG_8 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_9_Eimp = ifelse(
+                AG_9 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_9_EVimp = ifelse(
+                AG_9 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_10_Eimp = ifelse(
+                AG_10 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_10_EVimp = ifelse(
+                AG_10 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_11_Eimp = ifelse(
+                AG_11 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_11_EVimp = ifelse(
+                AG_11 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_12_Eimp = ifelse(
+                AG_12 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_12_EVimp = ifelse(
+                AG_12 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_13_Eimp = ifelse(
+                AG_13 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_13_EVimp = ifelse(
+                AG_13 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_14_Eimp = ifelse(
+                AG_14 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_14_EVimp = ifelse(
+                AG_14 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_15_Eimp = ifelse(
+                AG_15 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_15_EVimp = ifelse(
+                AG_15 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_16_Eimp = ifelse(
+                AG_16 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_16_EVimp = ifelse(
+                AG_16 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_17_Eimp = ifelse(
+                AG_17 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_17_EVimp = ifelse(
+                AG_17 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_18_Eimp = ifelse(
+                AG_18 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_18_EVimp = ifelse(
+                AG_18 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_19_Eimp = ifelse(
+                AG_19 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_19_EVimp = ifelse(
+                AG_19 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_20_Eimp = ifelse(
+                AG_20 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_20_EVimp = ifelse(
+                AG_20 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  AG_22_Eimp = ifelse(
+                AG_22 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  AG_22_EVimp = ifelse(
+                AG_22 >= 3,1,0))
+
+
+```
+# BINARY VARIABLE FOR EXTREMELY AND VERY IMPORTANT FOR ALL TOPICS (not the KNW_ ones)
+# NATURAL RESOURCES
+```{r}
+data_numeric <- data_numeric %>% mutate(
+  NR_1_Eimp = ifelse(
+                NR_1 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_1_EVimp = ifelse(
+                NR_1 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_2_Eimp = ifelse(
+                NR_2 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_2_EVimp = ifelse(
+                NR_2 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_3_Eimp = ifelse(
+                NR_3 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_3_EVimp = ifelse(
+                NR_3 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_4_Eimp = ifelse(
+                NR_4 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_4_EVimp = ifelse(
+                NR_4 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_5_Eimp = ifelse(
+                NR_5 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_5_EVimp = ifelse(
+                NR_5 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_6_Eimp = ifelse(
+                NR_6 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_6_EVimp = ifelse(
+                NR_6 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_7_Eimp = ifelse(
+                NR_7 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_7_EVimp = ifelse(
+                NR_7 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_8_Eimp = ifelse(
+                NR_8 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_8_EVimp = ifelse(
+                NR_8 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_9_Eimp = ifelse(
+                NR_9 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_9_EVimp = ifelse(
+                NR_9 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_10_Eimp = ifelse(
+                NR_10 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_10_EVimp = ifelse(
+                NR_10 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_11_Eimp = ifelse(
+                NR_11 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_11_EVimp = ifelse(
+                NR_11 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_12_Eimp = ifelse(
+                NR_12 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_12_EVimp = ifelse(
+                NR_12 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_13_Eimp = ifelse(
+                NR_13 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_13_EVimp = ifelse(
+                NR_13 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_14_Eimp = ifelse(
+                NR_14 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_14_EVimp = ifelse(
+                NR_14 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_15_Eimp = ifelse(
+                NR_15 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_15_EVimp = ifelse(
+                NR_15 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_16_Eimp = ifelse(
+                NR_16 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_16_EVimp = ifelse(
+                NR_16 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_17_Eimp = ifelse(
+                NR_17 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_17_EVimp = ifelse(
+                NR_17 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_18_Eimp = ifelse(
+                NR_18 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_18_EVimp = ifelse(
+                NR_18 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_19_Eimp = ifelse(
+                NR_19 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_19_EVimp = ifelse(
+                NR_19 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_20_Eimp = ifelse(
+                NR_20 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_20_EVimp = ifelse(
+                NR_20 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  NR_21_Eimp = ifelse(
+                NR_21 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  NR_21_EVimp = ifelse(
+                NR_21 >= 3,1,0))
+
+```
+
+# BINARY VARIABLE FOR EXTREMELY AND VERY IMPORTANT FOR ALL TOPICS (not the KNW_ ones)
+# COMMUNITY AND ECONOMIC DEVELOPMENT
+```{r}
+data_numeric <- data_numeric %>% mutate(
+  CED_1_Eimp = ifelse(
+                CED_1 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_1_EVimp = ifelse(
+                CED_1 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_2_Eimp = ifelse(
+                CED_2 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_2_EVimp = ifelse(
+                CED_2 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_3_Eimp = ifelse(
+                CED_3 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_3_EVimp = ifelse(
+                CED_3 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_4_Eimp = ifelse(
+                CED_4 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_4_EVimp = ifelse(
+                CED_4 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_5_Eimp = ifelse(
+                CED_5 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_5_EVimp = ifelse(
+                CED_5 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_6_Eimp = ifelse(
+                CED_6 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_6_EVimp = ifelse(
+                CED_6 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_7_Eimp = ifelse(
+                CED_7 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_7_EVimp = ifelse(
+                CED_7 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_8_Eimp = ifelse(
+                CED_8 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_8_EVimp = ifelse(
+                CED_8 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_9_Eimp = ifelse(
+                CED_9 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_9_EVimp = ifelse(
+                CED_9 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_10_Eimp = ifelse(
+                CED_10 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_10_EVimp = ifelse(
+                CED_10 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_11_Eimp = ifelse(
+                CED_11 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_11_EVimp = ifelse(
+                CED_11 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_12_Eimp = ifelse(
+                CED_12 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_12_EVimp = ifelse(
+                CED_12 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_13_Eimp = ifelse(
+                CED_13 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_13_EVimp = ifelse(
+                CED_13 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_14_Eimp = ifelse(
+                CED_14 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_14_EVimp = ifelse(
+                CED_14 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_15_Eimp = ifelse(
+                CED_15 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_15_EVimp = ifelse(
+                CED_15 >= 3,1,0))
+data_numeric <- data_numeric %>% mutate(
+  CED_16_Eimp = ifelse(
+                CED_16 == 4,1,0))
+
+data_numeric <- data_numeric %>% mutate(
+  CED_16_EVimp = ifelse(
+                CED_16 >= 3,1,0))
+
+```
+
+# Add NAs to "Prefer not to answer" and "I prefer not to answer" together
+```{r}
+data_numeric <- data_numeric %>% mutate(
+  DEM_13 = case_when(
+    is.na(DEM_13) ~ "Prefer not to answer",
+    DEM_13 == "I prefer not to answer" ~ "Prefer not to answer",
+    TRUE ~ DEM_13
+  )
+)
+
+```
+
+
+
+
+# Calculate 100% FPL using the variable DEM_13 (Household income) and DEM_5 (number of people living in household)
+```{r}
+
+data_numeric <- data_numeric %>% 
+  mutate(Low_Income_FPL_100 = case_when(
+    is.na(DEM_5) | is.na(DEM_13) ~ NA_real_,
+    DEM_5 == 1 & DEM_13 <= 14580 ~ 1,
+    DEM_5 == 2 & DEM_13 <= 19720 ~ 1,
+    DEM_5 == 3 & DEM_13 <= 24860 ~ 1,
+    DEM_5 == 4 & DEM_13 <= 30000 ~ 1,
+    DEM_5 == 5 & DEM_13 <= 35140 ~ 1,
+    DEM_5 == 6 & DEM_13 <= 40280 ~ 1,
+    DEM_5 == 7 & DEM_13 <= 45420 ~ 1,
+    DEM_5 == 8 & DEM_13 <= 50560 ~ 1,
+    DEM_5 == 9 & DEM_13 <= 55700 ~ 1,
+    DEM_5 == 10 & DEM_13 <= 60840 ~ 1,
+    DEM_5 == 11 & DEM_13 <= 65980 ~ 1,
+    DEM_5 == 12 & DEM_13 <= 71120 ~ 1,
+    DEM_5 == 13 & DEM_13 <= 76260 ~ 1,
+    DEM_5 == 14 & DEM_13 <= 81400 ~ 1,
+    TRUE ~ 0 
+  ))
+
+data_numeric$Low_Income_FPL_100 <- ifelse(data_numeric$Low_Income_FPL_100 == 0, "No", "Yes")
+
+
+
+
+```
+
+
+
+# Calculate 185% FPL using the variable DEM_13 (Household income) and DEM_5 (number of people living in household)
+```{r}
+
+data_numeric <- data_numeric %>% 
+  mutate(Low_Income_FPL_185 = case_when(
+    is.na(DEM_5) | is.na(DEM_13) ~ NA_real_, # Set NAs as missing values
+    DEM_5 == 1 & DEM_13 <= 26973 ~ 1,
+    DEM_5 == 2 & DEM_13 <= 36482 ~ 1,
+    DEM_5 == 3 & DEM_13 <= 45991 ~ 1,
+    DEM_5 == 4 & DEM_13 <= 55500 ~ 1,
+    DEM_5 == 5 & DEM_13 <= 65009 ~ 1,
+    DEM_5 == 6 & DEM_13 <= 74518 ~ 1,
+    DEM_5 == 7 & DEM_13 <= 84027 ~ 1,
+    DEM_5 == 8 & DEM_13 <= 93536 ~ 1,
+    DEM_5 == 9 & DEM_13 <= 103045 ~ 1,
+    DEM_5 == 10 & DEM_13 <= 112554 ~ 1,
+    DEM_5 == 11 & DEM_13 <= 122063 ~ 1,
+    DEM_5 == 12 & DEM_13 <= 131572 ~ 1,
+    DEM_5 == 13 & DEM_13 <= 141081 ~ 1,
+    DEM_5 == 14 & DEM_13 <= 150590 ~ 1,
+    TRUE ~ 0 
+  ))
+
+data_numeric$Low_Income_FPL_185 <- ifelse(data_numeric$Low_Income_FPL_185 == 0, "No", "Yes")
+
+
+```
+
+# Create a new bucket variable for AGE
+```{r}
+
+data_numeric <- data_numeric %>% 
+  mutate(AGE = case_when(
+    DEM_9 >= 14 & DEM_9 <= 24 ~ "14-24 years old",
+    DEM_9 >= 25 & DEM_9 <= 39 ~ "25-39 years old",
+    DEM_9 >= 40 & DEM_9 <= 54 ~ "40-54 years old",
+    DEM_9 >= 55 & DEM_9 <= 64 ~ "55-64 years old",
+    DEM_9 >= 65 ~ "65 years and older",
+    is.na(DEM_9) ~ "Prefer not to answer",
+    TRUE ~ "Prefer not to answer"
+  ))
+
+
+```
+
+# Add NA to "Prefer not to answer"
+```{r}
+
+data_numeric <- data_numeric %>% mutate(
+  DEM_11 = ifelse(is.na(DEM_11), "Prefer not to answer", DEM_11))
+
+```
+
+
+# Create a new educational attainment variable
+
+```{r}
+
+data_numeric <- data_numeric %>% mutate(
+  Bach_or_higher = case_when(
+    DEM_11 %in% c("Bachelor's degree", "Graduate or professional degree") ~ "Yes",
+    is.na(DEM_11) ~ "No Response",
+    TRUE ~ "No"
+  )
+)
+
+```
+
+# Fix Gender for data viz to show NAs as "no response"
+```{r}
+
+data_numeric <- data_numeric %>% mutate(
+  Gender = case_when(
+    GENDER == "Non-binary Woman" ~ "Non-binary",
+    GENDER == "Man" ~ "Man",
+    GENDER == "Woman" ~ "Woman",
+    GENDER == "Non-binary" ~ "Non-binary",
+    is.na(GENDER) ~ "No Response",
+    TRUE ~ NA_character_
+  )
+)
+
+```
+
+# Add a non-response to the information question
+```{r}
+
+data_numeric <- data_numeric %>% 
+  rowwise() %>%
+  mutate(DEM_14_NR = case_when(
+             all(is.na(c_across(starts_with("DEM_14")))) ~ "Prefer not to answer",
+             any(!is.na(c_across(starts_with("DEM_14")))) ~ NA_character_,
+             TRUE ~ NA_character_
+  ))
+
+
+data_DEM_14 <- data_numeric %>% select(DEM_14_1: DEM_14_NR)
+
+
+# If any of these is not NA, then mark the new value as NA.
+# If all of the DEM_14 columns are NA, then write "Prefer not to answer"
+
+```
+
+
+
+# data_numeric$Gender %>% count()
+
+# Only select the columns needed for the dashboard
+```{r}
+data_numeric <- data_numeric %>% 
+select(
+    COUNTY,
+    LIVE_V3,
+    UserLanguage,
+    DEM_11,
+    DEM_13,
+    DEM_14_1: DEM_14_10,
+    DEM_14_NR,
+    Low_Income_FPL_185,
+    Gender,
+    AGE,
+    Bach_or_higher,
+    ends_with("EVimp"),
+    AIAN,
+    AS,
+    BL,
+    HL,
+    MR,
+    NHPI,
+    WH,
+    NR,
+    ends_with("EXPERIENCE"),
+    ends_with("KNOWLEDGE"), 
+    CE_USER,
+    CE_EXPOSED,
+    all_of(labels$Metric)
+  )
+
+
+
+```
+
+
+# Write this data as a CSV
+```{r}
+# getwd()
+write_csv(data_numeric, "path/to/file/file_name_date.csv")
+
+```
+
+# Pin it to the board on R Studio Connect
+```{r}
+# For our team, we pinned the data on R Studio Connect which is password protected with two-step verification. Even so, this file did not contain identifiable or zipcode level data.
+
+library(pins)
+board <- board_connect()
+pin_write(board, data_numeric, "file-name", type = "arrow")
+
+```
+
