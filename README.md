@@ -38,42 +38,42 @@ Within this repository, there are the following folders:
 `app`
 
 `dashboard`
-    - labels file has the list of survey items
-    - ui, server, global scripts for the Shiny app
-    - www folder contains images
-    - az counties provides the shapefiles for the map on the demographics page
-    - rsconnect folder links to the location of the dashboard on R Studio Connect for UArizona
+ - labels file has the list of survey items
+ - ui, server, global scripts for the Shiny app
+ - www folder contains images
+ - az counties provides the shapefiles for the map on the demographics page
+ - rsconnect folder links to the location of the dashboard on R Studio Connect for UArizona
 
 `data`
-    - .gitignore file
-    - Arizona_County_Boundaries.geojson
-    - labels file has the list of survey items
+  - .gitignore file
+  - Arizona_County_Boundaries.geojson
+  - labels file has the list of survey items
 
 `notes`
-    - Survey for reference and variable names
-    - bytopicbarchart
-    - bytopicbarchart_plotly
-    - demographic_donuts_plotly
-    - demographics_page
-    - example-map
-    - test-map
-    - demographic_donuts
-    - leaflet-chloropleths
-    - sample-size-indicator
-    - top20ishbarchart
-    - selectize_prototype
+  - Survey for reference and variable names
+  - bytopicbarchart
+  - bytopicbarchart_plotly
+  - demographic_donuts_plotly
+  - demographics_page
+  - example-map
+  - test-map
+  - demographic_donuts
+  - leaflet-chloropleths
+  - sample-size-indicator
+  - top20ishbarchart
+  - selectize_prototype
     
 `renv`
-    - library folder
-    - staging folder
-    - .gitignore
-    - activate (R Script)
-    - settings.json
+  - library folder
+  - staging folder
+  - .gitignore
+  - activate (R Script)
+  - settings.json
 
 `scripts`
-    - Rhistory
-    - 01-clean-survey-data
-    - 02-wrangle-survey-data
+  - Rhistory
+  - 01-clean-survey-data
+  - 02-wrangle-survey-data
 
 Other files include:
 `.gitignore`
