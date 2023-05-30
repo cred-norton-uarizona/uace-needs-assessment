@@ -34,8 +34,7 @@ Ewinghill, T., Scott, E.R., & Guo, J.. (2023). Code for "University of Arizona C
 Within this repository, there are the following folders:
 
 `.github`
-
-`app`
+ - workflows (for automatic updates to the app)
 
 `dashboard`
  - labels file has the list of survey items
