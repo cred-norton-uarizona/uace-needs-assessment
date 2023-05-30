@@ -111,12 +111,17 @@ navbarPage(
       )
     )),
   
-  # Tab panel 3 - Demographics by county
+
+    # Tab panel 3 - Demographics by county
   tabPanel(
     "Demographics",
     fluidPage(
       fluidRow(column(width = 4,
                       box(
+                        div(
+                          "This tab presents key demographic characteristics of the respondents to the Needs Assessment Survey. When thinking about the survey results, it's important to think about 'who' is represented in the survey sample. To look more closely at the demographics for a particular region, use the dropdown filter to select one or more counties",
+                          style = "font-size: 14px; margin-bottom: 10px;"
+                        ),
                         selectizeGroupUI(
                           id = "county-filter",
                           params = list(
