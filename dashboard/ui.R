@@ -7,6 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 
+tags$head(includeScript("google_analytics.js"))
+
 # Application title
 navbarPage(
   title = "University of Arizona Cooperative Extension",
