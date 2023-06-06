@@ -314,6 +314,7 @@ function(input, output, session) {
                 type = 'bar',
                 orientation = 'h',
                 text = ~percent,
+                textangle = 0,
                 marker = list(color = "#1b587c")) %>% 
         # ~paste(percent, race_ethnicity)) %>%
         layout(title = "Race/Ethnicity",
@@ -518,6 +519,7 @@ function(input, output, session) {
     color_vec <- ifelse(ind == TRUE, "#2b556d", "#89c3e5")
 
     # Static plotly - shows all counties
+    # Static plotly - shows all counties
     data %>% 
       group_by(COUNTY) %>%
       summarize(count = n(),
@@ -528,10 +530,14 @@ function(input, output, session) {
               type = 'bar',
               orientation = 'h',
               text = ~percent,
+              textangle = 0,  # Set the text angle to 0 (horizontal)
               marker = list(color = color_vec)) %>% 
-      layout(title = "Respondents by County",
-             xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
-             yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE))
+      layout(
+        title = "Respondents by County",
+        xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
+        yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE)
+      )
+    
     
   })
   
@@ -722,6 +728,7 @@ function(input, output, session) {
                 type = 'bar',
                 orientation = 'h',
                 text = ~percent,
+                textangle = 0, # Set the text angle to horizontal
                 marker = list(color = "#1b587c")) %>% 
         # ~paste(percent, race_ethnicity)) %>%
         layout(title = "Race/Ethnicity",  
@@ -743,6 +750,7 @@ function(input, output, session) {
               type = 'bar',
               orientation = 'h',
               text = ~percent,
+              textangle = 0,
               marker = list(color = "#4e8542")) %>% 
       layout(title = "Age",
              xaxis = list(title = "", showgrid = FALSE, zeroline = FALSE),
@@ -772,6 +780,7 @@ function(input, output, session) {
               type = 'bar',
               orientation = 'h',
               text = ~percent,
+              textangle = 0,
               marker = list(color = "#9f2936")) %>%
       layout(title = "Educational Attainment",
              showlegend = FALSE,
@@ -802,6 +811,7 @@ function(input, output, session) {
               type = 'bar',
               orientation = 'h',
               text = ~percent,
+              textangle = 0,
               marker = list(color = "#594a6a")) %>%
       layout(title = "Household Income",
              showlegend = FALSE,
@@ -859,6 +869,7 @@ function(input, output, session) {
               type = 'bar',
               orientation = 'h',
               text = ~percent,
+              textangle = 0,
               # hoverinfo = "text",
               marker = list(color = "#594a6a")) %>% 
       layout(title = "Preferred Information Sources",
