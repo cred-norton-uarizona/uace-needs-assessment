@@ -11,9 +11,9 @@
 
 # Application title
 navbarPage(
-  tags$head(includeHTML("google_analytics.html")),
+  tags$head(includeHTML("google_tag_head.html")),
   title = "University of Arizona Cooperative Extension",
-  
+  tags$body(includeHTML("google_tag_body.html")),
   
   # Tab panel 1 - instructions
   tabPanel("Needs Assessment",
