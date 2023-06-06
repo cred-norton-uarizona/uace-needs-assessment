@@ -11,7 +11,7 @@
 
 # Application title
 navbarPage(
-  tags$head(includeScript("google_analytics.js")),
+  tags$head(includeHTML("google_analytics.html")),
   title = "University of Arizona Cooperative Extension",
   
   
