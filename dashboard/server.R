@@ -26,7 +26,8 @@ break_string2 <- function(x, n) {
 
 # Define server logic 
 function(input, output, session) {
-
+  telemetry$start_session() #minimal setup to track events
+  telemetry$log_click("my-filters") #log clicking on stuff
 # Filtering ---------------------------------------------------------------
   initial_filtered <- callModule(
     module = selectizeGroupServer,

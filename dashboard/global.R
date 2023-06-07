@@ -28,6 +28,9 @@ library(mapproj)
 library(usethis)
 # Use pr_finish to close old branches
 
+library(shiny.telemetry)
+data_store <- DataStorageLogFile$new("log.txt")
+telemetry <- Telemetry$new(data_storage = data_store) # initialize telemetry with default options
 
 # Prepare Data ------------------------------------------------------------
 # read in pinned data
