@@ -26,6 +26,8 @@ break_string2 <- function(x, n) {
 
 # Define server logic 
 function(input, output, session) {
+  telemetry$start_session() # 3. Minimal setup to track events
+  output$plot <- renderPlot({ hist(runif(input$n)),
 
 # Filtering ---------------------------------------------------------------
   initial_filtered <- callModule(
