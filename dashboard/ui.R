@@ -11,6 +11,9 @@
 
 # Application title
 navbarPage(
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
+  numericInput("n", "n", 1),
+  plotOutput('plot'),
   tags$head(includeHTML("google_tag_head.html")),
   title = "University of Arizona Cooperative Extension",
   tags$body(includeHTML("google_tag_body.html")),
