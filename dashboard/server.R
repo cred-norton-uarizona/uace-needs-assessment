@@ -88,7 +88,7 @@ function(input, output, session) {
         "Natural Resources" = "#1B587C",
         "Agriculture" = "#4E8542",
         "Community and Economic Development" = "#C09001",
-        "Education" = "#C65A11"
+        "Education and Youth Development" = "#C65A11"
       )
      
     # Do not print if N < = 6
@@ -419,7 +419,7 @@ function(input, output, session) {
     } else {
     if(input$topic == "Health and Well-Being"){
       colors <- c("Extremely" = "#30243c", "Very" = "#5a4a6a", "Somewhat" = "#a088b7", "A little" = "#bfafcf", "Not at all" = "#dfd7e7")
-      } else if(input$topic == "Education") {
+      } else if(input$topic == "Education and Youth Development") {
         colors <- c("Extremely" = "#783f05", "Very" = "#b45f07", "Somewhat" = "#f9b268", "A little" = "#fbcc9a", "Not at all" = "#fde5cd")
         } else if(input$topic == "Agriculture"){
           colors <- c("Extremely" = "#274221", "Very" = "#4e7345", "Somewhat" = "#8ec182", "A little" = "#b3d6ac", "Not at all" = "#d9ead5")
