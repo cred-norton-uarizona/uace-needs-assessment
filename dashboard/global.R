@@ -30,7 +30,7 @@ library(usethis)
 
 # Add Telemetry to Track App Use Online
 # install.packages("remotes")
-library(remotes)
+# library(remotes)
 # remotes::install_github("Appsilon/shiny.telemetry", dependencies = TRUE)
 library(shiny.telemetry)
 
