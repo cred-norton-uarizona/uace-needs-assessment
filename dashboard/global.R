@@ -28,6 +28,11 @@ library(mapproj)
 library(usethis)
 # Use pr_finish to close old branches
 
+# Add Telemetry to Track App Use Online
+# install.packages("remotes")
+# library(remotes)
+# remotes::install_github("Appsilon/shiny.telemetry", dependencies = TRUE)
+library(shiny.telemetry)
 
 # Prepare Data ------------------------------------------------------------
 # read in pinned data
