@@ -25,7 +25,7 @@ navbarPage(
               style = "font-weight: bold;"),
            p("Arizona Cooperative Extension conducted a statewide needs assessment survey in Fall 2022 to better understand community needs as a basis for examining and prioritizing Extension activities. Cooperative Extension users, topical experts, and members of the general public from each county were invited to participate via online or paper survey (available in English and Spanish). Participants were shown 99 items across topics relevant to Cooperative Extension and asked to rank how important it is to prioritize each item in their community on a 5-point scale."),
            br(),
-           p(HTML("Click this <a href='https://arizona.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4176d6af-67c3-412a-955d-b046011f9fb2&start=0'>link</a> to watch the dashboard video tutorial.")),
+           p(HTML("Click this <a href='https://youtu.be/Gp6icpGP0z8'>link</a> to watch the dashboard video tutorial.")),
            br(),
            p("How to use this dashboard: This dashboards enables users to look at the needs assessment results by different filters including:"),
            tags$ul(
