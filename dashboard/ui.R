@@ -174,6 +174,11 @@ navbarPage(
                  width = NULL)
       )
       )
+    )),
+  tabPanel(
+    "County Priorities Map",
+    fluidPage(
+      
     ))
 )
 
