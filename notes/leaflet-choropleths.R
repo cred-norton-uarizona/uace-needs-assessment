@@ -6,13 +6,14 @@ library(leaflet)
 board <- board_connect()
 data <- pin_read(board, "terrace/uace-na")
 
-data %>%
-  count(COUNTY) %>%
-  arrange(n) %>%
-  mutate(county = fct_inorder(COUNTY)) %>%
-  ggplot(aes(x = county, y = n)) +
-  geom_bar(stat = "identity") +
-  coord_flip()
+# # county bar chart
+# data %>%
+#   count(COUNTY) %>%
+#   arrange(n) %>%
+#   mutate(county = fct_inorder(COUNTY)) %>%
+#   ggplot(aes(x = county, y = n)) +
+#   geom_bar(stat = "identity") +
+#   coord_flip()
 
 # AZ counties shapefile
 # Download and unzip (once)
@@ -26,4 +27,10 @@ counties <- read_sf("dashboard/az_counties/azcounties.shp")
 str(counties)
 
 leaflet(counties) %>%
-  addPolygons()
+  addPolygons(
+    color = "black", # border color
+    weight = 1, # border thickness
+    fill = TRUE, # fill the counties
+    fillColor = "#2271b8", # county fill color,
+    fillOpacity = 0.5 # fill opacity
+  )
