@@ -34,3 +34,12 @@ leaflet(counties) %>%
     fillColor = "#2271b8", # county fill color,
     fillOpacity = 0.5 # fill opacity
   )
+
+
+# Need to join labels with the data frame with a pivot_longer()
+
+# Then, we can filter by Topic, Metric and then display description and percent
+
+# We have code that does this in Top 20 for 'extreme' plus 'very' 
+
+
