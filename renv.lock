@@ -18,15 +18,8 @@
     },
     "Cairo": {
       "Package": "Cairo",
-      "Version": "1.6-0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "grDevices",
-        "graphics"
-      ],
-      "Hash": "60aada7beac23aa3e9b219485d6b2da8"
+      "Version": "1.6-1",
+      "Source": "Repository"
     },
     "DBI": {
       "Package": "DBI",
@@ -231,28 +224,8 @@
     },
     "bslib": {
       "Package": "bslib",
-      "Version": "0.4.2.9000",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "bslib",
-      "RemoteUsername": "rstudio",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "4c3073a4bb4d135e21086253592ec857b99daed1",
-      "Requirements": [
-        "R",
-        "base64enc",
-        "cachem",
-        "grDevices",
-        "htmltools",
-        "jquerylib",
-        "jsonlite",
-        "memoise",
-        "mime",
-        "rlang",
-        "sass"
-      ],
-      "Hash": "0105c826d868c4e4701b662b22b02a5a"
+      "Version": "0.5.1",
+      "Source": "Repository"
     },
     "cachem": {
       "Package": "cachem",
