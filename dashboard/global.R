@@ -9,8 +9,12 @@ library(Cairo) # for graphics
 options(shiny.usecairo = TRUE)
 
 # General data wrangling
-library(tidyverse)
+# library(tidyverse)
+library(readr)
+library(dplyr)
+library(tidyr)
 library(stringr)
+library(forcats)
 
 # Using data as pins on Posit Connect
 library(pins)
@@ -18,6 +22,7 @@ library(arrow)
 library(rsconnect)
 
 # For plots and maps
+library(ggplot2)
 library(plotly)
 library(ggforce)
 library(htmltools)
