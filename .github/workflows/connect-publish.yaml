@@ -17,6 +17,7 @@ jobs:
       APP_NAME: uace-needs-assessment #edit this to change the custom URL of the app
       APP_DIR: dashboard #edit this if you rename or move the contents of the app
       APP_ACCESS: all #See https://github.com/rstudio/actions/tree/main/connect-publish#access-type
+      RENV_CONFIG_PAK_ENABLED: true
     steps:
       - uses: actions/checkout@v3
       - name: Install R
